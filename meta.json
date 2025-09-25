@@ -1,0 +1,15 @@
+{
+  "romanee-conti": {
+    "zh": "羅曼尼康帝",
+    "level": "Grand Cru",
+    "village": "Vosne-Romanée",
+    "notes": "DRC 獨占 Monopole，約 1.81 ha。",
+    "link": "https://example.com/romanee-conti"
+  },
+  "vosne-romanee-premier-cru-les-chaumes": {
+    "zh": "沃恩–羅曼尼一級園 Les Chaumes",
+    "level": "Premier Cru",
+    "village": "Vosne-Romanée",
+    "notes": "位於村莊南端，毗鄰 Nuits-Saint-Georges。"
+  }
+}
