@@ -88,16 +88,36 @@
         .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
         .replace(/[-\s\u2010-\u2015]+/g,'');
     }
-
+const GRAND_CRU = [
+  "Chambertin","Chambertin-Clos de Bèze","Mazis-Chambertin","Charmes-Chambertin",
+  "Griotte-Chambertin","Latricières-Chambertin","Ruchottes-Chambertin","Mazoyères-Chambertin",
+  "Clos de la Roche","Clos Saint-Denis","Clos des Lambrays","Clos de Tart","Bonnes-Mares","Musigny",
+  "Clos de Vougeot","Échezeaux","Grands Échezeaux","Richebourg",
+  "Romanée-Conti","La Romanée","Romanée-Saint-Vivant","La Tâche","La Grande Rue",
+  "Corton","Corton-Charlemagne","Charlemagne",
+  "Montrachet","Bâtard-Montrachet","Chevalier-Montrachet","Criots-Bâtard-Montrachet","Bienvenues-Bâtard-Montrachet",
+  "Chablis Grand Cru"
+];
+const GRAND_CRU_NORM = GRAND_CRU.map(n => norm(n));
     // —— 等級判斷：依 denom 文字判斷 GC / 1er / Village / 其他 ——
-    function classify(props){
-      const d = (props?.denom || '').toLowerCase();
-      if (d.includes('grand cru')) return 'GC';
-      if (d.includes('premier cru')) return 'PC';
-      // 粗略辨識 Village：含這些村名（可自行擴充）
-      if (/(vosne|gevrey|meursault|chambolle|puligny|chassagne|nuits|volnay|pommard|beaune|morey|vougeot|aloxe|pernand|savigny|santenay|marsannay|fixin|rully|mercurey|givry|montagny|pouilly|veran|vire|macon)/i.test(d)) return 'VI';
-      return 'RE';
-    }
+   function classify(props){
+  const dRaw = props?.denom || '';
+  const d = dRaw.toLowerCase();
+  const dn = norm(dRaw); // 去重音、去空白/連字號的版本
+
+  // 先用清單判斷 Grand Cru（就算文字裡沒寫 "grand cru" 也能命中）
+  const isGC = GRAND_CRU_NORM.some(gc => dn.includes(gc));
+  if (isGC || d.includes('grand cru')) return 'GC';
+
+  // 其餘用關鍵字判斷
+  if (d.includes('premier cru')) return 'PC';
+
+  // 粗略判斷 Village（可再擴充）
+  if (/(vosne|gevrey|meursault|chambolle|puligny|chassagne|nuits|volnay|pommard|beaune|morey|vougeot|aloxe|pernand|savigny|santenay|marsannay|fixin|rully|mercurey|givry|montagny|pouilly|veran|vire|macon)/i.test(d))
+    return 'VI';
+
+  return 'RE'; // Régionale / 其他
+}
 
     // —— 依等級回傳樣式（線色/填色） ——
     function styleByProps(props){
