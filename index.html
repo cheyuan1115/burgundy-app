@@ -83,11 +83,13 @@
     let rawFC=null, layer=null, META={};
 
     // 小工具：正規化（小寫、去重音、移除空白與各種連字號）
-    function norm(s=''){
-      return s.toLowerCase()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-        .replace(/[-\s\u2010-\u2015]+/g,'');
-    }
+ function norm(s=''){
+  return s.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[-\s\u2010-\u2015]+/g,'');
+}
+
+// 33 個官方 Grand Cru（不細分 Chablis 7 個 climat）
 const GRAND_CRU = [
   "Chambertin","Chambertin-Clos de Bèze","Mazis-Chambertin","Charmes-Chambertin",
   "Griotte-Chambertin","Latricières-Chambertin","Ruchottes-Chambertin","Mazoyères-Chambertin",
@@ -99,25 +101,17 @@ const GRAND_CRU = [
   "Chablis Grand Cru"
 ];
 const GRAND_CRU_NORM = GRAND_CRU.map(n => norm(n));
-    // —— 等級判斷：依 denom 文字判斷 GC / 1er / Village / 其他 ——
-   function classify(props){
-  const dRaw = props?.denom || '';
-  const d = dRaw.toLowerCase();
-  const dn = norm(dRaw); // 去重音、去空白/連字號的版本
 
-  // 先用清單判斷 Grand Cru（就算文字裡沒寫 "grand cru" 也能命中）
-  const isGC = GRAND_CRU_NORM.some(gc => dn.includes(gc));
-  if (isGC || d.includes('grand cru')) return 'GC';
-
-  // 其餘用關鍵字判斷
-  if (d.includes('premier cru')) return 'PC';
-
-  // 粗略判斷 Village（可再擴充）
-  if (/(vosne|gevrey|meursault|chambolle|puligny|chassagne|nuits|volnay|pommard|beaune|morey|vougeot|aloxe|pernand|savigny|santenay|marsannay|fixin|rully|mercurey|givry|montagny|pouilly|veran|vire|macon)/i.test(d))
-    return 'VI';
-
-  return 'RE'; // Régionale / 其他
-}
+// 常見村莊（只用來輔助判斷 Village）
+const VILLAGES = [
+  "Gevrey-Chambertin","Morey-Saint-Denis","Chambolle-Musigny","Vougeot","Vosne-Romanée","Nuits-Saint-Georges",
+  "Aloxe-Corton","Pernand-Vergelesses","Savigny-lès-Beaune","Beaune","Pommard","Volnay",
+  "Meursault","Puligny-Montrachet","Chassagne-Montrachet","Santenay",
+  "Marsannay","Fixin","Saint-Aubin","Saint-Romain","Auxey-Duresses",
+  "Rully","Mercurey","Givry","Montagny",
+  "Pouilly-Fuissé","Pouilly-Loché","Pouilly-Vinzelles","Saint-Véran","Viré-Clessé","Mâcon"
+];
+const VILLAGES_NORM = VILLAGES.map(n => norm(n));
 
     // —— 依等級回傳樣式（線色/填色） ——
     function styleByProps(props){
