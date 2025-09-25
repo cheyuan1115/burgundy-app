@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8" />
-  <title>Burgundy AOC (colored by level)</title>
+  <title>Burgundy AOC (完整版)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -11,7 +11,7 @@
     .ui {
       position:absolute; z-index:1000; top:12px; left:12px;
       background:#fff; padding:10px; border-radius:10px;
-      box-shadow:0 6px 20px rgba(0,0,0,.18); width:min(88vw,460px);
+      box-shadow:0 6px 20px rgba(0,0,0,.18); width:min(88vw,480px);
       font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
     }
     .row{display:flex; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap}
@@ -41,7 +41,7 @@
   <div class="ui">
     <div class="row">
       <b>篩選 AOC 名稱</b>
-      <span class="hint">（支援無重音/空白/連字號，如「romanee conti」）</span>
+      <span class="hint">（支援無重音/空白/連字號，例如「romanee conti」）</span>
     </div>
     <div class="row">
       <input id="q" type="text" placeholder="例如：Meursault / Nuits-Saint-Georges / Romanee Conti">
@@ -54,17 +54,19 @@
       <button class="btn" data-k="la romanee">La Romanée</button>
       <button class="btn" data-k="romanee-saint-vivant">Romanée-Saint-Vivant</button>
       <button class="btn" data-k="la tache">La Tâche</button>
+      <button class="btn" data-k="la grande rue">La Grande Rue</button>
       <button class="btn" data-k="richebourg">Richebourg</button>
-      <button class="btn" data-k="echezeaux">Echézeaux</button>
-      <button class="btn" data-k="grands-echezeaux">Grands-Echézeaux</button>
-      <button class="btn" data-k="montrachet">Montrachet</button>
-      <button class="btn" data-k="bonnes mares">Bonnes-Mares</button>
+      <button class="btn" data-k="echezeaux">Échezeaux</button>
+      <button class="btn" data-k="grands-echezeaux">Grands-Échezeaux</button>
+      <button class="btn" data-k="musigny">Musigny</button>
+      <button class="btn" data-k="bonnes-mares">Bonnes-Mares</button>
       <button class="btn" data-k="chambertin">Chambertin</button>
+      <button class="btn" data-k="chambertin-clos de beze">Chambertin-Clos de Bèze</button>
       <button class="btn" data-k="clos de vougeot">Clos de Vougeot</button>
+      <button class="btn" data-k="montrachet">Montrachet</button>
     </div>
   </div>
 
-  <!-- 圖例 -->
   <div class="legend">
     <div class="item"><span class="swatch gc"></span> Grand Cru</div>
     <div class="item"><span class="swatch pc"></span> Premier Cru</div>
@@ -73,7 +75,7 @@
   </div>
 
   <script>
-    // ===== 地圖 =====
+    // ===== 地圖初始化 =====
     const map = L.map('map').setView([47.0, 4.8], 9);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
@@ -82,51 +84,70 @@
 
     let rawFC=null, layer=null, META={};
 
-    // 小工具：正規化（小寫、去重音、移除空白與各種連字號）
- function norm(s=''){
-  return s.toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-    .replace(/[-\s\u2010-\u2015]+/g,'');
-}
+    // ===== 工具：正規化（小寫、去重音、移除空白與各種連字號） =====
+    function norm(s=''){
+      return s.toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+        .replace(/[-\s\u2010-\u2015]+/g,'');
+    }
 
-// 33 個官方 Grand Cru（不細分 Chablis 7 個 climat）
-const GRAND_CRU = [
-  "Chambertin","Chambertin-Clos de Bèze","Mazis-Chambertin","Charmes-Chambertin",
-  "Griotte-Chambertin","Latricières-Chambertin","Ruchottes-Chambertin","Mazoyères-Chambertin",
-  "Clos de la Roche","Clos Saint-Denis","Clos des Lambrays","Clos de Tart","Bonnes-Mares","Musigny",
-  "Clos de Vougeot","Échezeaux","Grands Échezeaux","Richebourg",
-  "Romanée-Conti","La Romanée","Romanée-Saint-Vivant","La Tâche","La Grande Rue",
-  "Corton","Corton-Charlemagne","Charlemagne",
-  "Montrachet","Bâtard-Montrachet","Chevalier-Montrachet","Criots-Bâtard-Montrachet","Bienvenues-Bâtard-Montrachet",
-  "Chablis Grand Cru"
-];
-const GRAND_CRU_NORM = GRAND_CRU.map(n => norm(n));
+    // —— 官方 33 Grand Cru（不細分 Chablis 7 個 climat）— 可自行增補 ——
+    const GRAND_CRU = [
+      "Chambertin","Chambertin-Clos de Bèze","Mazis-Chambertin","Charmes-Chambertin",
+      "Griotte-Chambertin","Latricières-Chambertin","Ruchottes-Chambertin","Mazoyères-Chambertin",
+      "Clos de la Roche","Clos Saint-Denis","Clos des Lambrays","Clos de Tart","Bonnes-Mares","Musigny",
+      "Clos de Vougeot","Échezeaux","Grands Échezeaux","Richebourg",
+      "Romanée-Conti","La Romanée","Romanée-Saint-Vivant","La Tâche","La Grande Rue",
+      "Corton","Corton-Charlemagne","Charlemagne",
+      "Montrachet","Bâtard-Montrachet","Chevalier-Montrachet","Criots-Bâtard-Montrachet","Bienvenues-Bâtard-Montrachet",
+      "Chablis Grand Cru"
+    ];
+    const GRAND_CRU_NORM = GRAND_CRU.map(n => norm(n));
 
-// 常見村莊（只用來輔助判斷 Village）
-const VILLAGES = [
-  "Gevrey-Chambertin","Morey-Saint-Denis","Chambolle-Musigny","Vougeot","Vosne-Romanée","Nuits-Saint-Georges",
-  "Aloxe-Corton","Pernand-Vergelesses","Savigny-lès-Beaune","Beaune","Pommard","Volnay",
-  "Meursault","Puligny-Montrachet","Chassagne-Montrachet","Santenay",
-  "Marsannay","Fixin","Saint-Aubin","Saint-Romain","Auxey-Duresses",
-  "Rully","Mercurey","Givry","Montagny",
-  "Pouilly-Fuissé","Pouilly-Loché","Pouilly-Vinzelles","Saint-Véran","Viré-Clessé","Mâcon"
-];
-const VILLAGES_NORM = VILLAGES.map(n => norm(n));
+    // —— 常見村莊（只用來輔助判斷 Village）— 可自行增補 ——
+    const VILLAGES = [
+      "Gevrey-Chambertin","Morey-Saint-Denis","Chambolle-Musigny","Vougeot","Vosne-Romanée","Nuits-Saint-Georges",
+      "Aloxe-Corton","Pernand-Vergelesses","Savigny-lès-Beaune","Beaune","Pommard","Volnay",
+      "Meursault","Puligny-Montrachet","Chassagne-Montrachet","Santenay",
+      "Marsannay","Fixin","Saint-Aubin","Saint-Romain","Auxey-Duresses",
+      "Rully","Mercurey","Givry","Montagny",
+      "Pouilly-Fuissé","Pouilly-Loché","Pouilly-Vinzelles","Saint-Véran","Viré-Clessé","Mâcon"
+    ];
+    const VILLAGES_NORM = VILLAGES.map(n => norm(n));
 
-    // —— 依等級回傳樣式（線色/填色） ——
+    // —— 等級判斷（精確比對）——
+    function classify(props){
+      const denom = props?.denom || '';
+      const names = denom.split(',').map(s=>s.trim()).filter(Boolean);
+      const namesN = names.map(norm);
+
+      // ① Grand Cru：必須「完整名稱」命中清單（或單名含 'grand cru'）
+      const hitGC = namesN.some(n => GRAND_CRU_NORM.includes(n));
+      if (hitGC || names.some(n => n.toLowerCase().includes('grand cru'))) return 'GC';
+
+      // ② Premier Cru：任一名稱含 "premier cru"
+      if (names.some(n => n.toLowerCase().includes('premier cru'))) return 'PC';
+
+      // ③ Village：任一名稱完整等於常見村莊
+      if (namesN.some(n => VILLAGES_NORM.includes(n))) return 'VI';
+
+      return 'RE'; // ④ 其他：Régionale / Crémant / etc.
+    }
+
+    // —— 上色 —— 
     function styleByProps(props){
-      const level = classify(props);
-      if (level === 'GC') return { color:'#cc0033', weight:1.6, fillColor:'#cc0033', fillOpacity:0.18 };
-      if (level === 'PC') return { color:'#ff7f0e', weight:1.4, fillColor:'#ff7f0e', fillOpacity:0.16 };
-      if (level === 'VI') return { color:'#1f77b4', weight:1.2, fillColor:'#1f77b4', fillOpacity:0.14 };
-      return { color:'#2ca02c', weight:1.0, fillColor:'#2ca02c', fillOpacity:0.12 }; // Régionale / 其他
+      const lvl = classify(props);
+      if (lvl === 'GC') return { color:'#cc0033', weight:1.6, fillColor:'#cc0033', fillOpacity:0.18 };
+      if (lvl === 'PC') return { color:'#ff7f0e', weight:1.4, fillColor:'#ff7f0e', fillOpacity:0.16 };
+      if (lvl === 'VI') return { color:'#1f77b4', weight:1.2, fillColor:'#1f77b4', fillOpacity:0.14 };
+      return { color:'#2ca02c', weight:1.0, fillColor:'#2ca02c', fillOpacity:0.12 };
     }
     function highlightStyle(props){
       const s = styleByProps(props);
-      return { ...s, weight: s.weight + 0.8, fillOpacity: Math.min(0.3, (s.fillOpacity||0.15)+0.1) };
+      return { ...s, weight: s.weight + 0.8, fillOpacity: Math.min(0.35, (s.fillOpacity||0.15)+0.12) };
     }
 
-    // 從逗點分隔的 denom 中挑 1~2 個「最具體名稱」
+    // —— 取 1~2 個最具體名稱（彈窗用）——
     function pickMostSpecific(denomStr=''){
       const list = denomStr.split(',').map(s=>s.trim()).filter(Boolean);
       const score = (name) => {
@@ -134,45 +155,59 @@ const VILLAGES_NORM = VILLAGES.map(n => norm(n));
         if (n.includes('grand cru')) return 100;
         if (n.includes('premier cru') && /premier cru\s+\S/.test(n)) return 80;
         if (n.includes('premier cru')) return 60;
-        if (/(vosne|gevrey|meursault|chambolle|puligny|chassagne|nuits|volnay|pommard|beaune|morey|vougeot|aloxe|pernand|savigny|santenay|marsannay|fixin|rully|mercurey|givry|montagny|pouilly|veran|vire|macon)/i.test(name)) return 40;
+        if (VILLAGES_NORM.includes(norm(name))) return 40;
         if (/bourgogne|crémant|cremant/i.test(name)) return 20;
         return 10;
       };
       return list.sort((a,b)=>score(b)-score(a)).slice(0,2);
     }
 
-    // 讀你的 meta.json（同資料夾）
+    // —— 載入你的 meta.json（可空）——
     fetch('./meta.json').then(r=>r.json()).then(j=>{ META = j || {}; }).catch(()=>{ META = {}; });
 
-    // 彈窗內容：先用 denom 名稱列表逐一比對 META，有就顯中文
+    // —— 彈窗：優先顯示你的 meta.json，其次顯示最具體名稱；可展開全部 —— 
     function popupHtmlFromProps(props){
       const denom = props?.denom || '';
-      const names = denom.split(',').map(s=>s.trim()).filter(Boolean)
-                         .sort((a,b)=>{ // 具體度排序
-                           const S=n=> (n.toLowerCase().includes('grand cru')?100:
-                                        (n.toLowerCase().includes('premier cru') && /premier cru\s+\S/.test(n.toLowerCase()))?80:
-                                        n.toLowerCase().includes('premier cru')?60:40);
-                           return S(b)-S(a);
-                         });
-      let hitName = null, hitMeta = null;
-      for (const n of names){
-        const k = norm(n);
-        if (META[k]) { hitName=n; hitMeta=META[k]; break; }
-      }
+      const names = denom.split(',').map(s=>s.trim()).filter(Boolean);
+      // 依具體度排序
+      const S = n => (n.toLowerCase().includes('grand cru')?100:
+                     (n.toLowerCase().includes('premier cru') && /premier cru\s+\S/.test(n.toLowerCase()))?80:
+                     n.toLowerCase().includes('premier cru')?60:
+                     VILLAGES_NORM.includes(norm(n))?40:20);
+      names.sort((a,b)=>S(b)-S(a));
+
+      // 嘗試用每個名稱去 META 命中
+      let hitName=null, hitMeta=null;
+      for (const n of names){ const k=norm(n); if(META[k]){hitName=n; hitMeta=META[k]; break;} }
+
       if (hitMeta){
         const link = hitMeta.link ? `<br><a href="${hitMeta.link}" target="_blank">更多</a>` : '';
+        const moreId = 'm'+Math.random().toString(36).slice(2);
+        const more = names.slice(1).length
+          ? `<div style="margin-top:6px">
+               <a href="#" onclick="const e=document.getElementById('${moreId}');e.style.display=e.style.display?'':'block';this.remove();return false;">+ 顯示更多適用名稱</a>
+               <div id="${moreId}" style="display:none;margin-top:4px;font-size:12px;color:#555">${names.slice(1).join('<br>')}</div>
+             </div>`
+          : '';
         return `<b>${hitMeta.zh || hitName}</b><br>
                 等級：${hitMeta.level || ''}${hitMeta.village ? `（${hitMeta.village}）` : ''}<br>
                 ${hitMeta.notes || ''}${link}
                 <hr style="border:none;border-top:1px solid #eee;margin:8px 0">
-                <small>地圖名稱：${hitName}</small>`;
+                <small>地圖名稱：${hitName}</small>${more}`;
       }else{
         const titles = pickMostSpecific(denom);
-        return `<b>${titles.join('<br>') || 'AOC'}</b>`;
+        const moreId = 'm'+Math.random().toString(36).slice(2);
+        const more = names.slice(2).length
+          ? `<div style="margin-top:6px">
+               <a href="#" onclick="const e=document.getElementById('${moreId}');e.style.display=e.style.display?'':'block';this.remove();return false;">+ 顯示更多適用名稱</a>
+               <div id="${moreId}" style="display:none;margin-top:4px;font-size:12px;color:#555">${names.slice(2).join('<br>')}</div>
+             </div>`
+          : '';
+        return `<b>${titles.join('<br>') || 'AOC'}</b>${more}`;
       }
     }
 
-    // 載入 GeoJSON 並依查詢重繪
+    // —— 載入 GeoJSON 並繪製 —— 
     fetch('./burgundy.geojson').then(r=>r.json()).then(fc => { rawFC = fc; draw(''); });
 
     function draw(queryRaw){
@@ -197,7 +232,7 @@ const VILLAGES_NORM = VILLAGES.map(n => norm(n));
       if (feats.length) map.fitBounds(layer.getBounds(), { padding:[20,20] });
     }
 
-    // UI 事件
+    // —— UI 事件 —— 
     const input = document.getElementById('q');
     const btnClear = document.getElementById('clear');
     const btnAll   = document.getElementById('all');
