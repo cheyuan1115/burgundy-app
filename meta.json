@@ -3,13 +3,42 @@
     "zh": "羅曼尼康帝",
     "level": "Grand Cru",
     "village": "Vosne-Romanée",
-    "notes": "DRC 獨占 Monopole，約 1.81 ha。",
-    "link": "https://example.com/romanee-conti"
+    "notes": "DRC 獨占 Monopole，約 1.81 ha。"
   },
-  "vosne-romanee-premier-cru-les-chaumes": {
+  "la romanee": {
+    "zh": "拉羅曼尼",
+    "level": "Grand Cru",
+    "village": "Vosne-Romanée",
+    "notes": "勃根地最小的 Grand Cru，約 0.85 ha。"
+  },
+  "romanee-saint-vivant": {
+    "zh": "羅曼尼-聖維旺",
+    "level": "Grand Cru",
+    "village": "Vosne-Romanée",
+    "notes": "多家酒莊共有。"
+  },
+  "vosne-romanee premier cru les chaumes": {
     "zh": "沃恩–羅曼尼一級園 Les Chaumes",
     "level": "Premier Cru",
     "village": "Vosne-Romanée",
-    "notes": "位於村莊南端，毗鄰 Nuits-Saint-Georges。"
+    "notes": "村莊南端，臨近 Nuits-Saint-Georges。"
+  },
+  "echezeaux": {
+    "zh": "艾雪索",
+    "level": "Grand Cru",
+    "village": "Flagey-Échezeaux",
+    "notes": "面積大、地塊多元。"
+  },
+  "grands-echezeaux": {
+    "zh": "大艾雪索",
+    "level": "Grand Cru",
+    "village": "Flagey-Échezeaux",
+    "notes": "位於 Clos de Vougeot 與 Échezeaux 之間。"
+  },
+  "montrachet": {
+    "zh": "蒙哈榭",
+    "level": "Grand Cru",
+    "village": "Puligny-Montrachet / Chassagne-Montrachet",
+    "notes": "世界級白酒名園。"
   }
 }
