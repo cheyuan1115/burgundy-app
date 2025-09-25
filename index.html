@@ -2,83 +2,141 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8" />
-  <title>Burgundy AOC (filterable)</title>
+  <title>Burgundy AOC (clean UI)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <style>
     html,body,#map{height:100%;margin:0}
-    .toolbar{
+    .ui {
       position:absolute; z-index:1000; top:12px; left:12px;
-      background:#fff; padding:8px 10px; border-radius:8px; box-shadow:0 2px 10px rgba(0,0,0,.2);
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+      background:#fff; padding:10px; border-radius:10px;
+      box-shadow:0 6px 20px rgba(0,0,0,.18); width:min(88vw,420px);
+      font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
     }
-    .toolbar input{width:260px; padding:6px 8px; border:1px solid #ccc; border-radius:6px}
-    .toolbar small{display:block; color:#666; margin-top:4px}
+    .row{display:flex; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap}
+    .ui input{
+      flex:1; padding:8px 10px; border:1px solid #ddd; border-radius:8px; font:inherit;
+    }
+    .btn {
+      padding:6px 10px; border:1px solid #ddd; border-radius:8px;
+      background:#f8f8f8; cursor:pointer; font:12px; white-space:nowrap;
+    }
+    .btn:hover{background:#eee}
+    .chips{display:flex; gap:6px; flex-wrap:wrap; max-height:96px; overflow:auto}
+    .hint{color:#666; font-size:12px}
   </style>
 </head>
 <body>
   <div id="map"></div>
-  <div class="toolbar">
-    <div><b>篩選 AOC 名稱</b></div>
-    <input id="q" type="text" placeholder="例如：Meursault / Nuits-Saint-Georges / Montrachet">
-    <small>留空＝顯示全部。點多邊形會只顯示命中的名稱。</small>
+
+  <div class="ui">
+    <div class="row">
+      <b>篩選 AOC 名稱</b>
+      <span class="hint">（支援無重音/空白/連字號，如「romanee conti」）</span>
+    </div>
+    <div class="row">
+      <input id="q" type="text" placeholder="例如：Meursault / Nuits-Saint-Georges / Romanee Conti">
+      <button class="btn" id="clear">清除</button>
+      <button class="btn" id="all">全部</button>
+    </div>
+    <div class="row hint">快捷（Grand Cru）</div>
+    <div class="row chips" id="chips">
+      <!-- 你可自由增減 -->
+      <button class="btn" data-k="romanee-conti">Romanée-Conti</button>
+      <button class="btn" data-k="la romanee">La Romanée</button>
+      <button class="btn" data-k="romanee-saint-vivant">Romanée-Saint-Vivant</button>
+      <button class="btn" data-k="la tache">La Tâche</button>
+      <button class="btn" data-k="richebourg">Richebourg</button>
+      <button class="btn" data-k="echezeaux">Echézeaux</button>
+      <button class="btn" data-k="grands-echezeaux">Grands-Echézeaux</button>
+      <button class="btn" data-k="montrachet">Montrachet</button>
+      <button class="btn" data-k="bonnes mares">Bonnes-Mares</button>
+      <button class="btn" data-k="chambertin">Chambertin</button>
+      <button class="btn" data-k="clos de vougeot">Clos de Vougeot</button>
+    </div>
   </div>
 
   <script>
+    // ===== 地圖 =====
     const map = L.map('map').setView([47.0, 4.8], 9);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19, attribution: '© OpenStreetMap · INAO/IGN data.geopf.fr (Open Licence 2.0)'
+      maxZoom: 19,
+      attribution: '© OpenStreetMap · INAO/IGN data.geopf.fr (Open Licence 2.0)'
     }).addTo(map);
 
+    const styleDefault  = { color:'#cc0033', weight:1.4, fillOpacity:0.14 };
+    const styleHighlight= { color:'#ff6600', weight:2.2, fillOpacity:0.22 };
     let rawFC=null, layer=null;
-    const defaultStyle = { color:'#cc0033', weight:1.2, fillOpacity:0.12 };
-    const highlightStyle = { color:'#ff6600', weight:2, fillOpacity:0.20 };
 
-    // 載入你的本地 GeoJSON（GitHub Pages 同資料夾）
-    fetch('./burgundy.geojson').then(r=>r.json()).then(fc=>{
-      rawFC = fc;
-      draw(); // 初始全顯示
-    });
+    // ===== 工具：正規化（小寫、去重音、移除空白與各種連字號） =====
+    function norm(s=''){
+      return s.toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+        .replace(/[-\s\u2010-\u2015]+/g,'');
+    }
 
-    // 依關鍵字重繪
-    function draw() {
-      const q = (document.getElementById('q').value || '').trim().toLowerCase();
+    // 從一串 denom（逗點分隔）挑「最具體」的 1~2 個名稱
+    function pickMostSpecific(denomStr=''){
+      const list = denomStr.split(',').map(s=>s.trim()).filter(Boolean);
+      const score = (name) => {
+        const n = name.toLowerCase();
+        if (n.includes('grand cru')) return 100;
+        if (n.includes('premier cru') && /premier cru\s+\S/.test(n)) return 80;
+        if (n.includes('premier cru')) return 60;
+        if (/vosne|gevrey|meursault|chambolle|puligny|chassagne|nuits|volnay|pommard|beaune|morey|vougeot|aloxe|pernand|savigny|santenay|marsannay|fixin|rully|mercurey|givry|montagny|pouilly|veran|vire|macon/i.test(name)) return 40;
+        if (/bourgogne|crémant|cremant/i.test(name)) return 20;
+        return 10;
+      };
+      return list.sort((a,b)=>score(b)-score(a)).slice(0,2);
+    }
+
+    // ===== 載入本地 GeoJSON 並初始繪製 =====
+    fetch('./burgundy.geojson')
+      .then(r=>r.json())
+      .then(fc => { rawFC = fc; draw(''); });
+
+    function draw(queryRaw){
+      const q = norm(queryRaw||'');
       if (layer) map.removeLayer(layer);
 
-      // 過濾：denom 含關鍵字才留
-      const feats = (rawFC.features||[]).filter(f=>{
-        const d = (f.properties?.denom || '').toLowerCase();
-        return q === '' || d.includes(q);
+      const feats = (rawFC?.features||[]).filter(f=>{
+        const d = f.properties?.denom || '';
+        return q==='' || norm(d).includes(q);
       });
 
-      const fc = { type:'FeatureCollection', features:feats };
-      layer = L.geoJSON(fc, {
-        style: defaultStyle,
+      layer = L.geoJSON({type:'FeatureCollection', features:feats}, {
+        style: styleDefault,
         onEachFeature: (f, l) => {
-          const denomList = (f.properties?.denom || '').split(',').map(s=>s.trim());
-          // 只顯示「命中的名稱」，若沒輸入關鍵字就顯示全部
-          const hit = (q==='') ? denomList : denomList.filter(name=>name.toLowerCase().includes(q));
-          l.bindPopup('<b>'+ (hit.join('<br>') || 'AOC') +'</b>');
-          l.on('mouseover', ()=> l.setStyle(highlightStyle));
-          l.on('mouseout',  ()=> l.setStyle(defaultStyle));
-          l.on('click',     ()=> { try { map.fitBounds(l.getBounds(), { maxZoom: 13 }); } catch(e){} });
+          const titles = pickMostSpecific(f.properties?.denom || '');
+          l.bindPopup('<b>'+ (titles.join('<br>') || 'AOC') +'</b>');
+          l.on('mouseover', ()=> l.setStyle(styleHighlight));
+          l.on('mouseout',  ()=> l.setStyle(styleDefault));
+          l.on('click',     ()=> { try { map.fitBounds(l.getBounds(), { maxZoom: 15 }); } catch(e){} });
         }
       }).addTo(map);
 
-      // 視野
       if (feats.length) map.fitBounds(layer.getBounds(), { padding:[20,20] });
     }
 
-    // 輸入框 debounce
-    (()=>{
-      const input = document.getElementById('q');
-      let t=null;
-      input.addEventListener('input', ()=>{
-        clearTimeout(t);
-        t=setTimeout(draw, 250);
-      });
-    })();
+    // ===== UI 事件 =====
+    const input = document.getElementById('q');
+    const btnClear = document.getElementById('clear');
+    const btnAll   = document.getElementById('all');
+    const chipsBox = document.getElementById('chips');
+
+    let t=null;
+    input.addEventListener('input', ()=>{
+      clearTimeout(t); t=setTimeout(()=> draw(input.value), 220);
+    });
+    btnClear.onclick = ()=> { input.value=''; draw(''); };
+    btnAll.onclick   = ()=> { input.value=''; draw(''); };
+    chipsBox.addEventListener('click', (e)=>{
+      const k = e.target?.dataset?.k;
+      if (!k) return;
+      input.value = k;
+      draw(k);
+    });
   </script>
 </body>
 </html>
