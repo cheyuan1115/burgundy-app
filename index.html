@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8" />
-  <title>Burgundy AOC (clean UI)</title>
+  <title>Burgundy AOC (with your metadata)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -11,7 +11,7 @@
     .ui {
       position:absolute; z-index:1000; top:12px; left:12px;
       background:#fff; padding:10px; border-radius:10px;
-      box-shadow:0 6px 20px rgba(0,0,0,.18); width:min(88vw,420px);
+      box-shadow:0 6px 20px rgba(0,0,0,.18); width:min(88vw,440px);
       font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
     }
     .row{display:flex; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap}
@@ -42,7 +42,6 @@
     </div>
     <div class="row hint">快捷（Grand Cru）</div>
     <div class="row chips" id="chips">
-      <!-- 你可自由增減 -->
       <button class="btn" data-k="romanee-conti">Romanée-Conti</button>
       <button class="btn" data-k="la romanee">La Romanée</button>
       <button class="btn" data-k="romanee-saint-vivant">Romanée-Saint-Vivant</button>
@@ -67,7 +66,7 @@
 
     const styleDefault  = { color:'#cc0033', weight:1.4, fillOpacity:0.14 };
     const styleHighlight= { color:'#ff6600', weight:2.2, fillOpacity:0.22 };
-    let rawFC=null, layer=null;
+    let rawFC=null, layer=null, META={};
 
     // ===== 工具：正規化（小寫、去重音、移除空白與各種連字號） =====
     function norm(s=''){
@@ -81,17 +80,39 @@
       const list = denomStr.split(',').map(s=>s.trim()).filter(Boolean);
       const score = (name) => {
         const n = name.toLowerCase();
-        if (n.includes('grand cru')) return 100;
-        if (n.includes('premier cru') && /premier cru\s+\S/.test(n)) return 80;
-        if (n.includes('premier cru')) return 60;
-        if (/vosne|gevrey|meursault|chambolle|puligny|chassagne|nuits|volnay|pommard|beaune|morey|vougeot|aloxe|pernand|savigny|santenay|marsannay|fixin|rully|mercurey|givry|montagny|pouilly|veran|vire|macon/i.test(name)) return 40;
-        if (/bourgogne|crémant|cremant/i.test(name)) return 20;
+        if (n.includes('grand cru')) return 100;                                         // Grand Cru
+        if (n.includes('premier cru') && /premier cru\s+\S/.test(n)) return 80;          // 具名 1er Cru
+        if (n.includes('premier cru')) return 60;                                        // 1er Cru 總稱
+        if (/vosne|gevrey|meursault|chambolle|puligny|chassagne|nuits|volnay|pommard|beaune|morey|vougeot|aloxe|pernand|savigny|santenay|marsannay|fixin|rully|mercurey|givry|montagny|pouilly|veran|vire|macon/i.test(name)) return 40; // Village
+        if (/bourgogne|crémant|cremant/i.test(name)) return 20;                          // Régionale / Crémant
         return 10;
       };
       return list.sort((a,b)=>score(b)-score(a)).slice(0,2);
     }
 
-    // ===== 載入本地 GeoJSON 並初始繪製 =====
+    // 讀你的 meta.json（同資料夾）
+    fetch('./meta.json').then(r=>r.json()).then(j=>{ META = j || {}; }).catch(()=>{ META = {}; });
+
+    // 產生彈窗：如果 meta.json 有資料就顯示你的內容，否則顯示地圖名稱
+    function popupHtmlFromProps(props){
+      const denom = props?.denom || '';
+      const titles = pickMostSpecific(denom);
+      const key = norm(titles[0] || denom.split(',')[0] || '');
+      const m = META[key];
+
+      if (m){
+        const link = m.link ? `<br><a href="${m.link}" target="_blank">更多</a>` : '';
+        return `<b>${m.zh || titles[0] || 'AOC'}</b><br>
+                等級：${m.level || ''}${m.village ? `（${m.village}）` : ''}<br>
+                ${m.notes || ''}${link}
+                <hr style="border:none;border-top:1px solid #eee;margin:8px 0">
+                <small>地圖名稱：${titles.join(' · ')}</small>`;
+      }else{
+        return `<b>${titles.join('<br>') || 'AOC'}</b>`;
+      }
+    }
+
+    // 載入本地 GeoJSON 並繪製
     fetch('./burgundy.geojson')
       .then(r=>r.json())
       .then(fc => { rawFC = fc; draw(''); });
@@ -108,8 +129,7 @@
       layer = L.geoJSON({type:'FeatureCollection', features:feats}, {
         style: styleDefault,
         onEachFeature: (f, l) => {
-          const titles = pickMostSpecific(f.properties?.denom || '');
-          l.bindPopup('<b>'+ (titles.join('<br>') || 'AOC') +'</b>');
+          l.bindPopup(popupHtmlFromProps(f.properties || {}));
           l.on('mouseover', ()=> l.setStyle(styleHighlight));
           l.on('mouseout',  ()=> l.setStyle(styleDefault));
           l.on('click',     ()=> { try { map.fitBounds(l.getBounds(), { maxZoom: 15 }); } catch(e){} });
@@ -119,7 +139,7 @@
       if (feats.length) map.fitBounds(layer.getBounds(), { padding:[20,20] });
     }
 
-    // ===== UI 事件 =====
+    // UI 事件
     const input = document.getElementById('q');
     const btnClear = document.getElementById('clear');
     const btnAll   = document.getElementById('all');
