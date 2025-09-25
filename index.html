@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8" />
-  <title>Burgundy AOC (with your metadata)</title>
+  <title>Burgundy AOC (colored by level)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -11,20 +11,28 @@
     .ui {
       position:absolute; z-index:1000; top:12px; left:12px;
       background:#fff; padding:10px; border-radius:10px;
-      box-shadow:0 6px 20px rgba(0,0,0,.18); width:min(88vw,440px);
+      box-shadow:0 6px 20px rgba(0,0,0,.18); width:min(88vw,460px);
       font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
     }
     .row{display:flex; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap}
-    .ui input{
-      flex:1; padding:8px 10px; border:1px solid #ddd; border-radius:8px; font:inherit;
-    }
-    .btn {
-      padding:6px 10px; border:1px solid #ddd; border-radius:8px;
-      background:#f8f8f8; cursor:pointer; font:12px; white-space:nowrap;
-    }
+    .ui input{ flex:1; padding:8px 10px; border:1px solid #ddd; border-radius:8px; font:inherit; }
+    .btn{ padding:6px 10px; border:1px solid #ddd; border-radius:8px; background:#f8f8f8; cursor:pointer; font:12px; white-space:nowrap;}
     .btn:hover{background:#eee}
     .chips{display:flex; gap:6px; flex-wrap:wrap; max-height:96px; overflow:auto}
     .hint{color:#666; font-size:12px}
+
+    /* 圖例 */
+    .legend{
+      position:absolute; z-index:1000; right:12px; bottom:12px;
+      background:#fff; padding:10px; border-radius:10px; box-shadow:0 6px 20px rgba(0,0,0,.18);
+      font:13px system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+    }
+    .legend .item{display:flex; align-items:center; gap:8px; margin:4px 0}
+    .swatch{width:16px; height:12px; border:2px solid #000; border-radius:3px}
+    .swatch.gc{border-color:#cc0033; background:#cc003322}
+    .swatch.pc{border-color:#ff7f0e; background:#ff7f0e33}
+    .swatch.vi{border-color:#1f77b4; background:#1f77b433}
+    .swatch.re{border-color:#2ca02c; background:#2ca02c33}
   </style>
 </head>
 <body>
@@ -56,6 +64,14 @@
     </div>
   </div>
 
+  <!-- 圖例 -->
+  <div class="legend">
+    <div class="item"><span class="swatch gc"></span> Grand Cru</div>
+    <div class="item"><span class="swatch pc"></span> Premier Cru</div>
+    <div class="item"><span class="swatch vi"></span> Village</div>
+    <div class="item"><span class="swatch re"></span> Régionale / 其他</div>
+  </div>
+
   <script>
     // ===== 地圖 =====
     const map = L.map('map').setView([47.0, 4.8], 9);
@@ -64,27 +80,48 @@
       attribution: '© OpenStreetMap · INAO/IGN data.geopf.fr (Open Licence 2.0)'
     }).addTo(map);
 
-    const styleDefault  = { color:'#cc0033', weight:1.4, fillOpacity:0.14 };
-    const styleHighlight= { color:'#ff6600', weight:2.2, fillOpacity:0.22 };
     let rawFC=null, layer=null, META={};
 
-    // ===== 工具：正規化（小寫、去重音、移除空白與各種連字號） =====
+    // 小工具：正規化（小寫、去重音、移除空白與各種連字號）
     function norm(s=''){
       return s.toLowerCase()
         .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
         .replace(/[-\s\u2010-\u2015]+/g,'');
     }
 
-    // 從一串 denom（逗點分隔）挑「最具體」的 1~2 個名稱
+    // —— 等級判斷：依 denom 文字判斷 GC / 1er / Village / 其他 ——
+    function classify(props){
+      const d = (props?.denom || '').toLowerCase();
+      if (d.includes('grand cru')) return 'GC';
+      if (d.includes('premier cru')) return 'PC';
+      // 粗略辨識 Village：含這些村名（可自行擴充）
+      if (/(vosne|gevrey|meursault|chambolle|puligny|chassagne|nuits|volnay|pommard|beaune|morey|vougeot|aloxe|pernand|savigny|santenay|marsannay|fixin|rully|mercurey|givry|montagny|pouilly|veran|vire|macon)/i.test(d)) return 'VI';
+      return 'RE';
+    }
+
+    // —— 依等級回傳樣式（線色/填色） ——
+    function styleByProps(props){
+      const level = classify(props);
+      if (level === 'GC') return { color:'#cc0033', weight:1.6, fillColor:'#cc0033', fillOpacity:0.18 };
+      if (level === 'PC') return { color:'#ff7f0e', weight:1.4, fillColor:'#ff7f0e', fillOpacity:0.16 };
+      if (level === 'VI') return { color:'#1f77b4', weight:1.2, fillColor:'#1f77b4', fillOpacity:0.14 };
+      return { color:'#2ca02c', weight:1.0, fillColor:'#2ca02c', fillOpacity:0.12 }; // Régionale / 其他
+    }
+    function highlightStyle(props){
+      const s = styleByProps(props);
+      return { ...s, weight: s.weight + 0.8, fillOpacity: Math.min(0.3, (s.fillOpacity||0.15)+0.1) };
+    }
+
+    // 從逗點分隔的 denom 中挑 1~2 個「最具體名稱」
     function pickMostSpecific(denomStr=''){
       const list = denomStr.split(',').map(s=>s.trim()).filter(Boolean);
       const score = (name) => {
         const n = name.toLowerCase();
-        if (n.includes('grand cru')) return 100;                                         // Grand Cru
-        if (n.includes('premier cru') && /premier cru\s+\S/.test(n)) return 80;          // 具名 1er Cru
-        if (n.includes('premier cru')) return 60;                                        // 1er Cru 總稱
-        if (/vosne|gevrey|meursault|chambolle|puligny|chassagne|nuits|volnay|pommard|beaune|morey|vougeot|aloxe|pernand|savigny|santenay|marsannay|fixin|rully|mercurey|givry|montagny|pouilly|veran|vire|macon/i.test(name)) return 40; // Village
-        if (/bourgogne|crémant|cremant/i.test(name)) return 20;                          // Régionale / Crémant
+        if (n.includes('grand cru')) return 100;
+        if (n.includes('premier cru') && /premier cru\s+\S/.test(n)) return 80;
+        if (n.includes('premier cru')) return 60;
+        if (/(vosne|gevrey|meursault|chambolle|puligny|chassagne|nuits|volnay|pommard|beaune|morey|vougeot|aloxe|pernand|savigny|santenay|marsannay|fixin|rully|mercurey|givry|montagny|pouilly|veran|vire|macon)/i.test(name)) return 40;
+        if (/bourgogne|crémant|cremant/i.test(name)) return 20;
         return 10;
       };
       return list.sort((a,b)=>score(b)-score(a)).slice(0,2);
@@ -93,29 +130,36 @@
     // 讀你的 meta.json（同資料夾）
     fetch('./meta.json').then(r=>r.json()).then(j=>{ META = j || {}; }).catch(()=>{ META = {}; });
 
-    // 產生彈窗：如果 meta.json 有資料就顯示你的內容，否則顯示地圖名稱
+    // 彈窗內容：先用 denom 名稱列表逐一比對 META，有就顯中文
     function popupHtmlFromProps(props){
       const denom = props?.denom || '';
-      const titles = pickMostSpecific(denom);
-      const key = norm(titles[0] || denom.split(',')[0] || '');
-      const m = META[key];
-
-      if (m){
-        const link = m.link ? `<br><a href="${m.link}" target="_blank">更多</a>` : '';
-        return `<b>${m.zh || titles[0] || 'AOC'}</b><br>
-                等級：${m.level || ''}${m.village ? `（${m.village}）` : ''}<br>
-                ${m.notes || ''}${link}
+      const names = denom.split(',').map(s=>s.trim()).filter(Boolean)
+                         .sort((a,b)=>{ // 具體度排序
+                           const S=n=> (n.toLowerCase().includes('grand cru')?100:
+                                        (n.toLowerCase().includes('premier cru') && /premier cru\s+\S/.test(n.toLowerCase()))?80:
+                                        n.toLowerCase().includes('premier cru')?60:40);
+                           return S(b)-S(a);
+                         });
+      let hitName = null, hitMeta = null;
+      for (const n of names){
+        const k = norm(n);
+        if (META[k]) { hitName=n; hitMeta=META[k]; break; }
+      }
+      if (hitMeta){
+        const link = hitMeta.link ? `<br><a href="${hitMeta.link}" target="_blank">更多</a>` : '';
+        return `<b>${hitMeta.zh || hitName}</b><br>
+                等級：${hitMeta.level || ''}${hitMeta.village ? `（${hitMeta.village}）` : ''}<br>
+                ${hitMeta.notes || ''}${link}
                 <hr style="border:none;border-top:1px solid #eee;margin:8px 0">
-                <small>地圖名稱：${titles.join(' · ')}</small>`;
+                <small>地圖名稱：${hitName}</small>`;
       }else{
+        const titles = pickMostSpecific(denom);
         return `<b>${titles.join('<br>') || 'AOC'}</b>`;
       }
     }
 
-    // 載入本地 GeoJSON 並繪製
-    fetch('./burgundy.geojson')
-      .then(r=>r.json())
-      .then(fc => { rawFC = fc; draw(''); });
+    // 載入 GeoJSON 並依查詢重繪
+    fetch('./burgundy.geojson').then(r=>r.json()).then(fc => { rawFC = fc; draw(''); });
 
     function draw(queryRaw){
       const q = norm(queryRaw||'');
@@ -127,11 +171,11 @@
       });
 
       layer = L.geoJSON({type:'FeatureCollection', features:feats}, {
-        style: styleDefault,
+        style: (f)=> styleByProps(f.properties || {}),
         onEachFeature: (f, l) => {
           l.bindPopup(popupHtmlFromProps(f.properties || {}));
-          l.on('mouseover', ()=> l.setStyle(styleHighlight));
-          l.on('mouseout',  ()=> l.setStyle(styleDefault));
+          l.on('mouseover', ()=> l.setStyle(highlightStyle(f.properties||{})));
+          l.on('mouseout',  ()=> l.setStyle(styleByProps(f.properties||{})));
           l.on('click',     ()=> { try { map.fitBounds(l.getBounds(), { maxZoom: 15 }); } catch(e){} });
         }
       }).addTo(map);
@@ -144,11 +188,8 @@
     const btnClear = document.getElementById('clear');
     const btnAll   = document.getElementById('all');
     const chipsBox = document.getElementById('chips');
-
     let t=null;
-    input.addEventListener('input', ()=>{
-      clearTimeout(t); t=setTimeout(()=> draw(input.value), 220);
-    });
+    input.addEventListener('input', ()=>{ clearTimeout(t); t=setTimeout(()=> draw(input.value), 220); });
     btnClear.onclick = ()=> { input.value=''; draw(''); };
     btnAll.onclick   = ()=> { input.value=''; draw(''); };
     chipsBox.addEventListener('click', (e)=>{
