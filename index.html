@@ -2,41 +2,83 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8" />
-  <title>Burgundy Offline Map</title>
+  <title>Burgundy AOC (filterable)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <style>
-    html, body, #map { height: 100%; margin: 0; }
+    html,body,#map{height:100%;margin:0}
+    .toolbar{
+      position:absolute; z-index:1000; top:12px; left:12px;
+      background:#fff; padding:8px 10px; border-radius:8px; box-shadow:0 2px 10px rgba(0,0,0,.2);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+    }
+    .toolbar input{width:260px; padding:6px 8px; border:1px solid #ccc; border-radius:6px}
+    .toolbar small{display:block; color:#666; margin-top:4px}
   </style>
 </head>
 <body>
   <div id="map"></div>
-  <script>
-    // 建立地圖（先 roughly 定位在勃根地）
-    const map = L.map('map').setView([47.0, 4.8], 8);
+  <div class="toolbar">
+    <div><b>篩選 AOC 名稱</b></div>
+    <input id="q" type="text" placeholder="例如：Meursault / Nuits-Saint-Georges / Montrachet">
+    <small>留空＝顯示全部。點多邊形會只顯示命中的名稱。</small>
+  </div>
 
-    // OSM 底圖
+  <script>
+    const map = L.map('map').setView([47.0, 4.8], 9);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '© OpenStreetMap contributors'
+      maxZoom: 19, attribution: '© OpenStreetMap · INAO/IGN data.geopf.fr (Open Licence 2.0)'
     }).addTo(map);
 
-    // 載入本地的 GeoJSON
-    fetch("./burgundy.geojson")
-      .then(r => r.json())
-      .then(data => {
-        const layer = L.geoJSON(data, {
-          style: { color: "red", weight: 1, fillOpacity: 0.1 },
-          onEachFeature: (feature, layer) => {
-            const props = feature.properties || {};
-            const text = props.denom || "AOC";
-            layer.bindPopup(`<b>${text}</b>`);
-          }
-        }).addTo(map);
+    let rawFC=null, layer=null;
+    const defaultStyle = { color:'#cc0033', weight:1.2, fillOpacity:0.12 };
+    const highlightStyle = { color:'#ff6600', weight:2, fillOpacity:0.20 };
 
-        // 自動縮放到資料範圍
-        map.fitBounds(layer.getBounds());
+    // 載入你的本地 GeoJSON（GitHub Pages 同資料夾）
+    fetch('./burgundy.geojson').then(r=>r.json()).then(fc=>{
+      rawFC = fc;
+      draw(); // 初始全顯示
+    });
+
+    // 依關鍵字重繪
+    function draw() {
+      const q = (document.getElementById('q').value || '').trim().toLowerCase();
+      if (layer) map.removeLayer(layer);
+
+      // 過濾：denom 含關鍵字才留
+      const feats = (rawFC.features||[]).filter(f=>{
+        const d = (f.properties?.denom || '').toLowerCase();
+        return q === '' || d.includes(q);
       });
+
+      const fc = { type:'FeatureCollection', features:feats };
+      layer = L.geoJSON(fc, {
+        style: defaultStyle,
+        onEachFeature: (f, l) => {
+          const denomList = (f.properties?.denom || '').split(',').map(s=>s.trim());
+          // 只顯示「命中的名稱」，若沒輸入關鍵字就顯示全部
+          const hit = (q==='') ? denomList : denomList.filter(name=>name.toLowerCase().includes(q));
+          l.bindPopup('<b>'+ (hit.join('<br>') || 'AOC') +'</b>');
+          l.on('mouseover', ()=> l.setStyle(highlightStyle));
+          l.on('mouseout',  ()=> l.setStyle(defaultStyle));
+          l.on('click',     ()=> { try { map.fitBounds(l.getBounds(), { maxZoom: 13 }); } catch(e){} });
+        }
+      }).addTo(map);
+
+      // 視野
+      if (feats.length) map.fitBounds(layer.getBounds(), { padding:[20,20] });
+    }
+
+    // 輸入框 debounce
+    (()=>{
+      const input = document.getElementById('q');
+      let t=null;
+      input.addEventListener('input', ()=>{
+        clearTimeout(t);
+        t=setTimeout(draw, 250);
+      });
+    })();
   </script>
 </body>
 </html>
