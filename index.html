@@ -23,11 +23,11 @@
     .swatch.vi{border-color:#1f77b4;background:#1f77b433}
     .swatch.re{border-color:#2ca02c;background:#2ca02c33}
     
-    /* ===== 手風琴選單樣式 ===== */
+    /* 手風琴選單樣式 */
     .accordion-title { background: #f1f1f1; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; }
     .accordion-title:hover { background: #e1e1e1; }
     .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; padding-top: 0; }
-    .accordion-content.show { max-height: 200px; /* 設定一個足夠大的高度 */ padding-top: 8px; }
+    .accordion-content.show { max-height: 200px; padding-top: 8px; }
   </style>
 </head>
 <body>
@@ -36,7 +36,6 @@
   <div class="ui">
     <div class="row">
       <b>篩選 AOC 名稱</b>
-      <span class="hint">（支援無重音/空白/連字號/撇號）</span>
     </div>
     <div class="row">
       <input id="q" type="text" placeholder="例如：Meursault / La Romanee">
@@ -45,10 +44,10 @@
     </div>
 
     <!-- =================================================================== -->
-    <!-- ===== 全新的手風琴式快捷選單 ===== -->
+    <!-- ===== 最終版的階層式快捷選單 ===== -->
     <!-- =================================================================== -->
     <div id="accordion-container">
-      <div class="accordion-title">快捷 (Grand Cru)</div>
+      <div class="accordion-title">Grand Cru</div>
       <div class="accordion-content">
         <div class="chips" id="chips">
           <button class="btn" data-k="romanee-conti">Romanée-Conti</button>
@@ -68,7 +67,7 @@
         </div>
       </div>
 
-      <div class="accordion-title">快捷 (Côte de Nuits 村莊)</div>
+      <div class="accordion-title">Côte de Nuits</div>
       <div class="accordion-content">
         <div class="chips" id="cdn-chips">
           <button class="btn" data-k="marsannay">Marsannay</button>
@@ -82,7 +81,7 @@
         </div>
       </div>
 
-      <div class="accordion-title">快捷 (Côte de Beaune 村莊)</div>
+      <div class="accordion-title">Côte de Beaune</div>
       <div class="accordion-content">
         <div class="chips" id="cdb-chips">
           <button class="btn" data-k="aloxe-corton">Aloxe-Corton</button>
@@ -99,7 +98,27 @@
         </div>
       </div>
       
-      <!-- 您可以仿照上面的格式，繼續添加夏隆內丘和馬貢的選單 -->
+      <div class="accordion-title">Côte Chalonnaise</div>
+      <div class="accordion-content">
+        <div class="chips" id="cdc-chips">
+          <button class="btn" data-k="bouzeron">Bouzeron</button>
+          <button class="btn" data-k="rully">Rully</button>
+          <button class="btn" data-k="mercurey">Mercurey</button>
+          <button class="btn" data-k="givry">Givry</button>
+          <button class="btn" data-k="montagny">Montagny</button>
+        </div>
+      </div>
+
+      <div class="accordion-title">Mâconnais</div>
+      <div class="accordion-content">
+        <div class="chips" id="mac-chips">
+          <button class="btn" data-k="pouilly-fuisse">Pouilly-Fuissé</button>
+          <button class="btn" data-k="pouilly-loche">Pouilly-Loché</button>
+          <button class="btn" data-k="pouilly-vinzelles">Pouilly-Vinzelles</button>
+          <button class="btn" data-k="saint-veran">Saint-Véran</button>
+          <button class="btn" data-k="vire-clesse">Viré-Clessé</button>
+        </div>
+      </div>
 
     </div>
   </div>
@@ -112,7 +131,7 @@
   </div>
 
   <script>
-    // ===== 1. 初始化地圖和變數 (不變) =====
+    // ===== 1. 初始化地圖和變數 =====
     const DATA_FILE = './burgundy.geojson';
     const map = L.map('map').setView([47.0, 4.8], 9);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -124,9 +143,11 @@
     const btnClear = document.getElementById('clear');
     const btnAll   = document.getElementById('all');
     const chipsBox = document.getElementById('chips');
-    // ===== 新增：獲取新的村莊按鈕容器 =====
+    // ===== 新增：獲取所有村莊按鈕的容器 =====
     const cdnChipsBox = document.getElementById('cdn-chips');
     const cdbChipsBox = document.getElementById('cdb-chips');
+    const cdcChipsBox = document.getElementById('cdc-chips');
+    const macChipsBox = document.getElementById('mac-chips');
 
     // ===== 2. 定義所有我們需要的工具函式 (不變) =====
     function norm(s=''){ return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/['’·.`´]+/g,'').replace(/[-\s\u00A0\u2000-\u200D\u2010-\u2015]+/g,'').trim(); }
@@ -173,7 +194,7 @@
         draw(k, true);
       });
 
-      // ===== 綁定新的村莊按鈕事件 =====
+      // ===== 綁定所有村莊按鈕的事件 =====
       const villageClickHandler = (e) => {
         const k = e.target?.dataset?.k;
         if (!k) return;
@@ -182,8 +203,10 @@
       };
       cdnChipsBox.addEventListener('click', villageClickHandler);
       cdbChipsBox.addEventListener('click', villageClickHandler);
+      cdcChipsBox.addEventListener('click', villageClickHandler);
+      macChipsBox.addEventListener('click', villageClickHandler);
 
-      // ===== 新增：手風琴選單功能 =====
+      // ===== 手風琴選單功能 =====
       document.querySelectorAll('.accordion-title').forEach(title => {
         title.addEventListener('click', () => {
           const content = title.nextElementSibling;
