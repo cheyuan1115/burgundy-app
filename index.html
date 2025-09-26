@@ -276,7 +276,20 @@
     const ALIASES = (() => { const pairs = [['romanee conti','romanee-conti'],['rc','romanee-conti'],['la tachi','la tache'],['latachi','la tache'],['richbourge','richebourg'],['la romanée','la romanee'],['laromanee','la romanee']]; const m={}; for (const [k,v] of pairs) m[norm(k)]=norm(v); return m; })();
     const GRAND_CRU = ["Chambertin","Chambertin-Clos de Bèze","Mazis-Chambertin","Charmes-Chambertin","Griotte-Chambertin","Latricières-Chambertin","Ruchottes-Chambertin","Mazoyères-Chambertin","Clos de la Roche","Clos Saint-Denis","Clos des Lambrays","Clos de Tart","Bonnes-Mares","Musigny","Clos de Vougeot","Échezeaux","Grands Échezeaux","Richebourg","Romanée-Conti","La Romanée","Romanée-Saint-Vivant","La Tâche","La Grande Rue","Corton","Corton-Charlemagne","Charlemagne","Montrachet","Bâtard-Montrachet","Chevalier-Montrachet","Criots-Bâtard-Montrachet","Bienvenues-Bâtard-Montrachet","Chablis Grand Cru"];
     const GRAND_CRU_NORM = GRAND_CRU.map(n => norm(n));
-    const VILLAGES = ["Gevrey-Chambertin","Morey-Saint-Denis","Chambolle-Musigny","Vougeot","Vosne-Romanée","Nuits-Saint-Georges","Aloxe-Corton","Pernand-Vergelesses","Savigny-lès-Beaune","Beaune","Pommard","Volnay","Meursault","Puligny-Montrachet","Chassagne-Montrachet","Santenay","Marsannay","Fixin","Saint-Aubin","Saint-Romain","Auxey-Duresses","Rully","Mercurey","Givry","Montagny","Pouilly-Fuissé","Pouilly-Loché","Pouilly-Vinzelles","Saint-Véran","Viré-Clessé","Mâcon"];
+const VILLAGES = [
+  // Chablis
+  "Chablis",
+  // Côte de Nuits
+  "Marsannay", "Fixin", "Gevrey-Chambertin", "Morey-Saint-Denis", "Chambolle-Musigny", "Vougeot", "Flagey-Échezeaux", "Vosne-Romanée", "Nuits-Saint-Georges", "Côte de Nuits-Villages",
+  // Côte de Beaune
+  "Ladoix", "Aloxe-Corton", "Pernand-Vergelesses", "Chorey-lès-Beaune", "Savigny-lès-Beaune", "Beaune", "Pommard", "Volnay", "Monthelie", "Auxey-Duresses", "Saint-Romain", "Meursault", "Blagny", "Puligny-Montrachet", "Chassagne-Montrachet", "Saint-Aubin", "Santenay", "Maranges", "Côte de Beaune-Villages",
+  // Côte Chalonnaise
+  "Bouzeron", "Rully", "Mercurey", "Givry", "Montagny",
+  // Mâconnais
+  "Pouilly-Fuissé", "Pouilly-Loché", "Pouilly-Vinzelles", "Saint-Véran", "Viré-Clessé", "Mâcon",
+  // Beaujolais Crus (often discussed with Burgundy)
+  "Saint-Amour", "Juliénas", "Chénas"
+];
     const VILLAGES_NORM = VILLAGES.map(n => norm(n));
     function classify(props){ const denom = props?.denom || ''; const names = denom.split(',').map(s=>s.trim()).filter(Boolean); const namesN = names.map(norm); if (namesN.some(n => GRAND_CRU_NORM.includes(n))) return 'GC'; if (names.some(n => n.toLowerCase().includes('grand cru'))) return 'GC'; if (names.some(n => n.toLowerCase().includes('premier cru'))) return 'PC'; if (namesN.some(n => VILLAGES_NORM.includes(n))) return 'VI'; return 'RE'; }
     function styleByProps(props){ const lvl = classify(props); if (lvl === 'GC') return { color:'#cc0033', weight:1.6, fillColor:'#cc0033', fillOpacity:0.18 }; if (lvl === 'PC') return { color:'#ff7f0e', weight:1.4, fillColor:'#ff7f0e', fillOpacity:0.16 }; if (lvl === 'VI') return { color:'#1f77b4', weight:1.2, fillColor:'#1f77b4', fillOpacity:0.14 }; return { color:'#2ca02c', weight:1.0, fillColor:'#2ca02c', fillOpacity:0.12 }; }
