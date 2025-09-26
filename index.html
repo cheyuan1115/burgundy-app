@@ -84,31 +84,33 @@
     function styleByProps(props){ const lvl = classify(props); if (lvl === 'GC') return { color:'#cc0033', weight:1.6, fillColor:'#cc0033', fillOpacity:0.18 }; if (lvl === 'PC') return { color:'#ff7f0e', weight:1.4, fillColor:'#ff7f0e', fillOpacity:0.16 }; if (lvl === 'VI') return { color:'#1f77b4', weight:1.2, fillColor:'#1f77b4', fillOpacity:0.14 }; return { color:'#2ca02c', weight:1.0, fillColor:'#2ca02c', fillOpacity:0.12 }; }
     function highlightStyle(props){ const s = styleByProps(props); return { ...s, weight: s.weight + 0.8, fillOpacity: Math.min(0.35, (s.fillOpacity||0.15)+0.12) }; }
     function pickMostSpecific(denomStr=''){ const list = denomStr.split(',').map(s=>s.trim()).filter(Boolean); const score = (name) => { const n = name.toLowerCase(); if (n.includes('grand cru')) return 100; if (n.includes('premier cru') && /premier cru\s+\S/.test(n)) return 80; if (n.includes('premier cru')) return 60; if (VILLAGES_NORM.includes(norm(name))) return 40; if (/bourgogne|crémant|cremant/i.test(name)) return 20; return 10; }; return list.sort((a,b)=>score(b)-score(a)).slice(0,2); }
+    
+    // ===== 載入 meta.json (不變) =====
     fetch('./meta.json').then(r=>r.json()).then(j=>{ META = j || {}; }).catch(()=>{ META = {}; });
+    
+    // ===== 彈窗內容 (不變) =====
     function popupHtmlFromProps(props){ const denom = props?.denom || ''; const names = denom.split(',').map(s=>s.trim()).filter(Boolean); const S = n => (n.toLowerCase().includes('grand cru')?100:(n.toLowerCase().includes('premier cru') && /premier cru\s+\S/.test(n.toLowerCase()))?80:n.toLowerCase().includes('premier cru')?60:VILLAGES_NORM.includes(norm(n))?40:20); names.sort((a,b)=>S(b)-S(a)); let hitName=null, hitMeta=null; for (const n of names){ const k=norm(n); if(META[k]){hitName=n; hitMeta=META[k]; break;} } if (hitMeta){ const link = hitMeta.link ? `<br><a href="${hitMeta.link}" target="_blank">更多</a>` : ''; const moreId = 'm'+Math.random().toString(36).slice(2); const more = names.slice(1).length ? `<div style="margin-top:6px"><a href="#" onclick="const e=document.getElementById('${moreId}');e.style.display=e.style.display?'':'block';this.remove();return false;">+ 顯示更多適用名稱</a><div id="${moreId}" style="display:none;margin-top:4px;font-size:12px;color:#555">${names.slice(1).join('<br>')}</div></div>` : ''; return `<b>${hitMeta.zh || hitName}</b><br>等級：${hitMeta.level || ''}${hitMeta.village ? `（${hitMeta.village}）` : ''}<br>${hitMeta.notes || ''}${link}<hr style="border:none;border-top:1px solid #eee;margin:8px 0"><small>地圖名稱：${hitName}</small>${more}`; }else{ const titles = pickMostSpecific(denom); const moreId = 'm'+Math.random().toString(36).slice(2); const more = names.slice(2).length ? `<div style="margin-top:6px"><a href="#" onclick="const e=document.getElementById('${moreId}');e.style.display=e.style.display?'':'block';this.remove();return false;">+ 顯示更多適用名稱</a><div id="${moreId}" style="display:none;margin-top:4px;font-size:12px;color:#555">${names.slice(2).join('<br>')}</div></div>` : ''; return `<b>${titles.join('<br>') || 'AOC'}</b>${more}`; } }
-    loadData().then(fc => { rawFC = fc; draw(''); });
 
     // ===================================================================
-    // ===== 搜尋引擎最終版：引入「精確模式 (exactMode)」=====
+    // ===== 順序修正：將「定義」放在「使用」之前 =====
     // ===================================================================
-    function draw(queryRaw, exactMode = false){ // 新增一個參數
+
+    // ===== 1. 先定義「載入資料」這個任務 =====
+    function loadData(){
+      return fetch(DATA_FILE).then(r=>r.json())
+        .catch(()=> fetch('./burgundy_full.geojson').then(r=>r.json()));
+    }
+
+    // ===== 2. 先定義「繪製地圖」這個任務 =====
+    function draw(queryRaw, exactMode = false){
       let q = norm(queryRaw || '');
       if (ALIASES[q]) q = ALIASES[q];
-
       if (layer) map.removeLayer(layer);
-
       const feats = (rawFC?.features || []).filter(f => {
         if (!q) return true;
-
         const denom = f.properties?.denom || '';
         const names = denom.split(',').map(s => s.trim()).filter(Boolean);
-        
-        // 在精確模式下，只比對「完全等於」
-        if (exactMode) {
-          return names.some(n => norm(n) === q);
-        }
-
-        // 在一般模式下，使用計分排序
+        if (exactMode) { return names.some(n => norm(n) === q); }
         const score = Math.max(...names.map(n => {
           const nn = norm(n);
           if (nn === q) return 100;
@@ -118,8 +120,6 @@
         }));
         return score > 0;
       });
-
-      // 如果是一般搜尋，我們依然進行排序
       if (!exactMode) {
         feats.sort((a, b) => {
           const scoreA = Math.max(...(a.properties.denom.split(',').map(n => norm(n) === q ? 100 : (norm(n).startsWith(q) ? 50 : (norm(n).includes(q) ? 10 : 0)))));
@@ -127,8 +127,6 @@
           return scoreB - scoreA;
         });
       }
-
-      // 繪製圖層 (不變)
       layer = L.geoJSON({ type:'FeatureCollection', features:feats }, {
         style: (f)=> styleByProps(f.properties || {}),
         onEachFeature: (f, l) => {
@@ -138,7 +136,6 @@
           l.on('click',     ()=> { try { map.fitBounds(l.getBounds(), { maxZoom: 16 }); } catch(e){} });
         }
       }).addTo(map);
-
       if (feats.length) {
         map.fitBounds(layer.getBounds(), { padding:[20,20] });
       } else {
@@ -146,25 +143,23 @@
       }
     }
 
-    // ===== UI 事件升級：快捷按鈕啟用「精確模式」=====
+    // ===== 3. 現在才開始執行任務 =====
+    loadData().then(fc => { rawFC = fc; draw(''); });
+
+    // ===== UI 事件 (不變) =====
     const input = document.getElementById('q');
     const btnClear = document.getElementById('clear');
     const btnAll   = document.getElementById('all');
     const chipsBox = document.getElementById('chips');
     let t=null;
-    
-    // 一般搜尋：使用模糊比對
     input.addEventListener('input', ()=>{ clearTimeout(t); t=setTimeout(()=> draw(input.value, false), 220); });
-    
     btnClear.onclick = ()=> { input.value=''; draw(''); };
     btnAll.onclick   = ()=> { input.value=''; draw(''); };
-    
-    // 快捷按鈕搜尋：啟用精確模式！
     chipsBox.addEventListener('click', (e)=>{
       const k = e.target?.dataset?.k;
       if (!k) return;
-      input.value = e.target.innerText; // 讓輸入框顯示正確的名字
-      draw(k, true); // 第二個參數設為 true，啟用精確模式！
+      input.value = e.target.innerText;
+      draw(k, true);
     });
   </script>
 </body>
