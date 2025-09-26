@@ -137,7 +137,7 @@
     <div class="item"><span class="swatch re"></span> Régionale / 其他</div>
   </div>
 
-   <script>
+    <script>
     // ===== 1. 初始化地圖和變數 (不變) =====
     const DATA_FILE = './burgundy.geojson';
     const map = L.map('map').setView([47.0, 4.8], 9);
@@ -164,11 +164,16 @@
     const VILLAGES = ["Chablis","Marsannay","Fixin","Gevrey-Chambertin","Morey-Saint-Denis","Chambolle-Musigny","Vougeot","Flagey-Échezeaux","Vosne-Romanée","Nuits-Saint-Georges","Côte de Nuits-Villages","Ladoix","Aloxe-Corton","Pernand-Vergelesses","Chorey-lès-Beaune","Savigny-lès-Beaune","Beaune","Pommard","Volnay","Monthelie","Auxey-Duresses","Saint-Romain","Meursault","Blagny","Puligny-Montrachet","Chassagne-Montrachet","Saint-Aubin","Santenay","Maranges","Côte de Beaune-Villages","Bouzeron","Rully","Mercurey","Givry","Montagny","Pouilly-Fuissé","Pouilly-Loché","Pouilly-Vinzelles","Saint-Véran","Viré-Clessé","Mâcon","Saint-Amour","Juliénas","Chénas"];
     const VILLAGES_NORM = VILLAGES.map(n => norm(n));
     
-    // ===== 升級版的 classify 函式 =====
+    // ===================================================================
+    // ===== 最終版 classify 函式：加入「覆蓋規則」=====
+    // ===================================================================
     function classify(props){
       const denom = props?.denom || '';
       const names = denom.split(',').map(s=>s.trim()).filter(Boolean);
       const namesN = names.map(norm);
+
+      // 優先級 0：手動指定覆蓋規則 (VIP 名單)
+      if (namesN.includes('closdevougeot')) return 'GC';
 
       // 優先級 1：檢查是否為特級園
       if (namesN.some(n => GRAND_CRU_NORM.includes(n))) return 'GC';
@@ -187,47 +192,7 @@
     function styleByProps(props){ const lvl = classify(props); if (lvl === 'GC') return { color:'#cc0033', weight:1.6, fillColor:'#cc0033', fillOpacity:0.18 }; if (lvl === 'PC') return { color:'#ff7f0e', weight:1.4, fillColor:'#ff7f0e', fillOpacity:0.16 }; if (lvl === 'VI') return { color:'#1f77b4', weight:1.2, fillColor:'#1f77b4', fillOpacity:0.14 }; return { color:'#2ca02c', weight:1.0, fillColor:'#2ca02c', fillOpacity:0.12 }; }
     function highlightStyle(props){ const s = styleByProps(props); return { ...s, weight: s.weight + 0.8, fillOpacity: Math.min(0.35, (s.fillOpacity||0.15)+0.12) }; }
     function popupHtmlFromProps(props){ const denom = props?.denom || ''; const names = denom.split(',').map(s=>s.trim()).filter(Boolean); const score = (name) => { const n = norm(name); if (GRAND_CRU_NORM.includes(n)) return 100; if (n.toLowerCase().includes('grand cru')) return 90; if (n.toLowerCase().includes('premier cru')) return 60; if (VILLAGES_NORM.includes(n)) return 40; return 10; }; names.sort((a, b) => score(b) - score(a)); let hitName = null, hitMeta = null; for (const n of names){ const k = norm(n); if (META[k]){ hitName = n; hitMeta = META[k]; break; } } if (hitMeta){ const link = hitMeta.link ? `<br><a href="${hitMeta.link}" target="_blank">更多</a>` : ''; const moreId = 'm'+Math.random().toString(36).slice(2); const otherNames = names.filter(n => n !== hitName); const more = otherNames.length ? `<div style="margin-top:6px"><a href="#" onclick="const e=document.getElementById('${moreId}');e.style.display=e.style.display?'':'block';this.remove();return false;">+ 顯示其他適用名稱</a><div id="${moreId}" style="display:none;margin-top:4px;font-size:12px;color:#555">${otherNames.join('<br>')}</div></div>` : ''; return `<b>${hitMeta.zh || hitName}</b><br>等級：${hitMeta.level || ''}${hitMeta.village ? `（${hitMeta.village}）` : ''}<br>${hitMeta.notes || ''}${link}<hr style="border:none;border-top:1px solid #eee;margin:8px 0"><small>地圖名稱：${hitName}</small>${more}`; } else { const titles = names.slice(0,2); const moreId = 'm'+Math.random().toString(36).slice(2); const more = names.slice(2).length ? `<div style="margin-top:6px"><a href="#" onclick="const e=document.getElementById('${moreId}');e.style.display=e.style.display?'':'block';this.remove();return false;">+ 顯示更多適用名稱</a><div id="${moreId}" style="display:none;margin-top:4px;font-size:12px;color:#555">${names.slice(2).join('<br>')}</div></div>` : ''; return `<b>${titles.join('<br>') || 'AOC'}</b>${more}`; } }
-    
-    // ===== 升級版的 draw 函式 =====
-    function draw(queryRaw, exactMode = false){
-      let q = norm(queryRaw || '');
-      if (ALIASES[q]) q = ALIASES[q];
-
-      if (layer) map.removeLayer(layer);
-
-      const feats = (rawFC?.features || []).filter(f => {
-        if (!q) return true;
-
-        const denom = f.properties?.denom || '';
-        const names = denom.split(',').map(s => s.trim()).filter(Boolean);
-        
-        // 在精確模式下，我們不再要求「完全等於」，而是要求「其中一個名字等於」
-        if (exactMode) {
-          return names.some(n => norm(n) === q);
-        }
-
-        // 一般模式不變
-        const score = Math.max(...names.map(n => {
-          const nn = norm(n);
-          if (nn === q) return 100;
-          if (nn.startsWith(q)) return 50;
-          if (nn.includes(q)) return 10;
-          return 0;
-        }));
-        return score > 0;
-      });
-
-      if (!exactMode && feats.length > 1) { // 只有在模糊搜尋且結果多於一個時才排序
-        feats.sort((a, b) => {
-          const scoreA = Math.max(...(a.properties.denom.split(',').map(n => norm(n) === q ? 100 : (norm(n).startsWith(q) ? 50 : (norm(n).includes(q) ? 10 : 0)))));
-          const scoreB = Math.max(...(b.properties.denom.split(',').map(n => norm(n) === q ? 100 : (norm(n).startsWith(q) ? 50 : (norm(n).includes(q) ? 10 : 0)))));
-          return scoreB - scoreA;
-        });
-      }
-      
-      layer = L.geoJSON({ type:'FeatureCollection', features:feats }, { style: (f)=> styleByProps(f.properties || {}), onEachFeature: (f, l) => { l.bindPopup(popupHtmlFromProps(f.properties || {})); l.on('mouseover', ()=> l.setStyle(highlightStyle(f.properties||{}))); l.on('mouseout',  ()=> l.setStyle(styleByProps(f.properties||{}))); l.on('click',     ()=> { try { map.fitBounds(l.getBounds(), { maxZoom: 16 }); } catch(e){} }); } }).addTo(map);
-      if (feats.length) { map.fitBounds(layer.getBounds(), { padding:[20,20] }); } else { console.warn('找不到結果：', queryRaw); }
-    }
+    function draw(queryRaw, exactMode = false){ let q = norm(queryRaw || ''); if (ALIASES[q]) q = ALIASES[q]; if (layer) map.removeLayer(layer); const feats = (rawFC?.features || []).filter(f => { if (!q) return true; const denom = f.properties?.denom || ''; const names = denom.split(',').map(s => s.trim()).filter(Boolean); if (exactMode) { return names.some(n => norm(n) === q); } const score = Math.max(...names.map(n => { const nn = norm(n); if (nn === q) return 100; if (nn.startsWith(q)) return 50; if (nn.includes(q)) return 10; return 0; })); return score > 0; }); if (!exactMode && feats.length > 1) { feats.sort((a, b) => { const scoreA = Math.max(...(a.properties.denom.split(',').map(n => norm(n) === q ? 100 : (norm(n).startsWith(q) ? 50 : (norm(n).includes(q) ? 10 : 0))))); const scoreB = Math.max(...(b.properties.denom.split(',').map(n => norm(n) === q ? 100 : (norm(n).startsWith(q) ? 50 : (norm(n).includes(q) ? 10 : 0))))); return scoreB - scoreA; }); } layer = L.geoJSON({ type:'FeatureCollection', features:feats }, { style: (f)=> styleByProps(f.properties || {}), onEachFeature: (f, l) => { l.bindPopup(popupHtmlFromProps(f.properties || {})); l.on('mouseover', ()=> l.setStyle(highlightStyle(f.properties||{}))); l.on('mouseout',  ()=> l.setStyle(styleByProps(f.properties||{}))); l.on('click',     ()=> { try { map.fitBounds(l.getBounds(), { maxZoom: 16 }); } catch(e){} }); } }).addTo(map); if (feats.length) { map.fitBounds(layer.getBounds(), { padding:[20,20] }); } else { console.warn('找不到結果：', queryRaw); } }
 
     // ===== 3. 建立主函式 (不變) =====
     async function main() {
@@ -258,6 +223,8 @@
     // ===== 4. 執行主函式 (不變) =====
     main();
   </script>
+</body>
+</html>
 </body>
 </html>
 </body>
