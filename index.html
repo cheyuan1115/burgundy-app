@@ -2,37 +2,26 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8" />
-  <title>Burgundy AOC (完整版)</title>
+  <title>Burgundy AOC（搜尋穩定版＋等級上色）</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <style>
     html,body,#map{height:100%;margin:0}
-    .ui {
-      position:absolute; z-index:1000; top:12px; left:12px;
-      background:#fff; padding:10px; border-radius:10px;
-      box-shadow:0 6px 20px rgba(0,0,0,.18); width:min(88vw,480px);
-      font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-    }
-    .row{display:flex; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap}
-    .ui input{ flex:1; padding:8px 10px; border:1px solid #ddd; border-radius:8px; font:inherit; }
-    .btn{ padding:6px 10px; border:1px solid #ddd; border-radius:8px; background:#f8f8f8; cursor:pointer; font:12px; white-space:nowrap;}
+    .ui{position:absolute;z-index:1000;top:12px;left:12px;background:#fff;padding:10px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.18);width:min(88vw,480px);font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+    .row{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+    .ui input{flex:1;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font:inherit}
+    .btn{padding:6px 10px;border:1px solid #ddd;border-radius:8px;background:#f8f8f8;cursor:pointer;font:12px;white-space:nowrap}
     .btn:hover{background:#eee}
-    .chips{display:flex; gap:6px; flex-wrap:wrap; max-height:96px; overflow:auto}
-    .hint{color:#666; font-size:12px}
-
-    /* 圖例 */
-    .legend{
-      position:absolute; z-index:1000; right:12px; bottom:12px;
-      background:#fff; padding:10px; border-radius:10px; box-shadow:0 6px 20px rgba(0,0,0,.18);
-      font:13px system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-    }
-    .legend .item{display:flex; align-items:center; gap:8px; margin:4px 0}
-    .swatch{width:16px; height:12px; border:2px solid #000; border-radius:3px}
-    .swatch.gc{border-color:#cc0033; background:#cc003322}
-    .swatch.pc{border-color:#ff7f0e; background:#ff7f0e33}
-    .swatch.vi{border-color:#1f77b4; background:#1f77b433}
-    .swatch.re{border-color:#2ca02c; background:#2ca02c33}
+    .chips{display:flex;gap:6px;flex-wrap:wrap;max-height:96px;overflow:auto}
+    .hint{color:#666;font-size:12px}
+    .legend{position:absolute;z-index:1000;right:12px;bottom:12px;background:#fff;padding:10px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.18);font:13px system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+    .legend .item{display:flex;align-items:center;gap:8px;margin:4px 0}
+    .swatch{width:16px;height:12px;border:2px solid #000;border-radius:3px}
+    .swatch.gc{border-color:#cc0033;background:#cc003322}
+    .swatch.pc{border-color:#ff7f0e;background:#ff7f0e33}
+    .swatch.vi{border-color:#1f77b4;background:#1f77b433}
+    .swatch.re{border-color:#2ca02c;background:#2ca02c33}
   </style>
 </head>
 <body>
@@ -41,10 +30,10 @@
   <div class="ui">
     <div class="row">
       <b>篩選 AOC 名稱</b>
-      <span class="hint">（支援無重音/空白/連字號，例如「romanee conti」）</span>
+      <span class="hint">（支援無重音/空白/連字號/撇號，例如「romanee conti」「la romanee」「richbourge」）</span>
     </div>
     <div class="row">
-      <input id="q" type="text" placeholder="例如：Meursault / Nuits-Saint-Georges / Romanee Conti">
+      <input id="q" type="text" placeholder="例如：Meursault / Nuits-Saint-Georges / La Romanee / Romanee Conti">
       <button class="btn" id="clear">清除</button>
       <button class="btn" id="all">全部</button>
     </div>
@@ -59,7 +48,7 @@
       <button class="btn" data-k="echezeaux">Échezeaux</button>
       <button class="btn" data-k="grands-echezeaux">Grands-Échezeaux</button>
       <button class="btn" data-k="musigny">Musigny</button>
-      <button class="btn" data-k="bonnes-mares">Bonnes-Mares</button>
+      <button class="btn" data-k="bonnes mares">Bonnes-Mares</button>
       <button class="btn" data-k="chambertin">Chambertin</button>
       <button class="btn" data-k="chambertin-clos de beze">Chambertin-Clos de Bèze</button>
       <button class="btn" data-k="clos de vougeot">Clos de Vougeot</button>
@@ -75,6 +64,9 @@
   </div>
 
   <script>
+    // ===== 設定：資料檔名 =====
+    const DATA_FILE = './burgundy_min.geojson'; // 若你用別的檔名，改這裡
+
     // ===== 地圖初始化 =====
     const map = L.map('map').setView([47.0, 4.8], 9);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -84,17 +76,31 @@
 
     let rawFC=null, layer=null, META={};
 
-    // ===== 工具：正規化（小寫、去重音、移除空白與各種連字號） =====
-function norm(s=''){
-  return s
-    .toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')     // 去重音
-    .replace(/['’·.`´]+/g,'')                            // 去撇號/點號
-    .replace(/[-\s\u00A0\u2000-\u200D\u2010-\u2015]+/g,'') // 去各種空白/連字號（含不換行空白等）
-    .trim();
-}
+    // ===== 正規化：小寫、去重音、去撇號/點號、移除各種空白/連字號 =====
+    function norm(s=''){
+      return s.toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g,'')             // 去重音
+        .replace(/['’·.`´]+/g,'')                                    // 去撇號/點號
+        .replace(/[-\s\u00A0\u2000-\u200D\u2010-\u2015]+/g,'')       // 去各種連字號/空白
+        .trim();
+    }
 
-    // —— 官方 33 Grand Cru（不細分 Chablis 7 個 climat）— 可自行增補 ——
+    // ===== 常見別名 / 錯拼（key/value 皆為正規化後的字串）=====
+    const ALIASES = (() => {
+      const pairs = [
+        // Romanée-Conti
+        ['romanee conti','romanee-conti'], ['romaneeconti','romanee-conti'], ['rc','romanee-conti'],
+        // La Tâche
+        ['la tachi','la tache'], ['la tach','la tache'], ['latachi','la tache'],
+        // Richebourg
+        ['richbourge','richebourg'], ['richeborug','richebourg'], ['richbourg','richebourg'],
+        // La Romanée
+        ['la romanée','la romanee'], ['la romanee','la romanee'], ['laromanee','la romanee']
+      ];
+      const m={}; for (const [k,v] of pairs) m[norm(k)]=norm(v); return m;
+    })();
+
+    // ===== 官方 33 Grand Cru（不細分 Chablis 7 climat）=====
     const GRAND_CRU = [
       "Chambertin","Chambertin-Clos de Bèze","Mazis-Chambertin","Charmes-Chambertin",
       "Griotte-Chambertin","Latricières-Chambertin","Ruchottes-Chambertin","Mazoyères-Chambertin",
@@ -107,7 +113,7 @@ function norm(s=''){
     ];
     const GRAND_CRU_NORM = GRAND_CRU.map(n => norm(n));
 
-    // —— 常見村莊（只用來輔助判斷 Village）— 可自行增補 ——
+    // ===== 常見 Village（輔助判斷用，可再擴充）=====
     const VILLAGES = [
       "Gevrey-Chambertin","Morey-Saint-Denis","Chambolle-Musigny","Vougeot","Vosne-Romanée","Nuits-Saint-Georges",
       "Aloxe-Corton","Pernand-Vergelesses","Savigny-lès-Beaune","Beaune","Pommard","Volnay",
@@ -118,26 +124,26 @@ function norm(s=''){
     ];
     const VILLAGES_NORM = VILLAGES.map(n => norm(n));
 
-    // —— 等級判斷（精確比對）——
+    // ===== 等級判斷（精確比對單一名稱）=====
     function classify(props){
       const denom = props?.denom || '';
       const names = denom.split(',').map(s=>s.trim()).filter(Boolean);
       const namesN = names.map(norm);
 
-      // ① Grand Cru：必須「完整名稱」命中清單（或單名含 'grand cru'）
-      const hitGC = namesN.some(n => GRAND_CRU_NORM.includes(n));
-      if (hitGC || names.some(n => n.toLowerCase().includes('grand cru'))) return 'GC';
+      // Grand Cru：完整名稱命中清單，或單名含 'grand cru'
+      if (namesN.some(n => GRAND_CRU_NORM.includes(n))) return 'GC';
+      if (names.some(n => n.toLowerCase().includes('grand cru')))   return 'GC';
 
-      // ② Premier Cru：任一名稱含 "premier cru"
+      // Premier Cru：任一單名含 'premier cru'
       if (names.some(n => n.toLowerCase().includes('premier cru'))) return 'PC';
 
-      // ③ Village：任一名稱完整等於常見村莊
+      // Village：任一單名完整等於村莊
       if (namesN.some(n => VILLAGES_NORM.includes(n))) return 'VI';
 
-      return 'RE'; // ④ 其他：Régionale / Crémant / etc.
+      return 'RE';
     }
 
-    // —— 上色 —— 
+    // ===== 樣式（依等級上色）=====
     function styleByProps(props){
       const lvl = classify(props);
       if (lvl === 'GC') return { color:'#cc0033', weight:1.6, fillColor:'#cc0033', fillOpacity:0.18 };
@@ -150,7 +156,7 @@ function norm(s=''){
       return { ...s, weight: s.weight + 0.8, fillOpacity: Math.min(0.35, (s.fillOpacity||0.15)+0.12) };
     }
 
-    // —— 取 1~2 個最具體名稱（彈窗用）——
+    // ===== 取 1~2 個最具體名稱（彈窗用）=====
     function pickMostSpecific(denomStr=''){
       const list = denomStr.split(',').map(s=>s.trim()).filter(Boolean);
       const score = (name) => {
@@ -165,21 +171,19 @@ function norm(s=''){
       return list.sort((a,b)=>score(b)-score(a)).slice(0,2);
     }
 
-    // —— 載入你的 meta.json（可空）——
+    // ===== 載入你的 meta.json（可空）=====
     fetch('./meta.json').then(r=>r.json()).then(j=>{ META = j || {}; }).catch(()=>{ META = {}; });
 
-    // —— 彈窗：優先顯示你的 meta.json，其次顯示最具體名稱；可展開全部 —— 
+    // ===== 彈窗內容（優先顯示 meta；可展開更多名稱）=====
     function popupHtmlFromProps(props){
       const denom = props?.denom || '';
       const names = denom.split(',').map(s=>s.trim()).filter(Boolean);
-      // 依具體度排序
       const S = n => (n.toLowerCase().includes('grand cru')?100:
                      (n.toLowerCase().includes('premier cru') && /premier cru\s+\S/.test(n.toLowerCase()))?80:
                      n.toLowerCase().includes('premier cru')?60:
                      VILLAGES_NORM.includes(norm(n))?40:20);
       names.sort((a,b)=>S(b)-S(a));
 
-      // 嘗試用每個名稱去 META 命中
       let hitName=null, hitMeta=null;
       for (const n of names){ const k=norm(n); if(META[k]){hitName=n; hitMeta=META[k]; break;} }
 
@@ -190,8 +194,7 @@ function norm(s=''){
           ? `<div style="margin-top:6px">
                <a href="#" onclick="const e=document.getElementById('${moreId}');e.style.display=e.style.display?'':'block';this.remove();return false;">+ 顯示更多適用名稱</a>
                <div id="${moreId}" style="display:none;margin-top:4px;font-size:12px;color:#555">${names.slice(1).join('<br>')}</div>
-             </div>`
-          : '';
+             </div>` : '';
         return `<b>${hitMeta.zh || hitName}</b><br>
                 等級：${hitMeta.level || ''}${hitMeta.village ? `（${hitMeta.village}）` : ''}<br>
                 ${hitMeta.notes || ''}${link}
@@ -204,62 +207,74 @@ function norm(s=''){
           ? `<div style="margin-top:6px">
                <a href="#" onclick="const e=document.getElementById('${moreId}');e.style.display=e.style.display?'':'block';this.remove();return false;">+ 顯示更多適用名稱</a>
                <div id="${moreId}" style="display:none;margin-top:4px;font-size:12px;color:#555">${names.slice(2).join('<br>')}</div>
-             </div>`
-          : '';
+             </div>` : '';
         return `<b>${titles.join('<br>') || 'AOC'}</b>${more}`;
       }
     }
 
-    // —— 載入 GeoJSON 並繪製 —— 
-    fetch('./burgundy.geojson').then(r=>r.json()).then(fc => { rawFC = fc; draw(''); });
-
-    <script>
-function draw(queryRaw){
-  // 正規化 + 別名修正
-  let q = norm(queryRaw || '');
-  if (ALIASES && ALIASES[q]) q = ALIASES[q];
-
-  if (layer) map.removeLayer(layer);
-
-  const feats = (rawFC?.features || []).filter(f => {
-    if (!q) return true;
-
-    const denom = f.properties?.denom || '';
-    // A) 先整串（未分割）做一次比對，避免分隔符差異
-    const whole = norm(denom);
-    if (whole.includes(q)) return true;
-
-    // B) 再把 denom 依逗點切成「完整名稱」逐一比對
-    const names = denom.split(',').map(s => s.trim()).filter(Boolean);
-    for (const n of names) {
-      const nn = norm(n);
-      // 包含 or 被包含（應付縮寫/簡寫）
-      if (nn.includes(q) || q.includes(nn)) return true;
-
-      // 額外：把連字號換空白來試（如 "la romanee" vs "la-romanee"）
-      const nn2 = nn.replace(/-/g,'');
-      if (nn2.includes(q)) return true;
+    // ===== 載入資料（先讀 min，失敗再嘗試 full）=====
+    function loadData(){
+      return fetch(DATA_FILE).then(r=>r.json())
+        .catch(()=> fetch('./burgundy_full.geojson').then(r=>r.json()));
     }
-    return false;
-  });
 
-  // 繪製
-  layer = L.geoJSON({ type:'FeatureCollection', features:feats }, {
-    style: (f)=> styleByProps(f.properties || {}),
-    onEachFeature: (f, l) => {
-      l.bindPopup(popupHtmlFromProps(f.properties || {}));
-      l.on('mouseover', ()=> l.setStyle(highlightStyle(f.properties||{})));
-      l.on('mouseout',  ()=> l.setStyle(styleByProps(f.properties||{})));
-      l.on('click',     ()=> { try { map.fitBounds(l.getBounds(), { maxZoom: 16 }); } catch(e){} });
+    loadData().then(fc => { rawFC = fc; draw(''); });
+
+    // ===== 搜尋與繪製（穩定版；整串與逐名雙重比對）=====
+    function draw(queryRaw){
+      let q = norm(queryRaw || '');
+      if (ALIASES[q]) q = ALIASES[q];
+
+      if (layer) map.removeLayer(layer);
+
+      const feats = (rawFC?.features || []).filter(f => {
+        if (!q) return true;
+
+        const denom = f.properties?.denom || '';
+        // A) 整串先比一次（處理奇怪分隔符）
+        if (norm(denom).includes(q)) return true;
+
+        // B) 再逐名比對（完整名稱）
+        const names = denom.split(',').map(s => s.trim()).filter(Boolean);
+        for (const n of names) {
+          const nn = norm(n);
+          if (nn.includes(q) || q.includes(nn)) return true; // 包含或被包含
+        }
+        return false;
+      });
+
+      layer = L.geoJSON({ type:'FeatureCollection', features:feats }, {
+        style: (f)=> styleByProps(f.properties || {}),
+        onEachFeature: (f, l) => {
+          l.bindPopup(popupHtmlFromProps(f.properties || {}));
+          l.on('mouseover', ()=> l.setStyle(highlightStyle(f.properties||{})));
+          l.on('mouseout',  ()=> l.setStyle(styleByProps(f.properties||{})));
+          l.on('click',     ()=> { try { map.fitBounds(l.getBounds(), { maxZoom: 16 }); } catch(e){} });
+        }
+      }).addTo(map);
+
+      if (feats.length) {
+        map.fitBounds(layer.getBounds(), { padding:[20,20] });
+      } else {
+        console.warn('找不到結果：', queryRaw);
+      }
     }
-  }).addTo(map);
 
-  if (feats.length) {
-    map.fitBounds(layer.getBounds(), { padding:[20,20] });
-  } else {
-    console.warn('找不到結果：', queryRaw);
-  }
-});
+    // ===== UI 事件 =====
+    const input = document.getElementById('q');
+    const btnClear = document.getElementById('clear');
+    const btnAll   = document.getElementById('all');
+    const chipsBox = document.getElementById('chips');
+    let t=null;
+    input.addEventListener('input', ()=>{ clearTimeout(t); t=setTimeout(()=> draw(input.value), 220); });
+    btnClear.onclick = ()=> { input.value=''; draw(''); };
+    btnAll.onclick   = ()=> { input.value=''; draw(''); };
+    chipsBox.addEventListener('click', (e)=>{
+      const k = e.target?.dataset?.k;
+      if (!k) return;
+      input.value = k;
+      draw(k);
+    });
   </script>
 </body>
 </html>
