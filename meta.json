@@ -1,12 +1,12 @@
 {
-  "romanee-conti": {
+  "romaneeconti": {
     "zh": "羅曼尼-康帝",
     "level": "特級園 (Grand Cru)",
     "village": "Vosne-Romanée",
     "notes": "DRC 獨佔園。被譽為『天堂的味道』，是優雅、複雜度與陳年潛力的完美結合。帶有細緻的紅色水果、紫羅蘭、異國香料與濕潤泥土的氣息，口感如絲綢般滑順，尾韻悠長。",
     "link": "https://www.wine-searcher.com/find/dom+de+la+romanee+conti+romanee+conti+grand+cru+cote+de+nuits+france"
   },
-  "la tache": {
+  "latache": {
     "zh": "拉塔希",
     "level": "特級園 (Grand Cru)",
     "village": "Vosne-Romanée",
@@ -20,7 +20,7 @@
     "notes": "風格雄壯、豐腴且深邃，被認為是力量最強勁的特級園之一。充滿濃郁的黑色水果、松露、皮革與煙燻風味，酒體飽滿，單寧強勁，需要長時間陳年才能展現其全部潛力。",
     "link": "https://www.wine-searcher.com/find/richebourg+grand+cru+cote+de+nuits+france"
   },
-  "romanee-saint-vivant": {
+  "romaneesaintvivant": {
     "zh": "羅曼尼-聖-維馮",
     "level": "特級園 (Grand Cru)",
     "village": "Vosne-Romanée",
@@ -34,7 +34,7 @@
     "notes": "被譽為『王者之酒』，拿破崙的最愛。風格強勁、結構宏大、充滿力量感。香氣以深色莓果、甘草、泥土和野味為主，單寧堅實，陳年潛力極佳，展現出無與倫比的深度與複雜性。",
     "link": "https://www.wine-searcher.com/find/chambertin+grand+cru+cote+de+nuits+france"
   },
-  "chambertin-clos de beze": {
+  "chambertinclosdebeze": {
     "zh": "香貝丹-貝日園",
     "level": "特級園 (Grand Cru)",
     "village": "Gevrey-Chambertin",
@@ -55,7 +55,7 @@
     "notes": "面積較大，橫跨多個不同的小地塊 (Lieux-dits)，因此風格多變。通常被認為比鄰近的 Grands-Échezeaux 更為輕盈、奔放，帶有紅色水果、香料與花香，口感較為柔和，更早進入適飲期。",
     "link": "https://www.wine-searcher.com/find/echezeaux+grand+cru+cote+de+nuits+france"
   },
-  "grands-echezeaux": {
+  "grandsechezeaux": {
     "zh": "大-艾雪索",
     "level": "特級園 (Grand Cru)",
     "village": "Flagey-Echézeaux",
