@@ -49,79 +49,67 @@
     </div>
   </div>
   <div class="legend">...</div>
-
   <script>
     // ===== 1. 初始化地圖和變數 =====
     const DATA_FILE = './burgundy.geojson';
-    const WINERY_FILE = './wineries.geojson'; // 新增酒莊資料檔
+    const WINERY_FILE = './wineries.geojson';
     const map = L.map('map').setView([47.0, 4.8], 9);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap · INAO/IGN data.geopf.fr (Open Licence 2.0)' }).addTo(map);
-    let rawFC = null, aocLayer = null, wineryLayer = null, META = {}; // aocLayer 取代 layer
-    // ... 其他 UI 變數不變 ...
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap · INAO/IGN data.geopf.fr (Open Licence 2.0)'
+    }).addTo(map);
+    let rawFC = null, aocLayer = null, wineryLayer = null, META = {};
+    const input = document.getElementById('q'), btnClear = document.getElementById('clear'), btnAll = document.getElementById('all'), chipsBox = document.getElementById('chips'), cdnChipsBox = document.getElementById('cdn-chips'), cdbChipsBox = document.getElementById('cdb-chips'), cdcChipsBox = document.getElementById('cdc-chips'), macChipsBox = document.getElementById('mac-chips'), chaChipsBox = document.getElementById('cha-chips');
 
-    // ===== 2. 定義所有我們需要的工具函式 (不變) =====
-    // ... norm(), ALIASES, GRAND_CRU, VILLAGES, classify(), styleByProps(), highlightStyle(), popupHtmlFromProps() ...
-    
-   // ===== 修正版的 drawAOC 函式 =====
-function drawAOC(queryRaw, exactMode = false){
-  let q = norm(queryRaw || '');
-  if (ALIASES[q]) q = ALIASES[q];
-  if (aocLayer) map.removeLayer(aocLayer);
+    // ===================================================================
+    // ===== 2. 定義所有「工具函式」(必須放在最前面) =====
+    // ===================================================================
+    function norm(s=''){ return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/['’·.`´]+/g,'').replace(/[-\s\u00A0\u2000-\u200D\u2010-\u2015]+/g,'').trim(); }
+    const ALIASES = (() => { const pairs = [['romanee conti','romanee-conti'],['rc','romanee-conti'],['la tachi','la tache'],['latachi','la tache'],['richbourge','richebourg'],['la romanée','la romanee'],['laromanee','la romanee']]; const m={}; for (const [k,v] of pairs) m[norm(k)]=norm(v); return m; })();
+    const GRAND_CRU = ["Chambertin","Chambertin-Clos de Bèze","Mazis-Chambertin","Charmes-Chambertin","Griotte-Chambertin","Latricières-Chambertin","Ruchottes-Chambertin","Mazoyères-Chambertin","Clos de la Roche","Clos Saint-Denis","Clos des Lambrays","Clos de Tart","Bonnes-Mares","Musigny","Clos de Vougeot","Échezeaux","Grands Échezeaux","Richebourg","Romanée-Conti","La Romanée","Romanée-Saint-Vivant","La Tâche","La Grande Rue","Corton","Corton-Charlemagne","Charlemagne","Montrachet","Bâtard-Montrachet","Chevalier-Montrachet","Criots-Bâtard-Montrachet","Bienvenues-Bâtard-Montrachet","Chablis Grand Cru"];
+    const GRAND_CRU_NORM = GRAND_CRU.map(n => norm(n));
+    const VILLAGES = ["Chablis","Marsannay","Fixin","Gevrey-Chambertin","Morey-Saint-Denis","Chambolle-Musigny","Vougeot","Flagey-Échezeaux","Vosne-Romanée","Nuits-Saint-Georges","Côte de Nuits-Villages","Ladoix","Aloxe-Corton","Pernand-Vergelesses","Chorey-lès-Beaune","Savigny-lès-Beaune","Beaune","Pommard","Volnay","Monthelie","Auxey-Duresses","Saint-Romain","Meursault","Blagny","Puligny-Montrachet","Chassagne-Montrachet","Saint-Aubin","Santenay","Maranges","Côte de Beaune-Villages","Bouzeron","Rully","Mercurey","Givry","Montagny","Pouilly-Fuissé","Pouilly-Loché","Pouilly-Vinzelles","Saint-Véran","Viré-Clessé","Mâcon","Saint-Amour","Juliénas","Chénas"];
+    const VILLAGES_NORM = VILLAGES.map(n => norm(n));
+    function classify(props){ const denom = props?.denom || ''; if (denom.toLowerCase().includes('clos de vougeot')) return 'GC'; const names = denom.split(',').map(s=>s.trim()).filter(Boolean); const namesN = names.map(norm); if (namesN.some(n => GRAND_CRU_NORM.includes(n))) return 'GC'; if (names.some(n => n.toLowerCase().includes('grand cru'))) return 'GC'; if (names.some(n => n.toLowerCase().includes('premier cru'))) return 'PC'; if (namesN.some(n => VILLAGES_NORM.includes(n))) return 'VI'; return 'RE'; }
+    function styleByProps(props){ const lvl = classify(props); if (lvl === 'GC') return { color:'#cc0033', weight:1.6, fillColor:'#cc0033', fillOpacity:0.18 }; if (lvl === 'PC') return { color:'#ff7f0e', weight:1.4, fillColor:'#ff7f0e', fillOpacity:0.16 }; if (lvl === 'VI') return { color:'#1f77b4', weight:1.2, fillColor:'#1f77b4', fillOpacity:0.14 }; return { color:'#2ca02c', weight:1.0, fillColor:'#2ca02c', fillOpacity:0.12 }; }
+    function highlightStyle(props){ const s = styleByProps(props); return { ...s, weight: s.weight + 0.8, fillOpacity: Math.min(0.35, (s.fillOpacity||0.15)+0.12) }; }
+    function popupHtmlFromProps(props){ const denom = props?.denom || ''; const names = denom.split(',').map(s=>s.trim()).filter(Boolean); const score = (name) => { const n = norm(name); if (GRAND_CRU_NORM.includes(n)) return 100; if (n.toLowerCase().includes('grand cru')) return 90; if (n.toLowerCase().includes('premier cru')) return 60; if (VILLAGES_NORM.includes(n)) return 40; return 10; }; names.sort((a, b) => score(b) - score(a)); let hitName = null, hitMeta = null; for (const n of names){ const k = norm(n); if (META[k]){ hitName = n; hitMeta = META[k]; break; } } if (hitMeta){ const link = hitMeta.link ? `<br><a href="${hitMeta.link}" target="_blank">更多</a>` : ''; const moreId = 'm'+Math.random().toString(36).slice(2); const otherNames = names.filter(n => n !== hitName); const more = otherNames.length ? `<div style="margin-top:6px"><a href="#" onclick="const e=document.getElementById('${moreId}');e.style.display=e.style.display?'':'block';this.remove();return false;">+ 顯示其他適用名稱</a><div id="${moreId}" style="display:none;margin-top:4px;font-size:12px;color:#555">${otherNames.join('<br>')}</div></div>` : ''; return `<b>${hitMeta.zh || hitName}</b><br>等級：${hitMeta.level || ''}${hitMeta.village ? `（${hitMeta.village}）` : ''}<br>${hitMeta.notes || ''}${link}<hr style="border:none;border-top:1px solid #eee;margin:8px 0"><small>地圖名稱：${hitName}</small>${more}`; } else { const titles = names.slice(0,2); const moreId = 'm'+Math.random().toString(36).slice(2); const more = names.slice(2).length ? `<div style="margin-top:6px"><a href="#" onclick="const e=document.getElementById('${moreId}');e.style.display=e.style.display?'':'block';this.remove();return false;">+ 顯示更多適用名稱</a><div id="${moreId}" style="display:none;margin-top:4px;font-size:12px;color:#555">${names.slice(2).join('<br>')}</div></div>` : ''; return `<b>${titles.join('<br>') || 'AOC'}</b>${more}`; } }
 
-  // 篩選後的結果，儲存在 `feats` 這個變數裡
-  const feats = (rawFC?.features || []).filter(f => {
-    if (!q) return true;
-    const denom = f.properties?.denom || '';
-    const names = denom.split(',').map(s => s.trim()).filter(Boolean);
-    if (exactMode) { return names.some(n => norm(n) === q); }
-    const score = Math.max(...names.map(n => {
-      const nn = norm(n);
-      if (nn === q) return 100;
-      if (nn.startsWith(q)) return 50;
-      if (nn.includes(q)) return 10;
-      return 0;
-    }));
-    return score > 0;
-  });
-
-  if (!exactMode && feats.length > 1) {
-    feats.sort((a, b) => {
-      const scoreA = Math.max(...(a.properties.denom.split(',').map(n => norm(n) === q ? 100 : (norm(n).startsWith(q) ? 50 : (norm(n).includes(q) ? 10 : 0)))));
-      const scoreB = Math.max(...(b.properties.denom.split(',').map(n => norm(n) === q ? 100 : (norm(n).startsWith(q) ? 50 : (norm(n).includes(q) ? 10 : 0)))));
-      return scoreB - scoreA;
-    });
-  }
-  
-  // 繪製圖層時，使用正確的 `feats` 變數
-  aocLayer = L.geoJSON({ type:'FeatureCollection', features: feats }, { // <-- 這裡已修正
-    style: (f)=> styleByProps(f.properties || {}),
-    onEachFeature: (f, l) => {
-      l.bindPopup(popupHtmlFromProps(f.properties || {}));
-      l.on('mouseover', ()=> l.setStyle(highlightStyle(f.properties||{})));
-      l.on('mouseout',  ()=> l.setStyle(styleByProps(f.properties||{})));
-      l.on('click',     ()=> { try { map.fitBounds(l.getBounds(), { maxZoom: 16 }); } catch(e){} });
+    // ===== 3. 定義「主要功能函式」=====
+    function drawAOC(queryRaw, exactMode = false){
+      let q = norm(queryRaw || '');
+      if (ALIASES[q]) q = ALIASES[q];
+      if (aocLayer) map.removeLayer(aocLayer);
+      const feats = (rawFC?.features || []).filter(f => {
+        if (!q) return true;
+        const denom = f.properties?.denom || '';
+        if (exactMode && q === 'closdevougeot') { return denom.toLowerCase().includes('clos de vougeot'); }
+        const names = denom.split(',').map(s => s.trim()).filter(Boolean);
+        if (exactMode) { return names.some(n => norm(n) === q); }
+        const score = Math.max(...names.map(n => { const nn = norm(n); if (nn === q) return 100; if (nn.startsWith(q)) return 50; if (nn.includes(q)) return 10; return 0; }));
+        return score > 0;
+      });
+      if (!exactMode && feats.length > 1) { feats.sort((a, b) => { const scoreA = Math.max(...(a.properties.denom.split(',').map(n => norm(n) === q ? 100 : (norm(n).startsWith(q) ? 50 : (norm(n).includes(q) ? 10 : 0))))); const scoreB = Math.max(...(b.properties.denom.split(',').map(n => norm(n) === q ? 100 : (norm(n).startsWith(q) ? 50 : (norm(n).includes(q) ? 10 : 0))))); return scoreB - scoreA; }); }
+      aocLayer = L.geoJSON({ type:'FeatureCollection', features: feats }, {
+        style: (f)=> styleByProps(f.properties || {}),
+        onEachFeature: (f, l) => {
+          l.bindPopup(popupHtmlFromProps(f.properties || {}));
+          l.on('mouseover', ()=> l.setStyle(highlightStyle(f.properties||{})));
+          l.on('mouseout',  ()=> l.setStyle(styleByProps(f.properties||{})));
+          l.on('click',     ()=> { try { map.fitBounds(l.getBounds(), { maxZoom: 16 }); } catch(e){} });
+        }
+      }).addTo(map);
+      if (feats.length) { map.fitBounds(aocLayer.getBounds(), { padding:[20,20] }); } else { console.warn('找不到結果：', queryRaw); }
     }
-  }).addTo(map);
-
-  if (feats.length) {
-    map.fitBounds(aocLayer.getBounds(), { padding:[20,20] }); // 這裡也建議用 aocLayer.getBounds()
-  } else {
-    console.warn('找不到結果：', queryRaw);
-  }
-}
-
-    // ===== 新增：繪製酒莊圖釘的函式 =====
     function drawWineries(wineries) {
-      const markers = L.markerClusterGroup(); // 使用聚合圖層來處理大量圖釘
+      const markers = L.markerClusterGroup();
       for (const winery of wineries) {
         if (winery.geometry && winery.geometry.type === 'Point') {
           const [lon, lat] = winery.geometry.coordinates;
           const name = winery.properties.name || '未命名酒莊';
           const website = winery.properties.website;
           let popupContent = `<b>${name}</b>`;
-          if (website) {
-            popupContent += `<br><a href="${website}" target="_blank">官方網站</a>`;
-          }
+          if (website) { popupContent += `<br><a href="${website}" target="_blank">官方網站</a>`; }
           const marker = L.marker([lat, lon]).bindPopup(popupContent);
           markers.addLayer(marker);
         }
@@ -129,13 +117,12 @@ function drawAOC(queryRaw, exactMode = false){
       return markers;
     }
 
-    // ===== 3. 建立主函式來啟動所有功能 =====
+    // ===== 4. 建立主函式來啟動所有功能 =====
     async function main() {
       let wineryData = null;
       try {
-        // Promise.all 現在載入三個檔案！
         const [metaRes, geoRes, wineryRes] = await Promise.all([
-          fetch('./meta.json').catch(e => ({})), // 讓 meta 和 winery 載入失敗也不會中斷
+          fetch('./meta.json').catch(e => ({})),
           fetch(DATA_FILE),
           fetch(WINERY_FILE).catch(e => ({}))
         ]);
@@ -148,31 +135,37 @@ function drawAOC(queryRaw, exactMode = false){
         return;
       }
 
-      // 繪製 AOC 圖層
       drawAOC('');
 
-      // 如果酒莊資料成功載入，就繪製酒莊圖層
       if (wineryData && wineryData.features) {
         wineryLayer = drawWineries(wineryData.features);
-        wineryLayer.addTo(map); // 預設顯示酒莊
+        wineryLayer.addTo(map);
       }
 
-      // ===== 新增：圖層控制器 =====
       const baseLayers = {};
-      const overlayLayers = {
-        "AOC 產區": aocLayer
-      };
-      if (wineryLayer) {
-        overlayLayers["酒莊位置"] = wineryLayer;
-      }
+      const overlayLayers = { "AOC 產區": aocLayer };
+      if (wineryLayer) { overlayLayers["酒莊位置"] = wineryLayer; }
       L.control.layers(baseLayers, overlayLayers, { collapsed: false }).addTo(map);
 
-      // ===== 綁定所有 UI 事件 (不變) =====
-      // ... input, btnClear, btnAll, chipsBox, villageChipsBox, accordion ...
+      let t = null;
+      input.addEventListener('input', () => { clearTimeout(t); t = setTimeout(() => drawAOC(input.value, false), 220); });
+      btnClear.onclick = () => { input.value = ''; drawAOC(''); };
+      btnAll.onclick = () => { input.value = ''; drawAOC(''); };
+      const gcClickHandler = (e) => { const k = e.target?.dataset?.k; if (!k) return; input.value = e.target.innerText; drawAOC(k, true); };
+      const villageClickHandler = (e) => { const k = e.target?.dataset?.k; if (!k) return; input.value = e.target.innerText; drawAOC(k, false); };
+      chipsBox.addEventListener('click', gcClickHandler);
+      chaChipsBox.addEventListener('click', villageClickHandler);
+      cdnChipsBox.addEventListener('click', villageClickHandler);
+      cdbChipsBox.addEventListener('click', villageClickHandler);
+      cdcChipsBox.addEventListener('click', villageClickHandler);
+      macChipsBox.addEventListener('click', villageClickHandler);
+      document.querySelectorAll('.accordion-title').forEach(title => { title.addEventListener('click', () => { const content = title.nextElementSibling; document.querySelectorAll('.accordion-content.show').forEach(openContent => { if (openContent !== content) { openContent.classList.remove('show'); } }); content.classList.toggle('show'); }); });
     }
 
-    // ===== 4. 執行主函式 (不變) =====
+    // ===== 5. 執行主函式 =====
     main();
   </script>
+</body>
+</html>
 </body>
 </html>
