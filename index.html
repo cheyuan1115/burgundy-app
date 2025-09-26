@@ -149,7 +149,8 @@
 
       if (wineryData && wineryData.features) {
         wineryLayer = drawWineries(wineryData.features);
-        wineryLayer.addTo(map);
+        // 預設不顯示酒莊圖層，讓使用者自己開啟
+        // wineryLayer.addTo(map); 
       }
 
       const baseLayers = {};
