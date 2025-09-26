@@ -63,7 +63,87 @@
     <div class="item"><span class="swatch re"></span> Régionale / 其他</div>
   </div>
 
-    <script>
+   <!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <title>Burgundy AOC (搜尋穩定版＋等級上色)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <style>
+    html,body,#map{height:100%;margin:0}
+    .ui{position:absolute;z-index:1000;top:12px;left:12px;background:#fff;padding:10px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.18);width:min(88vw,480px);font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+    .row{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+    .ui input{flex:1;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font:inherit}
+    .btn{padding:6px 10px;border:1px solid #ddd;border-radius:8px;background:#f8f8f8;cursor:pointer;font:12px;white-space:nowrap}
+    .btn:hover{background:#eee}
+    .chips{display:flex;gap:6px;flex-wrap:wrap;max-height:96px;overflow:auto}
+    .hint{color:#666;font-size:12px}
+    .legend{position:absolute;z-index:1000;right:12px;bottom:12px;background:#fff;padding:10px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.18);font:13px system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+    .legend .item{display:flex;align-items:center;gap:8px;margin:4px 0}
+    .swatch{width:16px;height:12px;border:2px solid #000;border-radius:3px}
+    .swatch.gc{border-color:#cc0033;background:#cc003322}
+    .swatch.pc{border-color:#ff7f0e;background:#ff7f0e33}
+    .swatch.vi{border-color:#1f77b4;background:#1f77b433}
+    .swatch.re{border-color:#2ca02c;background:#2ca02c33}
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <div class="ui">
+    <div class="row">
+      <b>篩選 AOC 名稱</b>
+      <span class="hint">（支援無重音/空白/連字號/撇號，例如「romanee conti」「la romanee」「richbourge」）</span>
+    </div>
+    <div class="row">
+      <input id="q" type="text" placeholder="例如：Meursault / Nuits-Saint-Georges / La Romanee / Romanee Conti">
+      <button class="btn" id="clear">清除</button>
+      <button class="btn" id="all">全部</button>
+    </div>
+    <div class="row hint">快捷（Grand Cru）</div>
+    <div class="row chips" id="chips">
+      <button class="btn" data-k="romanee-conti">Romanée-Conti</button>
+      <button class="btn" data-k="la romanee">La Romanée</button>
+      <button class="btn" data-k="romanee-saint-vivant">Romanée-Saint-Vivant</button>
+      <button class="btn" data-k="la tache">La Tâche</button>
+      <button class="btn" data-k="la grande rue">La Grande Rue</button>
+      <button class="btn" data-k="richebourg">Richebourg</button>
+      <button class="btn" data-k="echezeaux">Échezeaux</button>
+      <button class="btn" data-k="grands-echezeaux">Grands-Échezeaux</button>
+      <button class="btn" data-k="musigny">Musigny</button>
+      <button class="btn" data-k="bonnes mares">Bonnes-Mares</button>
+      <button class="btn" data-k="chambertin">Chambertin</button>
+      <button class="btn" data-k="chambertin-clos de beze">Chambertin-Clos de Bèze</button>
+      <button class="btn" data-k="clos de vougeot">Clos de Vougeot</button>
+      <button class="btn" data-k="montrachet">Montrachet</button>
+    </div>
+    <!-- =================================================================== -->
+    <!-- ===== 新增的村莊快捷按鈕 ===== -->
+    <!-- =================================================================== -->
+    <div class="row hint">快捷（村莊級）</div>
+    <div class="row chips" id="village-chips">
+      <button class="btn" data-k="gevrey-chambertin">Gevrey-Chambertin</button>
+      <button class="btn" data-k="morey-saint-denis">Morey-Saint-Denis</button>
+      <button class="btn" data-k="chambolle-musigny">Chambolle-Musigny</button>
+      <button class="btn" data-k="vosne-romanee">Vosne-Romanée</button>
+      <button class="btn" data-k="nuits-saint-georges">Nuits-Saint-Georges</button>
+      <button class="btn" data-k="pommard">Pommard</button>
+      <button class="btn" data-k="volnay">Volnay</button>
+      <button class="btn" data-k="meursault">Meursault</button>
+      <button class="btn" data-k="puligny-montrachet">Puligny-Montrachet</button>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="item"><span class="swatch gc"></span> Grand Cru</div>
+    <div class="item"><span class="swatch pc"></span> Premier Cru</div>
+    <div class="item"><span class="swatch vi"></span> Village</div>
+    <div class="item"><span class="swatch re"></span> Régionale / 其他</div>
+  </div>
+
+  <script>
     // ===== 1. 初始化地圖和變數 =====
     const DATA_FILE = './burgundy.geojson';
     const map = L.map('map').setView([47.0, 4.8], 9);
@@ -77,23 +157,24 @@
     const btnClear = document.getElementById('clear');
     const btnAll   = document.getElementById('all');
     const chipsBox = document.getElementById('chips');
+    // ===== 新增：獲取村莊按鈕的容器 =====
+    const villageChipsBox = document.getElementById('village-chips');
 
-    // ===== 2. 定義所有我們需要的工具函式 =====
-    function norm(s=''){ /* ... 內容不變 ... */ return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/['’·.`´]+/g,'').replace(/[-\s\u00A0\u2000-\u200D\u2010-\u2015]+/g,'').trim(); }
-    const ALIASES = (() => { /* ... 內容不變 ... */ const pairs = [['romanee conti','romanee-conti'],['rc','romanee-conti'],['la tachi','la tache'],['latachi','la tache'],['richbourge','richebourg'],['la romanée','la romanee'],['laromanee','la romanee']]; const m={}; for (const [k,v] of pairs) m[norm(k)]=norm(v); return m; })();
+    // ===== 2. 定義所有我們需要的工具函式 (不變) =====
+    function norm(s=''){ return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/['’·.`´]+/g,'').replace(/[-\s\u00A0\u2000-\u200D\u2010-\u2015]+/g,'').trim(); }
+    const ALIASES = (() => { const pairs = [['romanee conti','romanee-conti'],['rc','romanee-conti'],['la tachi','la tache'],['latachi','la tache'],['richbourge','richebourg'],['la romanée','la romanee'],['laromanee','la romanee']]; const m={}; for (const [k,v] of pairs) m[norm(k)]=norm(v); return m; })();
     const GRAND_CRU = ["Chambertin","Chambertin-Clos de Bèze","Mazis-Chambertin","Charmes-Chambertin","Griotte-Chambertin","Latricières-Chambertin","Ruchottes-Chambertin","Mazoyères-Chambertin","Clos de la Roche","Clos Saint-Denis","Clos des Lambrays","Clos de Tart","Bonnes-Mares","Musigny","Clos de Vougeot","Échezeaux","Grands Échezeaux","Richebourg","Romanée-Conti","La Romanée","Romanée-Saint-Vivant","La Tâche","La Grande Rue","Corton","Corton-Charlemagne","Charlemagne","Montrachet","Bâtard-Montrachet","Chevalier-Montrachet","Criots-Bâtard-Montrachet","Bienvenues-Bâtard-Montrachet","Chablis Grand Cru"];
     const GRAND_CRU_NORM = GRAND_CRU.map(n => norm(n));
     const VILLAGES = ["Gevrey-Chambertin","Morey-Saint-Denis","Chambolle-Musigny","Vougeot","Vosne-Romanée","Nuits-Saint-Georges","Aloxe-Corton","Pernand-Vergelesses","Savigny-lès-Beaune","Beaune","Pommard","Volnay","Meursault","Puligny-Montrachet","Chassagne-Montrachet","Santenay","Marsannay","Fixin","Saint-Aubin","Saint-Romain","Auxey-Duresses","Rully","Mercurey","Givry","Montagny","Pouilly-Fuissé","Pouilly-Loché","Pouilly-Vinzelles","Saint-Véran","Viré-Clessé","Mâcon"];
     const VILLAGES_NORM = VILLAGES.map(n => norm(n));
-    function classify(props){ /* ... 內容不變 ... */ const denom = props?.denom || ''; const names = denom.split(',').map(s=>s.trim()).filter(Boolean); const namesN = names.map(norm); if (namesN.some(n => GRAND_CRU_NORM.includes(n))) return 'GC'; if (names.some(n => n.toLowerCase().includes('grand cru'))) return 'GC'; if (names.some(n => n.toLowerCase().includes('premier cru'))) return 'PC'; if (namesN.some(n => VILLAGES_NORM.includes(n))) return 'VI'; return 'RE'; }
-    function styleByProps(props){ /* ... 內容不變 ... */ const lvl = classify(props); if (lvl === 'GC') return { color:'#cc0033', weight:1.6, fillColor:'#cc0033', fillOpacity:0.18 }; if (lvl === 'PC') return { color:'#ff7f0e', weight:1.4, fillColor:'#ff7f0e', fillOpacity:0.16 }; if (lvl === 'VI') return { color:'#1f77b4', weight:1.2, fillColor:'#1f77b4', fillOpacity:0.14 }; return { color:'#2ca02c', weight:1.0, fillColor:'#2ca02c', fillOpacity:0.12 }; }
-    function highlightStyle(props){ /* ... 內容不變 ... */ const s = styleByProps(props); return { ...s, weight: s.weight + 0.8, fillOpacity: Math.min(0.35, (s.fillOpacity||0.15)+0.12) }; }
-    function popupHtmlFromProps(props){ /* ... 內容不變 ... */ const denom = props?.denom || ''; const names = denom.split(',').map(s=>s.trim()).filter(Boolean); const score = (name) => { const n = norm(name); if (GRAND_CRU_NORM.includes(n)) return 100; if (n.toLowerCase().includes('grand cru')) return 90; if (n.toLowerCase().includes('premier cru')) return 60; if (VILLAGES_NORM.includes(n)) return 40; return 10; }; names.sort((a, b) => score(b) - score(a)); let hitName = null, hitMeta = null; for (const n of names){ const k = norm(n); if (META[k]){ hitName = n; hitMeta = META[k]; break; } } if (hitMeta){ const link = hitMeta.link ? `<br><a href="${hitMeta.link}" target="_blank">更多</a>` : ''; const moreId = 'm'+Math.random().toString(36).slice(2); const otherNames = names.filter(n => n !== hitName); const more = otherNames.length ? `<div style="margin-top:6px"><a href="#" onclick="const e=document.getElementById('${moreId}');e.style.display=e.style.display?'':'block';this.remove();return false;">+ 顯示其他適用名稱</a><div id="${moreId}" style="display:none;margin-top:4px;font-size:12px;color:#555">${otherNames.join('<br>')}</div></div>` : ''; return `<b>${hitMeta.zh || hitName}</b><br>等級：${hitMeta.level || ''}${hitMeta.village ? `（${hitMeta.village}）` : ''}<br>${hitMeta.notes || ''}${link}<hr style="border:none;border-top:1px solid #eee;margin:8px 0"><small>地圖名稱：${hitName}</small>${more}`; } else { const titles = names.slice(0,2); const moreId = 'm'+Math.random().toString(36).slice(2); const more = names.slice(2).length ? `<div style="margin-top:6px"><a href="#" onclick="const e=document.getElementById('${moreId}');e.style.display=e.style.display?'':'block';this.remove();return false;">+ 顯示更多適用名稱</a><div id="${moreId}" style="display:none;margin-top:4px;font-size:12px;color:#555">${names.slice(2).join('<br>')}</div></div>` : ''; return `<b>${titles.join('<br>') || 'AOC'}</b>${more}`; } }
-    function draw(queryRaw, exactMode = false){ /* ... 內容不變 ... */ let q = norm(queryRaw || ''); if (ALIASES[q]) q = ALIASES[q]; if (layer) map.removeLayer(layer); const feats = (rawFC?.features || []).filter(f => { if (!q) return true; const denom = f.properties?.denom || ''; const names = denom.split(',').map(s => s.trim()).filter(Boolean); if (exactMode) { return names.some(n => norm(n) === q); } const score = Math.max(...names.map(n => { const nn = norm(n); if (nn === q) return 100; if (nn.startsWith(q)) return 50; if (nn.includes(q)) return 10; return 0; })); return score > 0; }); if (!exactMode) { feats.sort((a, b) => { const scoreA = Math.max(...(a.properties.denom.split(',').map(n => norm(n) === q ? 100 : (norm(n).startsWith(q) ? 50 : (norm(n).includes(q) ? 10 : 0))))); const scoreB = Math.max(...(b.properties.denom.split(',').map(n => norm(n) === q ? 100 : (norm(n).startsWith(q) ? 50 : (norm(n).includes(q) ? 10 : 0))))); return scoreB - scoreA; }); } layer = L.geoJSON({ type:'FeatureCollection', features:feats }, { style: (f)=> styleByProps(f.properties || {}), onEachFeature: (f, l) => { l.bindPopup(popupHtmlFromProps(f.properties || {})); l.on('mouseover', ()=> l.setStyle(highlightStyle(f.properties||{}))); l.on('mouseout',  ()=> l.setStyle(styleByProps(f.properties||{}))); l.on('click',     ()=> { try { map.fitBounds(l.getBounds(), { maxZoom: 16 }); } catch(e){} }); } }).addTo(map); if (feats.length) { map.fitBounds(layer.getBounds(), { padding:[20,20] }); } else { console.warn('找不到結果：', queryRaw); } }
+    function classify(props){ const denom = props?.denom || ''; const names = denom.split(',').map(s=>s.trim()).filter(Boolean); const namesN = names.map(norm); if (namesN.some(n => GRAND_CRU_NORM.includes(n))) return 'GC'; if (names.some(n => n.toLowerCase().includes('grand cru'))) return 'GC'; if (names.some(n => n.toLowerCase().includes('premier cru'))) return 'PC'; if (namesN.some(n => VILLAGES_NORM.includes(n))) return 'VI'; return 'RE'; }
+    function styleByProps(props){ const lvl = classify(props); if (lvl === 'GC') return { color:'#cc0033', weight:1.6, fillColor:'#cc0033', fillOpacity:0.18 }; if (lvl === 'PC') return { color:'#ff7f0e', weight:1.4, fillColor:'#ff7f0e', fillOpacity:0.16 }; if (lvl === 'VI') return { color:'#1f77b4', weight:1.2, fillColor:'#1f77b4', fillOpacity:0.14 }; return { color:'#2ca02c', weight:1.0, fillColor:'#2ca02c', fillOpacity:0.12 }; }
+    function highlightStyle(props){ const s = styleByProps(props); return { ...s, weight: s.weight + 0.8, fillOpacity: Math.min(0.35, (s.fillOpacity||0.15)+0.12) }; }
+    function popupHtmlFromProps(props){ const denom = props?.denom || ''; const names = denom.split(',').map(s=>s.trim()).filter(Boolean); const score = (name) => { const n = norm(name); if (GRAND_CRU_NORM.includes(n)) return 100; if (n.toLowerCase().includes('grand cru')) return 90; if (n.toLowerCase().includes('premier cru')) return 60; if (VILLAGES_NORM.includes(n)) return 40; return 10; }; names.sort((a, b) => score(b) - score(a)); let hitName = null, hitMeta = null; for (const n of names){ const k = norm(n); if (META[k]){ hitName = n; hitMeta = META[k]; break; } } if (hitMeta){ const link = hitMeta.link ? `<br><a href="${hitMeta.link}" target="_blank">更多</a>` : ''; const moreId = 'm'+Math.random().toString(36).slice(2); const otherNames = names.filter(n => n !== hitName); const more = otherNames.length ? `<div style="margin-top:6px"><a href="#" onclick="const e=document.getElementById('${moreId}');e.style.display=e.style.display?'':'block';this.remove();return false;">+ 顯示其他適用名稱</a><div id="${moreId}" style="display:none;margin-top:4px;font-size:12px;color:#555">${otherNames.join('<br>')}</div></div>` : ''; return `<b>${hitMeta.zh || hitName}</b><br>等級：${hitMeta.level || ''}${hitMeta.village ? `（${hitMeta.village}）` : ''}<br>${hitMeta.notes || ''}${link}<hr style="border:none;border-top:1px solid #eee;margin:8px 0"><small>地圖名稱：${hitName}</small>${more}`; } else { const titles = names.slice(0,2); const moreId = 'm'+Math.random().toString(36).slice(2); const more = names.slice(2).length ? `<div style="margin-top:6px"><a href="#" onclick="const e=document.getElementById('${moreId}');e.style.display=e.style.display?'':'block';this.remove();return false;">+ 顯示更多適用名稱</a><div id="${moreId}" style="display:none;margin-top:4px;font-size:12px;color:#555">${names.slice(2).join('<br>')}</div></div>` : ''; return `<b>${titles.join('<br>') || 'AOC'}</b>${more}`; } }
+    function draw(queryRaw, exactMode = false){ let q = norm(queryRaw || ''); if (ALIASES[q]) q = ALIASES[q]; if (layer) map.removeLayer(layer); const feats = (rawFC?.features || []).filter(f => { if (!q) return true; const denom = f.properties?.denom || ''; const names = denom.split(',').map(s => s.trim()).filter(Boolean); if (exactMode) { return names.some(n => norm(n) === q); } const score = Math.max(...names.map(n => { const nn = norm(n); if (nn === q) return 100; if (nn.startsWith(q)) return 50; if (nn.includes(q)) return 10; return 0; })); return score > 0; }); if (!exactMode) { feats.sort((a, b) => { const scoreA = Math.max(...(a.properties.denom.split(',').map(n => norm(n) === q ? 100 : (norm(n).startsWith(q) ? 50 : (norm(n).includes(q) ? 10 : 0))))); const scoreB = Math.max(...(b.properties.denom.split(',').map(n => norm(n) === q ? 100 : (norm(n).startsWith(q) ? 50 : (norm(n).includes(q) ? 10 : 0))))); return scoreB - scoreA; }); } layer = L.geoJSON({ type:'FeatureCollection', features:feats }, { style: (f)=> styleByProps(f.properties || {}), onEachFeature: (f, l) => { l.bindPopup(popupHtmlFromProps(f.properties || {})); l.on('mouseover', ()=> l.setStyle(highlightStyle(f.properties||{}))); l.on('mouseout',  ()=> l.setStyle(styleByProps(f.properties||{}))); l.on('click',     ()=> { try { map.fitBounds(l.getBounds(), { maxZoom: 16 }); } catch(e){} }); } }).addTo(map); if (feats.length) { map.fitBounds(layer.getBounds(), { padding:[20,20] }); } else { console.warn('找不到結果：', queryRaw); } }
 
-    // ===== 3. 建立一個主函式來啟動所有功能 =====
+    // ===== 3. 建立主函式來啟動所有功能 (不變) =====
     async function main() {
-      // 首先，去取包裹 (載入 meta 和 geojson)
       try {
         const [metaRes, geoRes] = await Promise.all([
           fetch('./meta.json'),
@@ -104,11 +185,10 @@
       } catch (error) {
         console.error("無法載入必要的資料檔案:", error);
         alert("錯誤：無法載入地圖資料！請檢查 burgundy.geojson 和 meta.json 檔案是否存在。");
-        return; // 載入失敗，停止執行
+        return;
       }
 
-      // 包裹送達了！現在才把畫家 (draw) 和 UI 事件綁定起來
-      draw(''); // 第一次繪製完整地圖
+      draw('');
 
       let t = null;
       input.addEventListener('input', () => {
@@ -117,17 +197,29 @@
       });
       btnClear.onclick = () => { input.value = ''; draw(''); };
       btnAll.onclick = () => { input.value = ''; draw(''); };
+      
+      // 特級園快捷按鈕：啟用精確模式
       chipsBox.addEventListener('click', (e) => {
         const k = e.target?.dataset?.k;
         if (!k) return;
         input.value = e.target.innerText;
         draw(k, true);
       });
+
+      // ===== 新增：村莊快捷按鈕的事件綁定 =====
+      // 村莊快捷按鈕：使用模糊搜尋模式
+      villageChipsBox.addEventListener('click', (e) => {
+        const k = e.target?.dataset?.k;
+        if (!k) return;
+        input.value = e.target.innerText;
+        draw(k, false); // 第二個參數設為 false，使用模糊搜尋！
+      });
     }
 
-    // ===== 4. 執行主函式，啟動整個應用程式 =====
+    // ===== 4. 執行主函式 (不變) =====
     main();
-
   </script>
+</body>
+</html>
 </body>
 </html>
