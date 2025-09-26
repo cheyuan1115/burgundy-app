@@ -164,30 +164,31 @@
     const VILLAGES = ["Chablis","Marsannay","Fixin","Gevrey-Chambertin","Morey-Saint-Denis","Chambolle-Musigny","Vougeot","Flagey-Échezeaux","Vosne-Romanée","Nuits-Saint-Georges","Côte de Nuits-Villages","Ladoix","Aloxe-Corton","Pernand-Vergelesses","Chorey-lès-Beaune","Savigny-lès-Beaune","Beaune","Pommard","Volnay","Monthelie","Auxey-Duresses","Saint-Romain","Meursault","Blagny","Puligny-Montrachet","Chassagne-Montrachet","Saint-Aubin","Santenay","Maranges","Côte de Beaune-Villages","Bouzeron","Rully","Mercurey","Givry","Montagny","Pouilly-Fuissé","Pouilly-Loché","Pouilly-Vinzelles","Saint-Véran","Viré-Clessé","Mâcon","Saint-Amour","Juliénas","Chénas"];
     const VILLAGES_NORM = VILLAGES.map(n => norm(n));
     
-    // ===================================================================
-    // ===== 最終版 classify 函式：加入「覆蓋規則」=====
-    // ===================================================================
-    function classify(props){
-      const denom = props?.denom || '';
-      const names = denom.split(',').map(s=>s.trim()).filter(Boolean);
-      const namesN = names.map(norm);
+  // ===================================================================
+// ===== 最終版 classify 函式：使用最精準的覆蓋規則 =====
+// ===================================================================
+function classify(props){
+  const denom = props?.denom || '';
+  const names = denom.split(',').map(s=>s.trim()).filter(Boolean);
+  const namesN = names.map(norm);
 
-      // 優先級 0：手動指定覆蓋規則 (VIP 名單)
-      if (namesN.includes('closdevougeot')) return 'GC';
+  // 優先級 0：手動指定覆蓋規則 (VIP 名單)
+  // 我們現在檢查是否「包含」closdevougeot，而不是「等於」
+  if (denom.toLowerCase().includes('clos de vougeot')) return 'GC';
 
-      // 優先級 1：檢查是否為特級園
-      if (namesN.some(n => GRAND_CRU_NORM.includes(n))) return 'GC';
-      if (names.some(n => n.toLowerCase().includes('grand cru'))) return 'GC';
+  // 優先級 1：檢查是否為特級園
+  if (namesN.some(n => GRAND_CRU_NORM.includes(n))) return 'GC';
+  if (names.some(n => n.toLowerCase().includes('grand cru'))) return 'GC';
 
-      // 優先級 2：如果不是特級園，再檢查是否為一級園
-      if (names.some(n => n.toLowerCase().includes('premier cru'))) return 'PC';
+  // 優先級 2：如果不是特級園，再檢查是否為一級園
+  if (names.some(n => n.toLowerCase().includes('premier cru'))) return 'PC';
 
-      // 優先級 3：如果也不是一級園，再檢查是否為村莊級
-      if (namesN.some(n => VILLAGES_NORM.includes(n))) return 'VI';
+  // 優先級 3：如果也不是一級園，再檢查是否為村莊級
+  if (namesN.some(n => VILLAGES_NORM.includes(n))) return 'VI';
 
-      // 都不是，則是地區級
-      return 'RE';
-    }
+  // 都不是，則是地區級
+  return 'RE';
+}
 
     function styleByProps(props){ const lvl = classify(props); if (lvl === 'GC') return { color:'#cc0033', weight:1.6, fillColor:'#cc0033', fillOpacity:0.18 }; if (lvl === 'PC') return { color:'#ff7f0e', weight:1.4, fillColor:'#ff7f0e', fillOpacity:0.16 }; if (lvl === 'VI') return { color:'#1f77b4', weight:1.2, fillColor:'#1f77b4', fillOpacity:0.14 }; return { color:'#2ca02c', weight:1.0, fillColor:'#2ca02c', fillOpacity:0.12 }; }
     function highlightStyle(props){ const s = styleByProps(props); return { ...s, weight: s.weight + 0.8, fillOpacity: Math.min(0.35, (s.fillOpacity||0.15)+0.12) }; }
@@ -195,7 +196,26 @@ function popupHtmlFromProps(props){
   const denom = props?.denom || '沒有 denom 屬性';
   // 直接返回最原始的資料！
   return `<div style="font-family:monospace; max-width:300px; word-wrap:break-word;">${denom}</div>`;
-}    function draw(queryRaw, exactMode = false){ let q = norm(queryRaw || ''); if (ALIASES[q]) q = ALIASES[q]; if (layer) map.removeLayer(layer); const feats = (rawFC?.features || []).filter(f => { if (!q) return true; const denom = f.properties?.denom || ''; const names = denom.split(',').map(s => s.trim()).filter(Boolean); if (exactMode) { return names.some(n => norm(n) === q); } const score = Math.max(...names.map(n => { const nn = norm(n); if (nn === q) return 100; if (nn.startsWith(q)) return 50; if (nn.includes(q)) return 10; return 0; })); return score > 0; }); if (!exactMode && feats.length > 1) { feats.sort((a, b) => { const scoreA = Math.max(...(a.properties.denom.split(',').map(n => norm(n) === q ? 100 : (norm(n).startsWith(q) ? 50 : (norm(n).includes(q) ? 10 : 0))))); const scoreB = Math.max(...(b.properties.denom.split(',').map(n => norm(n) === q ? 100 : (norm(n).startsWith(q) ? 50 : (norm(n).includes(q) ? 10 : 0))))); return scoreB - scoreA; }); } layer = L.geoJSON({ type:'FeatureCollection', features:feats }, { style: (f)=> styleByProps(f.properties || {}), onEachFeature: (f, l) => { l.bindPopup(popupHtmlFromProps(f.properties || {})); l.on('mouseover', ()=> l.setStyle(highlightStyle(f.properties||{}))); l.on('mouseout',  ()=> l.setStyle(styleByProps(f.properties||{}))); l.on('click',     ()=> { try { map.fitBounds(l.getBounds(), { maxZoom: 16 }); } catch(e){} }); } }).addTo(map); if (feats.length) { map.fitBounds(layer.getBounds(), { padding:[20,20] }); } else { console.warn('找不到結果：', queryRaw); } }
+}    function draw(queryRaw, exactMode = false){
+  let q = norm(queryRaw || '');
+  if (ALIASES[q]) q = ALIASES[q];
+
+  if (layer) map.removeLayer(layer);
+
+  const feats = (rawFC?.features || []).filter(f => {
+    if (!q) return true;
+
+    const denom = f.properties?.denom || '';
+    const names = denom.split(',').map(s => s.trim()).filter(Boolean);
+    
+    // 在精確模式下，我們檢查拆開後的名字，是否「等於」搜尋詞
+    if (exactMode) {
+      // 特別處理 Clos de Vougeot
+      if (q === 'closdevougeot') {
+        return denom.toLowerCase().includes('clos de vougeot');
+      }
+      return names.some(n => norm(n) === q);
+    } const score = Math.max(...names.map(n => { const nn = norm(n); if (nn === q) return 100; if (nn.startsWith(q)) return 50; if (nn.includes(q)) return 10; return 0; })); return score > 0; }); if (!exactMode && feats.length > 1) { feats.sort((a, b) => { const scoreA = Math.max(...(a.properties.denom.split(',').map(n => norm(n) === q ? 100 : (norm(n).startsWith(q) ? 50 : (norm(n).includes(q) ? 10 : 0))))); const scoreB = Math.max(...(b.properties.denom.split(',').map(n => norm(n) === q ? 100 : (norm(n).startsWith(q) ? 50 : (norm(n).includes(q) ? 10 : 0))))); return scoreB - scoreA; }); } layer = L.geoJSON({ type:'FeatureCollection', features:feats }, { style: (f)=> styleByProps(f.properties || {}), onEachFeature: (f, l) => { l.bindPopup(popupHtmlFromProps(f.properties || {})); l.on('mouseover', ()=> l.setStyle(highlightStyle(f.properties||{}))); l.on('mouseout',  ()=> l.setStyle(styleByProps(f.properties||{}))); l.on('click',     ()=> { try { map.fitBounds(l.getBounds(), { maxZoom: 16 }); } catch(e){} }); } }).addTo(map); if (feats.length) { map.fitBounds(layer.getBounds(), { padding:[20,20] }); } else { console.warn('找不到結果：', queryRaw); } }
 
     // ===== 3. 建立主函式 (不變) =====
     async function main() {
