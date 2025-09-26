@@ -3,29 +3,74 @@
 <head>
   <meta charset="utf-8" />
   <title>Burgundy AOC (最終穩定版)</title>
+  <!-- 下面這一行是關鍵！ -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
-  <style>
-    html,body,#map{height:100%;margin:0}
-    .ui{position:absolute;z-index:1000;top:12px;left:12px;background:#fff;padding:10px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.18);width:min(88vw,480px);font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; max-height: calc(100vh - 40px); display: flex; flex-direction: column;}
-    .ui-content { overflow-y: auto; } /* 讓內容可以滾動 */
-    .row{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
-    .ui input{flex:1;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font:inherit}
-    .btn{padding:6px 10px;border:1px solid #ddd;border-radius:8px;background:#f8f8f8;cursor:pointer;font:12px;white-space:nowrap}
-    .btn:hover{background:#eee}
-    .chips{display:flex;gap:6px;flex-wrap:wrap;}
-    .section-title { font-weight: bold; margin-top: 10px; padding-bottom: 4px; border-bottom: 1px solid #eee; }
-    .legend{position:absolute;z-index:1000;right:12px;bottom:12px;background:#fff;padding:10px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.18);font:13px system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
-    .legend .item{display:flex;align-items:center;gap:8px;margin:4px 0}
-    .swatch{width:16px;height:12px;border:2px solid #000;border-radius:3px}
-    .swatch.gc{border-color:#cc0033;background:#cc003322}
-    .swatch.pc{border-color:#ff7f0e;background:#ff7f0e33}
-    .swatch.vi{border-color:#1f77b4;background:#1f77b433}
-    .swatch.re{border-color:#2ca02c;background:#2ca02c33}
+ <style>
+    html, body, #map { height: 100%; margin: 0; padding: 0; }
+    
+    /* 預設樣式 (手機優先) */
+    .ui {
+      position: absolute;
+      z-index: 1000;
+      top: 10px;
+      left: 10px;
+      right: 10px; /* 在手機上左右貼齊 */
+      background: #fff;
+      padding: 10px;
+      border-radius: 10px;
+      box-shadow: 0 6px 20px rgba(0,0,0,.18);
+      font: 14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      max-height: 50vh; /* 在手機上，UI 最高佔螢幕一半 */
+      display: flex;
+      flex-direction: column;
+    }
+    .ui-content { overflow-y: auto; }
+    .row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
+    .ui input { flex: 1; min-width: 100px; padding: 8px 10px; border: 1px solid #ddd; border-radius: 8px; font: inherit; }
+    .btn { padding: 6px 10px; border: 1px solid #ddd; border-radius: 8px; background: #f8f8f8; cursor: pointer; font-size: 12px; white-space: nowrap; }
+    .btn:hover { background: #eee; }
+    .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+    .section-title { font-weight: bold; margin-top: 10px; padding-bottom: 4px; border-bottom: 1px solid #eee; width: 100%; }
+    .legend {
+      position: absolute;
+      z-index: 999; /* 比 UI 低一層 */
+      right: 10px;
+      bottom: 10px;
+      background: rgba(255,255,255,0.8); /* 半透明背景 */
+      padding: 8px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.15);
+      font: 12px system-ui;
+    }
+    .legend .item { display: flex; align-items: center; gap: 6px; margin: 2px 0; }
+    .swatch { width: 14px; height: 10px; border: 2px solid #000; border-radius: 3px; }
+    .swatch.gc { border-color: #cc0033; background: #cc003322; }
+    .swatch.pc { border-color: #ff7f0e; background: #ff7f0e33; }
+    .swatch.vi { border-color: #1f77b4; background: #1f77b433; }
+    .swatch.re { border-color: #2ca02c; background: #2ca02c33; }
+
+    /* 媒體查詢：當螢幕寬度大於 600px 時 (平板或電腦) */
+    @media (min-width: 600px) {
+      .ui {
+        right: auto; /* 取消右邊貼齊 */
+        width: min(88vw, 480px); /* 恢復原來的寬度 */
+        max-height: calc(100vh - 40px); /* 恢復原來的高度 */
+      }
+      .legend {
+        background: #fff; /* 恢復不透明背景 */
+        padding: 10px;
+        font-size: 13px;
+      }
+    }
   </style>
 </head>
 <body>
