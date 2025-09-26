@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8" />
-  <title>Burgundy AOC (搜尋穩定版＋等級上色＋酒莊圖層)</title>
+  <title>Burgundy AOC (最終整合版)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -25,7 +25,20 @@
     .accordion-title:hover { background: #e1e1e1; }
     .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; padding-top: 0; }
     .accordion-content.show { max-height: 200px; padding-top: 8px; }
-    .leaflet-control-layers { border-radius: 10px; box-shadow: 0 6px 20px rgba(0,0,0,.18); }
+    
+    /* ===== 酒莊圖示樣式 ===== */
+    .winery-icon {
+      background-color: rgba(255, 255, 255, 0.8);
+      border: 2px solid #6A0DAD; /* 紫色邊框 */
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      text-align: center;
+      line-height: 16px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #6A0DAD;
+    }
   </style>
 </head>
 <body>
@@ -57,14 +70,14 @@
   <script>
     // ===== 1. 初始化地圖和變數 =====
     const AOC_DATA_FILE = './burgundy.geojson';
-    const WINERY_DATA_FILE = './wineries.json'; // 新增酒莊資料檔名
+    const WINERY_DATA_FILE = './wineries.geojson'; // 新增酒莊資料檔
     const map = L.map('map').setView([47.0, 4.8], 9);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '© OpenStreetMap · INAO/IGN data.geopf.fr (Open Licence 2.0)'
     }).addTo(map);
     
-    let rawFC = null, aocLayer = null, wineryLayer = null, META = {};
+    let rawAOC_FC = null, aocLayer = null, wineryLayer = null, META = {};
     const input = document.getElementById('q');
     const btnClear = document.getElementById('clear');
     const btnAll   = document.getElementById('all');
@@ -86,87 +99,82 @@
     function styleByProps(props){ const lvl = classify(props); if (lvl === 'GC') return { color:'#cc0033', weight:1.6, fillColor:'#cc0033', fillOpacity:0.18 }; if (lvl === 'PC') return { color:'#ff7f0e', weight:1.4, fillColor:'#ff7f0e', fillOpacity:0.16 }; if (lvl === 'VI') return { color:'#1f77b4', weight:1.2, fillColor:'#1f77b4', fillOpacity:0.14 }; return { color:'#2ca02c', weight:1.0, fillColor:'#2ca02c', fillOpacity:0.12 }; }
     function highlightStyle(props){ const s = styleByProps(props); return { ...s, weight: s.weight + 0.8, fillOpacity: Math.min(0.35, (s.fillOpacity||0.15)+0.12) }; }
     function popupHtmlFromProps(props){ const denom = props?.denom || ''; const names = denom.split(',').map(s=>s.trim()).filter(Boolean); const score = (name) => { const n = norm(name); if (GRAND_CRU_NORM.includes(n)) return 100; if (n.toLowerCase().includes('grand cru')) return 90; if (n.toLowerCase().includes('premier cru')) return 60; if (VILLAGES_NORM.includes(n)) return 40; return 10; }; names.sort((a, b) => score(b) - score(a)); let hitName = null, hitMeta = null; for (const n of names){ const k = norm(n); if (META[k]){ hitName = n; hitMeta = META[k]; break; } } if (hitMeta){ const link = hitMeta.link ? `<br><a href="${hitMeta.link}" target="_blank">更多</a>` : ''; const moreId = 'm'+Math.random().toString(36).slice(2); const otherNames = names.filter(n => n !== hitName); const more = otherNames.length ? `<div style="margin-top:6px"><a href="#" onclick="const e=document.getElementById('${moreId}');e.style.display=e.style.display?'':'block';this.remove();return false;">+ 顯示其他適用名稱</a><div id="${moreId}" style="display:none;margin-top:4px;font-size:12px;color:#555">${otherNames.join('<br>')}</div></div>` : ''; return `<b>${hitMeta.zh || hitName}</b><br>等級：${hitMeta.level || ''}${hitMeta.village ? `（${hitMeta.village}）` : ''}<br>${hitMeta.notes || ''}${link}<hr style="border:none;border-top:1px solid #eee;margin:8px 0"><small>地圖名稱：${hitName}</small>${more}`; } else { const titles = names.slice(0,2); const moreId = 'm'+Math.random().toString(36).slice(2); const more = names.slice(2).length ? `<div style="margin-top:6px"><a href="#" onclick="const e=document.getElementById('${moreId}');e.style.display=e.style.display?'':'block';this.remove();return false;">+ 顯示更多適用名稱</a><div id="${moreId}" style="display:none;margin-top:4px;font-size:12px;color:#555">${names.slice(2).join('<br>')}</div></div>` : ''; return `<b>${titles.join('<br>') || 'AOC'}</b>${more}`; } }
-    
+    function drawAOC(queryRaw, exactMode = false){ let q = norm(queryRaw || ''); if (ALIASES[q]) q = ALIASES[q]; if (aocLayer) aocLayer.clearLayers(); const feats = (rawAOC_FC?.features || []).filter(f => { if (!q) return true; const denom = f.properties?.denom || ''; if (exactMode && q === 'closdevougeot') { return denom.toLowerCase().includes('clos de vougeot'); } const names = denom.split(',').map(s => s.trim()).filter(Boolean); if (exactMode) { return names.some(n => norm(n) === q); } const score = Math.max(...names.map(n => { const nn = norm(n); if (nn === q) return 100; if (nn.startsWith(q)) return 50; if (nn.includes(q)) return 10; return 0; })); return score > 0; }); if (!exactMode && feats.length > 1) { feats.sort((a, b) => { const scoreA = Math.max(...(a.properties.denom.split(',').map(n => norm(n) === q ? 100 : (norm(n).startsWith(q) ? 50 : (norm(n).includes(q) ? 10 : 0))))); const scoreB = Math.max(...(b.properties.denom.split(',').map(n => norm(n) === q ? 100 : (norm(n).startsWith(q) ? 50 : (norm(n).includes(q) ? 10 : 0))))); return scoreB - scoreA; }); } aocLayer.addData({ type:'FeatureCollection', features:feats }); if (feats.length) { map.fitBounds(aocLayer.getBounds(), { padding:[20,20] }); } else { console.warn('找不到結果：', queryRaw); } }
+
+    // ===== 新增：繪製酒莊圖層的函式 =====
+    function drawWineries(wineryFC) {
+      const markers = [];
+      const wineryIcon = L.divIcon({
+        className: 'winery-icon',
+        html: '🍷',
+        iconSize: [20, 20],
+        iconAnchor: [10, 10]
+      });
+      for (const feature of wineryFC.features) {
+        const props = feature.properties;
+        const coords = feature.geometry.coordinates;
+        if (props.name && coords) {
+          // 注意：Leaflet 座標是 [lat, lon]，GeoJSON 是 [lon, lat]
+          const marker = L.marker([coords[1], coords[0]], { icon: wineryIcon });
+          marker.bindPopup(`<b>${props.name}</b><br>${props['addr:city'] || ''}`);
+          markers.push(marker);
+        }
+      }
+      return L.layerGroup(markers);
+    }
+
     // ===== 3. 建立主函式來啟動所有功能 =====
     async function main() {
-      let wineryFC = null;
       try {
+        // 現在一次載入三個檔案
         const [metaRes, aocRes, wineryRes] = await Promise.all([
-          fetch('./meta.json').catch(() => ({})), // 即使 meta.json 失敗也繼續
+          fetch('./meta.json'),
           fetch(AOC_DATA_FILE),
-          fetch(WINERY_DATA_FILE).catch(() => null) // 即使 wineries.json 失敗也繼續
+          fetch(WINERY_DATA_FILE)
         ]);
         META = await metaRes.json();
-        rawFC = await aocRes.json();
-        if (wineryRes) wineryFC = await wineryRes.json();
+        rawAOC_FC = await aocRes.json();
+        const wineryFC = await wineryRes.json();
+
+        // 建立 AOC 圖層 (一開始是空的)
+        aocLayer = L.geoJSON(null, {
+          style: (f) => styleByProps(f.properties || {}),
+          onEachFeature: (f, l) => {
+            l.bindPopup(popupHtmlFromProps(f.properties || {}));
+            l.on('mouseover', () => l.setStyle(highlightStyle(f.properties||{})));
+            l.on('mouseout',  () => l.setStyle(styleByProps(f.properties||{})));
+            l.on('click',     () => { try { map.fitBounds(l.getBounds(), { maxZoom: 16 }); } catch(e){} });
+          }
+        }).addTo(map);
+
+        // 建立酒莊圖層
+        wineryLayer = drawWineries(wineryFC); // 預設不加入地圖
+
+        // 建立圖層控制器
+        const overlayMaps = {
+          "AOC 產區": aocLayer,
+          "酒莊位置": wineryLayer
+        };
+        L.control.layers(null, overlayMaps, { collapsed: false }).addTo(map);
+
       } catch (error) {
-        console.error("無法載入 AOC 資料檔案:", error);
-        alert("錯誤：無法載入地圖資料！請檢查 burgundy.geojson 檔案是否存在。");
+        console.error("無法載入必要的資料檔案:", error);
+        alert("錯誤：無法載入地圖資料！請檢查 burgundy.geojson, wineries.geojson 和 meta.json 檔案是否存在。");
         return;
       }
 
-      // ===== 繪製 AOC 圖層 =====
-      aocLayer = L.geoJSON(null, { // 先建立一個空圖層
-        style: (f) => styleByProps(f.properties || {}),
-        onEachFeature: (f, l) => {
-          l.bindPopup(popupHtmlFromProps(f.properties || {}));
-          l.on('mouseover', () => l.setStyle(highlightStyle(f.properties||{})));
-          l.on('mouseout',  () => l.setStyle(styleByProps(f.properties||{})));
-          l.on('click',     () => { try { map.fitBounds(l.getBounds(), { maxZoom: 16 }); } catch(e){} });
-        }
-      }).addTo(map);
+      drawAOC(''); // 第一次繪製完整地圖
 
-      // ===== 繪製酒莊圖層 =====
-      if (wineryFC) {
-        wineryLayer = L.geoJSON(wineryFC, {
-          pointToLayer: (feature, latlng) => L.marker(latlng),
-          onEachFeature: (feature, layer) => {
-            const props = feature.properties;
-            const name = props.name || props.official_name || '未命名酒莊';
-            const website = props.website ? `<br><a href="${props.website}" target="_blank">官方網站</a>` : '';
-            layer.bindPopup(`<b>${name}</b>${website}`);
-          }
-        });
-      }
-
-      // ===== 建立圖層控制器 =====
-      const overlayLayers = {"AOC 產區": aocLayer};
-      if (wineryLayer) {
-        overlayLayers["酒莊位置"] = wineryLayer;
-      }
-      L.control.layers(null, overlayLayers, { collapsed: false }).addTo(map);
-
-      // ===== 改造 draw 函式為 searchAOC =====
-      function searchAOC(queryRaw, exactMode = false) {
-        let q = norm(queryRaw || '');
-        if (ALIASES[q]) q = ALIASES[q];
-        const feats = (rawFC?.features || []).filter(f => {
-          if (!q) return true;
-          const denom = f.properties?.denom || '';
-          if (exactMode && q === 'closdevougeot') { return denom.toLowerCase().includes('clos de vougeot'); }
-          const names = denom.split(',').map(s => s.trim()).filter(Boolean);
-          if (exactMode) { return names.some(n => norm(n) === q); }
-          const score = Math.max(...names.map(n => { const nn = norm(n); if (nn === q) return 100; if (nn.startsWith(q)) return 50; if (nn.includes(q)) return 10; return 0; }));
-          return score > 0;
-        });
-        if (!exactMode && feats.length > 1) { feats.sort((a, b) => { const scoreA = Math.max(...(a.properties.denom.split(',').map(n => norm(n) === q ? 100 : (norm(n).startsWith(q) ? 50 : (norm(n).includes(q) ? 10 : 0))))); const scoreB = Math.max(...(b.properties.denom.split(',').map(n => norm(n) === q ? 100 : (norm(n).startsWith(q) ? 50 : (norm(n).includes(q) ? 10 : 0))))); return scoreB - scoreA; }); }
-        
-        aocLayer.clearLayers();
-        aocLayer.addData({ type:'FeatureCollection', features:feats });
-        
-        if (feats.length) { map.fitBounds(aocLayer.getBounds(), { padding:[20,20] }); }
-      }
-
-      // 初始繪製
-      searchAOC('');
-
-      // ===== 綁定 UI 事件 =====
       let t = null;
-      input.addEventListener('input', () => { clearTimeout(t); t = setTimeout(() => searchAOC(input.value, false), 220); });
-      btnClear.onclick = () => { input.value = ''; searchAOC(''); };
-      btnAll.onclick = () => { input.value = ''; searchAOC(''); };
-      chipsBox.addEventListener('click', (e) => { const k = e.target?.dataset?.k; if (!k) return; input.value = e.target.innerText; searchAOC(k, true); });
-      const villageClickHandler = (e) => { const k = e.target?.dataset?.k; if (!k) return; input.value = e.target.innerText; searchAOC(k, false); };
+      input.addEventListener('input', () => {
+        clearTimeout(t);
+        t = setTimeout(() => drawAOC(input.value, false), 220);
+      });
+      btnClear.onclick = () => { input.value = ''; drawAOC(''); };
+      btnAll.onclick = () => { input.value = ''; drawAOC(''); };
+      
+      chipsBox.addEventListener('click', (e) => { const k = e.target?.dataset?.k; if (!k) return; input.value = e.target.innerText; drawAOC(k, true); });
+      const villageClickHandler = (e) => { const k = e.target?.dataset?.k; if (!k) return; input.value = e.target.innerText; drawAOC(k, false); };
       chaChipsBox.addEventListener('click', villageClickHandler);
       cdnChipsBox.addEventListener('click', villageClickHandler);
       cdbChipsBox.addEventListener('click', villageClickHandler);
@@ -175,7 +183,7 @@
       document.querySelectorAll('.accordion-title').forEach(title => { title.addEventListener('click', () => { const content = title.nextElementSibling; document.querySelectorAll('.accordion-content.show').forEach(openContent => { if (openContent !== content) { openContent.classList.remove('show'); } }); content.classList.toggle('show'); }); });
     }
 
-    // ===== 4. 執行主函式 (不變) =====
+    // ===== 4. 執行主函式 =====
     main();
   </script>
 </body>
