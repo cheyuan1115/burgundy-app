@@ -1,0 +1,2896 @@
+{
+  "type": "FeatureCollection",
+  "generator": "overpass-turbo",
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+  "timestamp": "2025-09-26T09:36:22Z",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "relation/4141043",
+        "building": "yes",
+        "craft": "winery",
+        "name": "Château du Clos de Vougeot",
+        "type": "multipolygon",
+        "website": "https://www.closdevougeot.fr/",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9551815,
+          47.174805
+        ]
+      },
+      "id": "relation/4141043"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/70590520",
+        "building": "yes",
+        "craft": "winery",
+        "name": "Domaine du Petit Béru",
+        "official_name": "Domaine du Petit Béru",
+        "shop": "wine",
+        "source": "data.gouv.fr:DATAtourisme - 05/2020",
+        "wall": "no",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.0055461,
+          47.8540527
+        ]
+      },
+      "id": "way/70590520"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/106069735",
+        "building": "yes",
+        "craft": "winery",
+        "name": "Simonnet Febvre",
+        "opening_hours": "Tu-Sa 10:00-13:00, 14:30-18:30",
+        "shop": "wine",
+        "source": "cadastre-dgi-fr source : Direction Générale des Impôts - Cadastre. Mise à jour : 2011",
+        "website": "https://www.simonnet-febvre.com/",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.8035535,
+          47.81599
+        ]
+      },
+      "id": "way/106069735"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/106071209",
+        "addr:housenumber": "20",
+        "addr:postcode": "89800",
+        "addr:street": "Avenue d'Oberwesel",
+        "building": "yes",
+        "craft": "winery",
+        "name": "Domaine Servin",
+        "shop": "wine",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.8043205,
+          47.8155795
+        ]
+      },
+      "id": "way/106071209"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/106929167",
+        "addr:city": "Gevrey-Chambertin",
+        "addr:housenumber": "17",
+        "addr:postcode": "21220",
+        "addr:street": "Rue Haute",
+        "building": "yes",
+        "craft": "winery",
+        "name": "Le Meix Coquebrique - Domaine Henri Magnien",
+        "source": "cadastre-dgi-fr source : Direction Générale des Impôts - Cadastre. Mise à jour : 2011",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.964474,
+          47.229111
+        ]
+      },
+      "id": "way/106929167"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/106929973",
+        "addr:city": "Gevrey-Chambertin",
+        "addr:housenumber": "1",
+        "addr:postcode": "21220",
+        "addr:street": "Rue Haute",
+        "building": "yes",
+        "craft": "winery",
+        "name": "Domaine Thibaut et Fils",
+        "source": "cadastre-dgi-fr source : Direction Générale des Impôts - Cadastre. Mise à jour : 2011",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.963271,
+          47.2280445
+        ]
+      },
+      "id": "way/106929973"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/106932146",
+        "addr:city": "Gevrey-Chambertin",
+        "addr:housenumber": "3",
+        "addr:postcode": "21220",
+        "addr:street": "Rue Neuve",
+        "building": "yes",
+        "craft": "winery",
+        "name": "Clos St Jacques",
+        "source": "cadastre-dgi-fr source : Direction Générale des Impôts - Cadastre. Mise à jour : 2011",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.962791,
+          47.22746
+        ]
+      },
+      "id": "way/106932146"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/117507321",
+        "addr:housenumber": "97",
+        "addr:street": "Route de Pommard",
+        "building": "yes",
+        "craft": "winery",
+        "name": "Cave des Hautes-Côtes Nuiton-Beaunoy",
+        "phone": "+33 3 80 25 01 03",
+        "ref:FR:SIRET": "77556721700028",
+        "shop": "wine",
+        "short_name": "CHC",
+        "website": "https://nuiton-beaunoy.fr",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.8160895,
+          47.013052
+        ]
+      },
+      "id": "way/117507321"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/117547537",
+        "addr:city": "Beaune",
+        "addr:housenumber": "1",
+        "addr:postcode": "21200",
+        "addr:street": "Place Saint-Jacques",
+        "building": "yes",
+        "craft": "winery",
+        "name": "Domaine Debray",
+        "source": "cadastre-dgi-fr source : Direction Générale des Impôts - Cadastre. Mise à jour : 2011;cadastre-dgi-fr source : Direction Générale des Finances Publiques - Cadastre. Mise à jour : 2014",
+        "website": "https://www.domaine-debray.fr/",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.836703,
+          47.0199305
+        ]
+      },
+      "id": "way/117547537"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/118384406",
+        "addr:housenumber": "19",
+        "addr:postcode": "21190",
+        "addr:street": "Rue de Mazeray",
+        "alt_name": "Domaine Patrick Javillier",
+        "building": "yes",
+        "craft": "winery",
+        "name": "Cave Saint-Nicolas",
+        "shop": "wine",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.772118,
+          46.9752265
+        ]
+      },
+      "id": "way/118384406"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/118387816",
+        "addr:city": "Meursault",
+        "addr:housenumber": "12",
+        "addr:postcode": "21190",
+        "addr:street": "Rue du Cromin",
+        "building": "yes",
+        "craft": "winery",
+        "name": "Domaine Michel Caillot",
+        "source": "cadastre-dgi-fr source : Direction Générale des Impôts - Cadastre. Mise à jour : 2011",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7709115,
+          46.981695
+        ]
+      },
+      "id": "way/118387816"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/124172572",
+        "alcohol": "wine",
+        "building": "retail",
+        "craft": "winery",
+        "name": "Les Vignerons de Mancey",
+        "shop": "alcohol",
+        "source": "cadastre-dgi-fr source : Direction Générale des Impôts - Cadastre. Mise à jour : 2011",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9029351,
+          46.5848559
+        ]
+      },
+      "id": "way/124172572"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/125383930",
+        "addr:city": "Brochon",
+        "addr:housenumber": "9",
+        "addr:postcode": "21220",
+        "addr:street": "Rue du Rapitot",
+        "building": "yes",
+        "craft": "winery",
+        "name": "Domaine Cluny",
+        "source": "cadastre-dgi-fr source : Direction Générale des Impôts - Cadastre. Mise à jour : 2011",
+        "website": "https://www.domaine-cluny.com/",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.966946,
+          47.238527
+        ]
+      },
+      "id": "way/125383930"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/126358615",
+        "building": "yes",
+        "craft": "winery",
+        "source": "cadastre-dgi-fr source : Direction Générale des Impôts - Cadastre. Mise à jour : 2011",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7746612,
+          46.3008014
+        ]
+      },
+      "id": "way/126358615"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/126363168",
+        "building": "yes",
+        "craft": "winery",
+        "name": "Cave de Charnay",
+        "source": "cadastre-dgi-fr source : Direction Générale des Impôts - Cadastre. Mise à jour : 2011",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7756678,
+          46.2999469
+        ]
+      },
+      "id": "way/126363168"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/126698281",
+        "addr:city": "La Chapelle-de-Guinchay",
+        "addr:housename": "Château Bonnet",
+        "addr:housenumber": "2",
+        "addr:place": "Les Paquelets",
+        "addr:postcode": "71570",
+        "building": "manufacture",
+        "craft": "winery",
+        "name": "Château Bonnet",
+        "opening_hours": "Mo-Su 09:00-12:00,14:00-18:00",
+        "phone": "+333 85 36 70 41",
+        "shop": "wine",
+        "tasting": "yes",
+        "website": "https://chateau-bonnet.fr/",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.747134,
+          46.2216225
+        ]
+      },
+      "id": "way/126698281"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/227192628",
+        "building": "yes",
+        "craft": "winery",
+        "source": "cadastre-dgi-fr source : Direction Générale des Finances Publiques - Cadastre. Mise à jour : 2013",
+        "wall": "no",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7788695,
+          46.2737295
+        ]
+      },
+      "id": "way/227192628"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/227192827",
+        "building": "yes",
+        "craft": "winery",
+        "source": "cadastre-dgi-fr source : Direction Générale des Finances Publiques - Cadastre. Mise à jour : 2013",
+        "wall": "no",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7790455,
+          46.2734955
+        ]
+      },
+      "id": "way/227192827"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/227193239",
+        "building": "yes",
+        "craft": "winery",
+        "source": "cadastre-dgi-fr source : Direction Générale des Finances Publiques - Cadastre. Mise à jour : 2013",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.778829,
+          46.273561
+        ]
+      },
+      "id": "way/227193239"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/227193414",
+        "building": "yes",
+        "craft": "winery",
+        "source": "cadastre-dgi-fr source : Direction Générale des Finances Publiques - Cadastre. Mise à jour : 2013",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.778081,
+          46.273572
+        ]
+      },
+      "id": "way/227193414"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/228924156",
+        "building": "yes",
+        "craft": "winery",
+        "name": "Renard Jacky",
+        "source": "cadastre-dgi-fr source : Direction Générale des Finances Publiques - Cadastre. Mise à jour : 2013",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.65339,
+          47.7452445
+        ]
+      },
+      "id": "way/228924156"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/228924249",
+        "building": "yes",
+        "craft": "winery",
+        "name": "Domaine des Remparts",
+        "source": "cadastre-dgi-fr source : Direction Générale des Finances Publiques - Cadastre. Mise à jour : 2013",
+        "website": "http://www.domaine-des-remparts.com/",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.65058,
+          47.7426845
+        ]
+      },
+      "id": "way/228924249"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/228924312",
+        "building": "yes",
+        "craft": "winery",
+        "name": "Domaine Verret",
+        "source": "cadastre-dgi-fr source : Direction Générale des Finances Publiques - Cadastre. Mise à jour : 2013",
+        "website": "https://www.domaineverret.com/",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.648521,
+          47.7424915
+        ]
+      },
+      "id": "way/228924312"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/228925072",
+        "building": "yes",
+        "craft": "winery",
+        "name": "Domaine Grivot-Goisot",
+        "source": "cadastre-dgi-fr source : Direction Générale des Finances Publiques - Cadastre. Mise à jour : 2013",
+        "website": "https://www.grivot-goisot.com/",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.650921,
+          47.7427735
+        ]
+      },
+      "id": "way/228925072"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/228925692",
+        "building": "yes",
+        "craft": "winery",
+        "name": "Domaine Madelin-Petit",
+        "source": "cadastre-dgi-fr source : Direction Générale des Finances Publiques - Cadastre. Mise à jour : 2013",
+        "website": "https://www.madelinpetit.com/",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.651104,
+          47.7422095
+        ]
+      },
+      "id": "way/228925692"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/228925721",
+        "building": "yes",
+        "craft": "winery",
+        "name": "Domaine Sorin-Coquard",
+        "source": "cadastre-dgi-fr source : Direction Générale des Finances Publiques - Cadastre. Mise à jour : 2013",
+        "website": "https://www.domaine-sorin-coquard.com/",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.6449815,
+          47.743216
+        ]
+      },
+      "id": "way/228925721"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/237131229",
+        "addr:city": "Chaintré",
+        "addr:housenumber": "180",
+        "addr:postcode": "71570",
+        "addr:street": "Route de Juliénas",
+        "building": "yes",
+        "craft": "winery",
+        "name": "Cave de Chaintré",
+        "operator": "Juliénas Chaintré Vignerons Associés",
+        "source": "cadastre-dgi-fr source : Direction Générale des Finances Publiques - Cadastre. Mise à jour : 2013",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.769303,
+          46.2614915
+        ]
+      },
+      "id": "way/237131229"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/259629021",
+        "building": "yes",
+        "craft": "winery",
+        "name": "Domaine Aimé Blouzard",
+        "source": "cadastre-dgi-fr source : Direction Générale des Finances Publiques - Cadastre. Mise à jour : 2014",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7882935,
+          46.4440955
+        ]
+      },
+      "id": "way/259629021"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/260157759",
+        "building": "yes",
+        "craft": "winery",
+        "name": "Domaine des Deux Roches",
+        "operator": "Collovray & Terrier",
+        "source": "cadastre-dgi-fr source : Direction Générale des Finances Publiques - Cadastre. Mise à jour : 2014",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7558127,
+          46.299541
+        ]
+      },
+      "id": "way/260157759"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/260158841",
+        "building": "yes",
+        "craft": "winery",
+        "name": "Domaine de Poncétys",
+        "operator": "EPLEFPA Mâcon-Davayé",
+        "source": "cadastre-dgi-fr source : Direction Générale des Finances Publiques - Cadastre. Mise à jour : 2014",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7380923,
+          46.306998
+        ]
+      },
+      "id": "way/260158841"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/260340258",
+        "building": "yes",
+        "craft": "winery",
+        "source": "cadastre-dgi-fr source : Direction Générale des Finances Publiques - Cadastre. Mise à jour : 2014",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.750471,
+          46.281189
+        ]
+      },
+      "id": "way/260340258"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/324067465",
+        "addr:city": "Couchey",
+        "addr:housenumber": "26",
+        "addr:postcode": "21160",
+        "building": "yes",
+        "craft": "winery",
+        "name": "Domaine Philippe Robert",
+        "source": "cadastre-dgi-fr source : Direction Générale des Finances Publiques - Cadastre. Mise à jour : 2015",
+        "website": "https://www.domainerobert.com/fr/",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.978224,
+          47.261357
+        ]
+      },
+      "id": "way/324067465"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/324067509",
+        "addr:city": "Couchey",
+        "addr:housenumber": "8",
+        "addr:postcode": "21160",
+        "building": "yes",
+        "craft": "winery",
+        "name": "Domaine de la Croix de Bois",
+        "source": "cadastre-dgi-fr source : Direction Générale des Finances Publiques - Cadastre. Mise à jour : 2015",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9756205,
+          47.26109
+        ]
+      },
+      "id": "way/324067509"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/646819523",
+        "addr:housenumber": "8",
+        "addr:street": "Chemin des Beveys",
+        "craft": "winery",
+        "landuse": "industrial",
+        "name": "Cave de Viillars-Fontaine",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.8918944,
+          47.1522803
+        ]
+      },
+      "id": "way/646819523"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/768313469",
+        "building": "yes",
+        "craft": "winery",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7502038,
+          46.2811621
+        ]
+      },
+      "id": "way/768313469"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1017825389",
+        "contact:city": "Irancy",
+        "contact:housenumber": "11",
+        "contact:street": "Chemin des Fossés",
+        "craft": "winery",
+        "name": "Christophe Ferrari",
+        "source": "cadastre-dgi-fr source : Direction Générale des Impôts - Cadastre. Mise à jour : 2010"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.662762,
+          47.7144831
+        ]
+      },
+      "id": "node/1017825389"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1071900226",
+        "building": "yes",
+        "craft": "winery",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7463444,
+          46.2791397
+        ]
+      },
+      "id": "way/1071900226"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1071900227",
+        "building": "yes",
+        "craft": "winery",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7467629,
+          46.2793795
+        ]
+      },
+      "id": "way/1071900227"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1097939317",
+        "addr:city": "Paron",
+        "addr:housenumber": "1",
+        "addr:street": "Allée des Sénons",
+        "building": "yes",
+        "craft": "winery",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.2564902,
+          48.1830234
+        ]
+      },
+      "id": "way/1097939317"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1260533563",
+        "building": "yes",
+        "craft": "winery",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.746175,
+          46.2795015
+        ]
+      },
+      "id": "way/1260533563"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1382766259",
+        "building": "yes",
+        "craft": "winery",
+        "name": "Doudet Naudin SA",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.8229105,
+          47.0615163
+        ]
+      },
+      "id": "way/1382766259"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1387044038",
+        "craft": "winery",
+        "name": "Domaine André Delorme",
+        "website": "https://annuaire-entreprises.data.gouv.fr/entreprise/domaine-andre-delorme-500995642",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.6295057,
+          46.8918382
+        ]
+      },
+      "id": "way/1387044038"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1829670599",
+        "craft": "winery",
+        "email": "domaine.jhg@goisot.com",
+        "fax": "+33 3 86 53 62 03",
+        "name": "Jean Hugues Et Guilhem Goisot",
+        "organic": "yes",
+        "phone": "+33 3 86 53 35 15",
+        "shop": "wine",
+        "website": "https://www.goisot.fr/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.6499376,
+          47.7435687
+        ]
+      },
+      "id": "node/1829670599"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2894143722",
+        "addr:housenumber": "27",
+        "craft": "winery",
+        "email": "contact.millotb@domaine-millot.com",
+        "name": "Domaine Bernard MILLOT",
+        "opening_hours": "Mo-Sa 08:00-12:00,14:00-18:00",
+        "phone": "+33 3 80 21 20 91",
+        "shop": "wine",
+        "source": "cadastre-dgi-fr source : Direction Générale des Finances Publiques - Cadastre. Mise à jour : 2014",
+        "website": "https://www.domaine-millot.com/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.770221,
+          46.9740145
+        ]
+      },
+      "id": "node/2894143722"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2906955550",
+        "addr:city": "Pouilly-sur-Loire",
+        "addr:housenumber": "1",
+        "addr:postcode": "58150",
+        "craft": "winery",
+        "description": "Pouilly-Fumé, Sancerre",
+        "email": "info@masson-blondelet.com",
+        "name": "Masson-Blondelet",
+        "organic": "yes",
+        "shop": "wine",
+        "website": "http://www.masson-blondelet.com/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          2.9543745,
+          47.2852065
+        ]
+      },
+      "id": "node/2906955550"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4187282920",
+        "craft": "winery",
+        "name": "Domaine des Fossiles",
+        "opening_hours": "Sa 11:00-14:00",
+        "operator": "Jean-Claude Berthillot",
+        "phone": "+33 3 85 84 01 23"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.1100154,
+          46.2313677
+        ]
+      },
+      "id": "node/4187282920"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4200492803",
+        "craft": "winery",
+        "email": "contact@chablis-gueguen.fr",
+        "name": "Degustation Domaine Céline et Frédéric Gueguen",
+        "shop": "wine",
+        "website": "https://www.chablis-gueguen.fr/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.8007495,
+          47.8131373
+        ]
+      },
+      "id": "node/4200492803"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4400759731",
+        "alcohol": "wine",
+        "craft": "winery",
+        "email": "vin@bourgognevin.com",
+        "name": "Domaine Gruhier",
+        "operator": "Dominique Gruhier",
+        "phone": "+33 386 553251",
+        "shop": "alcohol",
+        "website": "https://www.bourgognevin.com/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.977496,
+          47.8767716
+        ]
+      },
+      "id": "node/4400759731"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4893166861",
+        "craft": "winery",
+        "name": "Domaine Hudelot Noellat"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9642242,
+          47.1792375
+        ]
+      },
+      "id": "node/4893166861"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5039926678",
+        "craft": "winery",
+        "name": "Jeannin-Naltet",
+        "ref:FR:SIREN": "315030692"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7313255,
+          46.8358367
+        ]
+      },
+      "id": "node/5039926678"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5044234193",
+        "addr:city": "Beaune",
+        "addr:housenumber": "6",
+        "addr:postcode": "21200",
+        "addr:street": "Route de Seurre",
+        "craft": "winery",
+        "name": "Comte de Chapelle",
+        "ref:FR:NAF": "01.21Z",
+        "ref:FR:SIRET": "49937084900014"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.849796,
+          47.0199198
+        ]
+      },
+      "id": "node/5044234193"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5044234195",
+        "craft": "winery",
+        "name": "Domaine Emmanuel Giboulot"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.8461643,
+          47.0196145
+        ]
+      },
+      "id": "node/5044234195"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5044450908",
+        "addr:housenumber": "10",
+        "addr:street": "Route de Pommard",
+        "craft": "winery",
+        "name": "Robert Laboureau",
+        "ref:FR:SIRET": "34039563100013",
+        "source": "INSEE-SIRET 2017"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.8285851,
+          47.0192487
+        ]
+      },
+      "id": "node/5044450908"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5115968092",
+        "addr:city": "Saint-Père",
+        "addr:housenumber": "33",
+        "addr:postcode": "89450",
+        "craft": "winery",
+        "name": "Weinkellerei Defert Joel",
+        "phone": "+33 3 86 33 20 74",
+        "tourism": "chalet"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.763126,
+          47.4616703
+        ]
+      },
+      "id": "node/5115968092"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5416303850",
+        "addr:city": "Auxey-Duresses",
+        "addr:housenumber": "12",
+        "addr:postcode": "21190",
+        "addr:street": "Route de Beaune",
+        "craft": "winery",
+        "description": "Le domaine comprend 11,5 ha de vignes réparties sur le vignoble d’Auxey-Duresses et de Volnay. Une typicité du domaine est de posséder uniquement des vignes hautes en lyres.",
+        "name": "Domaine Roy",
+        "opening_hours": "mo-fr 09:00-12:00, 14:00-19:00",
+        "phone": "+33 3 80 21 22 37; +33 3 80 21 23 75",
+        "source": "Domaine Roy",
+        "website": "http://domaine.roy.free.fr/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7503061,
+          46.9870142
+        ]
+      },
+      "id": "node/5416303850"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5603017444",
+        "addr:city": "Savigny-lès-Beaune",
+        "addr:country": "FR",
+        "addr:housenumber": "11",
+        "addr:postcode": "21420",
+        "addr:street": "Rue du Jarron",
+        "air_conditioning": "yes",
+        "check_date": "2024-08-05",
+        "contact:phone": "+33 6 75 36 18 75",
+        "craft": "winery",
+        "email": "thierry.pinte101@orange.fr",
+        "facebook": "https://www.facebook.com/domainepinte",
+        "internet_access": "no",
+        "name": "Domaine Pinte",
+        "opening_hours": "Mo-Sa 08:00-18:30; Su 08:00-12:00",
+        "operator": "Thierry & Nicolas Pinte",
+        "payment:cash": "yes",
+        "payment:cheque": "yes",
+        "payment:credit_cards": "yes",
+        "phone": "+33 6 75 36 18 75",
+        "source": "local knowledge",
+        "toilets": "yes",
+        "website": "https://www.domaine-pinte.fr/",
+        "wheelchair": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.8195031,
+          47.0637923
+        ]
+      },
+      "id": "node/5603017444"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5603332841",
+        "addr:housenumber": "15",
+        "addr:street": "Rue du Château",
+        "craft": "winery",
+        "drink:wine": "retail",
+        "name": "Bouchard Père et Fils",
+        "name:en": "Bouchard Pere et Fils",
+        "phone": "+33 3 80 24 80 24",
+        "shop": "alcohol",
+        "website": "https://www.bouchard-pereetfils.com",
+        "wikidata": "Q2921339",
+        "wikipedia": "fr:Bouchard Père & Fils"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.8428382,
+          47.0240982
+        ]
+      },
+      "id": "node/5603332841"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5644434530",
+        "craft": "winery",
+        "name": "Cave cidricole bio"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.9937882,
+          46.8271647
+        ]
+      },
+      "id": "node/5644434530"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5655690913",
+        "addr:city": "Dijon",
+        "addr:housenumber": "62",
+        "addr:postcode": "21000",
+        "addr:street": "Rue des Moulins",
+        "craft": "winery",
+        "name": "Godret sébastien",
+        "opening_hours": "Mo-Fr 09:00-17:00",
+        "operator": "vigneron - vin naturel"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.0403722,
+          47.3036319
+        ]
+      },
+      "id": "node/5655690913"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5912705750",
+        "addr:city": "Auxey-Duresses",
+        "addr:postcode": "21190",
+        "addr:street": "Route de Beaune",
+        "contact:email": "domainemichelprunier-fille@wanadoo.fr",
+        "contact:phone": "+33 3 80 21 21 05",
+        "contact:website": "http://www.domainemichelprunieretfille.com",
+        "craft": "winery",
+        "description": "Producteur - Dégustation Vins de Bourgogne",
+        "name": "Vigneron Michel Prunier et fille",
+        "operator": "Michel Prunier"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7487471,
+          46.9869995
+        ]
+      },
+      "id": "node/5912705750"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6249940113",
+        "craft": "winery",
+        "name": "Domaine La Varenne",
+        "organic": "yes",
+        "shop": "wine"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.6468145,
+          46.654897
+        ]
+      },
+      "id": "node/6249940113"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6296773552",
+        "addr:city": "Marsannay-la-Côte",
+        "addr:housenumber": "5",
+        "addr:postcode": "21160",
+        "addr:street": "Rue du Vieux Collège",
+        "craft": "winery",
+        "name": "Domaine Bruno Clair",
+        "phone": "+33 3 80 52 28 95",
+        "website": "http://www.bruno-clair.com/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9909205,
+          47.271999
+        ]
+      },
+      "id": "node/6296773552"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6296773553",
+        "addr:city": "Marsannay-la-Côte",
+        "addr:housenumber": "4",
+        "addr:postcode": "21160",
+        "addr:street": "Rue du Vieux Collège",
+        "check_date": "2024-08-23",
+        "craft": "winery",
+        "name": "Domaine du Vieux Collège",
+        "phone": "+33 3 80 52 12 43",
+        "website": "https://www.domaineduvieuxcollege.com/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9898807,
+          47.2719915
+        ]
+      },
+      "id": "node/6296773553"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6296773554",
+        "addr:housenumber": "52",
+        "addr:postcode": "21160",
+        "addr:street": "Rue de Mazy",
+        "craft": "winery",
+        "name": "Domaine Régis Bouvier",
+        "phone": "+33 3 80 51 33 93",
+        "website": "https://www.vigneron-independant.com/domaine-bouvier-r%C3%A9gis"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9892649,
+          47.2717563
+        ]
+      },
+      "id": "node/6296773554"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6296773555",
+        "addr:city": "Marsannay-la-Côte",
+        "addr:housenumber": "14",
+        "addr:postcode": "21160",
+        "addr:street": "Rue Neuve",
+        "craft": "winery",
+        "name": "Domaine Sylvain Pataille",
+        "phone": "+33 3 80 51 17 35",
+        "website": "https://www.larvf.com/domaine-sylvain-pataille,10563,404729.asp"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.990194,
+          47.2703965
+        ]
+      },
+      "id": "node/6296773555"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6296773557",
+        "addr:city": "Marsannay-la-Côte",
+        "addr:housenumber": "39",
+        "addr:postcode": "21160",
+        "addr:street": "Rue de Mazy",
+        "craft": "winery",
+        "name": "Domaine Olivier Guyot",
+        "operator": "Olivier Guyot",
+        "phone": "+33 3 80 52 39 71",
+        "website": "http://www.domaineguyot.fr/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.987375,
+          47.2699332
+        ]
+      },
+      "id": "node/6296773557"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6296773558",
+        "addr:housenumber": "10",
+        "addr:postcode": "21160",
+        "addr:street": "Rue du Puits de Tet",
+        "craft": "winery",
+        "name": "Domaine Alain Guyard",
+        "phone": "+33 3 80 52 14 46",
+        "website": "https://alainguyard.webnode.fr/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9902086,
+          47.2710331
+        ]
+      },
+      "id": "node/6296773558"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6296809892",
+        "addr:city": "Marsannay-la-Côte",
+        "addr:housenumber": "7",
+        "addr:postcode": "21160",
+        "addr:street": "Rue de la Boulotte",
+        "craft": "winery",
+        "name": "Domaine Charles Audouin",
+        "phone": "+33 3 80 52 34 24",
+        "website": "http://domaines-de-bourgogne.com/domaines/domaine-audoinmarsannay/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9895644,
+          47.2693627
+        ]
+      },
+      "id": "node/6296809892"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6296809893",
+        "addr:city": "Marsannay-la-Côte",
+        "addr:housenumber": "29",
+        "addr:postcode": "21160",
+        "addr:street": "Rue du Château",
+        "craft": "winery",
+        "name": "EARL Domaine Jean Fournier",
+        "phone": "+33 3 80 52 24 38",
+        "website": "https://www.vins-bourgogne.fr/nos-savoir-faire/femmes-et-hommes-passionnes/domaine-jean-fournier-marsannay-la-cote-21160,2397,9211.html?&args=Y29tcF9pZD0xNDA2JmFjdGlvbj12aWV3RmljaGUmaWQ9VklOQk9VMDAwVjUwNkoyWiZ8"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9909391,
+          47.2695656
+        ]
+      },
+      "id": "node/6296809893"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6296809894",
+        "addr:city": "Marsannay-la-Côte",
+        "addr:housenumber": "31",
+        "addr:postcode": "21160",
+        "addr:street": "Rue du Château",
+        "craft": "winery",
+        "name": "Domaine Coillot Père et Fils",
+        "phone": "+33 3 80 48 20 46",
+        "website": "https://www.vins-bourgogne.fr/nos-savoir-faire/femmes-et-hommes-passionnes/coillot-bernard-pere-et-fils-marsannay-la-cote-21160,2397,9211.html?&args=Y29tcF9pZD0xNDA2JmFjdGlvbj12aWV3RmljaGUmaWQ9VklOQk9VMDAwMDIwMDI3MyZ8"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9907981,
+          47.2692749
+        ]
+      },
+      "id": "node/6296809894"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6296809895",
+        "addr:city": "Marsannay-la-Côte",
+        "addr:housenumber": "44",
+        "addr:postcode": "21160",
+        "addr:street": "Rue de Mazy",
+        "craft": "winery",
+        "name": "Domaine Fougeray de Beauclair",
+        "phone": "+33 3 80 52 21 12",
+        "website": "https://fougeraydebeauclair.com/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9875217,
+          47.2691773
+        ]
+      },
+      "id": "node/6296809895"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6296809896",
+        "addr:city": "Marsannay-la-Côte",
+        "addr:housenumber": "23",
+        "addr:postcode": "21160",
+        "addr:street": "Rue Moreau",
+        "craft": "winery",
+        "name": "Domaine Bart",
+        "phone": "+33 3 80 51 49 76",
+        "website": "https://www.vins-bourgogne.fr/nos-savoir-faire/femmes-et-hommes-passionnes/bart-marsannay-la-cote-21160,2397,9211.html?&args=Y29tcF9pZD0xNDA2JmFjdGlvbj12aWV3RmljaGUmaWQ9VklOQk9VMDAwMDIwMDAzOSZ8"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9866567,
+          47.267665
+        ]
+      },
+      "id": "node/6296809896"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6296809897",
+        "addr:city": "Marsannay-la-Côte",
+        "addr:housenumber": "7",
+        "addr:postcode": "21160",
+        "addr:street": "Ruelle du Carron",
+        "craft": "winery",
+        "name": "Domaine Huguenot Père et Fils",
+        "phone": "+33 3 80 52 11 56",
+        "website": "https://www.domainehuguenot.com/ElementsRubrique.aspx?SITE=SHUGUEN&RUB=1038&MP_SS_RUB=ELEM&MP_ELT=FICHE&PAGE=1&Lang=FR"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9859263,
+          47.2687169
+        ]
+      },
+      "id": "node/6296809897"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6296809898",
+        "addr:city": "Marsannay-la-Côte",
+        "addr:housenumber": "2",
+        "addr:postcode": "21160",
+        "addr:street": "Rue des Vignes",
+        "craft": "winery",
+        "name": "Château de Marsannay",
+        "phone": "+33 3 80 51 71 11",
+        "website": "https://www.chateau-marsannay.com/",
+        "wikidata": "Q15943823"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9843828,
+          47.267193
+        ]
+      },
+      "id": "node/6296809898"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6296809901",
+        "addr:city": "Marsannay-la-Côte",
+        "addr:housenumber": "5",
+        "addr:postcode": "21160",
+        "addr:street": "Rue des Avoines",
+        "craft": "winery",
+        "name": "Domaine Hervé Charlopin",
+        "phone": "+33 3 80 59 86 75",
+        "website": "https://www.vins-bourgogne.fr/nos-savoir-faire/femmes-et-hommes-passionnes/charlopin-herve-marsannay-la-cote-21160,2397,9211.html?&args=Y29tcF9pZD0xNDA2JmFjdGlvbj12aWV3RmljaGUmaWQ9VklOQk9VMDAwVjUwM1M1UyZ8"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9895018,
+          47.2662541
+        ]
+      },
+      "id": "node/6296809901"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6296809907",
+        "addr:city": "Marsannay-la-Côte",
+        "addr:housenumber": "16",
+        "addr:postcode": "21160",
+        "addr:street": "Rue du Carré",
+        "craft": "winery",
+        "name": "Domaine de l'Université de Bourgogne",
+        "phone": "+33 3 80 39 62 08",
+        "website": "https://iuvv.u-bourgogne.fr/domaine-de-luniversite.html"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9882842,
+          47.2744157
+        ]
+      },
+      "id": "node/6296809907"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6296823685",
+        "addr:city": "Vougeot",
+        "addr:housenumber": "10",
+        "addr:postcode": "21640",
+        "addr:street": "Ancienne Route Nationale 74",
+        "craft": "winery",
+        "email": "contact@christianclerget-vins.fr",
+        "name": "Domaine Christian Clerget",
+        "phone": "+33 3 80 62 87 37",
+        "website": "http://www.christianclerget-vins.fr/fr/domaine/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9643231,
+          47.1794444
+        ]
+      },
+      "id": "node/6296823685"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6296823686",
+        "addr:city": "Gilly-lès-Cîteaux",
+        "addr:postcode": "21640",
+        "addr:street": "Rue du Vieux Château",
+        "craft": "winery",
+        "name": "Domaine Christian Confuron",
+        "phone": "+33 3 80 62 86 80",
+        "website": "http://www.domaine-christian-confuron.com/fr/index.php"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9643694,
+          47.1784842
+        ]
+      },
+      "id": "node/6296823686"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6580974906",
+        "craft": "winery",
+        "name": "Les Caves Bailly Lapierre"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.62787,
+          47.7228205
+        ]
+      },
+      "id": "node/6580974906"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7038442021",
+        "craft": "winery"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7424162,
+          46.2536802
+        ]
+      },
+      "id": "node/7038442021"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7038471014",
+        "craft": "winery",
+        "name": "Cave des Grands Crus Blancs",
+        "website": "https://www.lesgrandscrusblancs.com/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7779985,
+          46.2738333
+        ]
+      },
+      "id": "node/7038471014"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7047821538",
+        "craft": "winery",
+        "name": "Guillaume Bouchacourt"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7365256,
+          46.2174622
+        ]
+      },
+      "id": "node/7047821538"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7105382090",
+        "craft": "winery"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7508018,
+          46.2543965
+        ]
+      },
+      "id": "node/7105382090"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7115046244",
+        "check_date": "2024-09-21",
+        "craft": "winery",
+        "name": "Château de Fuissé"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7405531,
+          46.2839341
+        ]
+      },
+      "id": "node/7115046244"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7115046245",
+        "addr:city": "Fuissé",
+        "addr:postcode": "71960",
+        "addr:street": "Rouette du Clos",
+        "craft": "winery",
+        "name": "Œnothèque Georges Burrier",
+        "opening_hours": "Tu-Sa 10:00-13:00; 14:00-18:00",
+        "operator": "Joseph Burrier",
+        "phone": "+337 86 68 44 37"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7410103,
+          46.2826255
+        ]
+      },
+      "id": "node/7115046245"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7115046246",
+        "craft": "winery",
+        "name": "Domaine Pierre Vessigaud"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7430238,
+          46.2903662
+        ]
+      },
+      "id": "node/7115046246"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7137480753",
+        "craft": "winery",
+        "name": "Domaine Hamet-Spay"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7495353,
+          46.2418408
+        ]
+      },
+      "id": "node/7137480753"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7139673954",
+        "craft": "winery",
+        "name": "Château Portier"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7257207,
+          46.2035863
+        ]
+      },
+      "id": "node/7139673954"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7149716312",
+        "craft": "winery",
+        "name": "Domaine du Greffeur",
+        "operator": "Jean-Claude Lespinasse"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7230643,
+          46.228905
+        ]
+      },
+      "id": "node/7149716312"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7149716358",
+        "craft": "winery",
+        "name": "Domaine Bernard Santé"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7388244,
+          46.2268715
+        ]
+      },
+      "id": "node/7149716358"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7173165750",
+        "addr:city": "Fuissé",
+        "addr:place": "Beauregard",
+        "addr:postcode": "71960",
+        "craft": "winery",
+        "email": "relation@joseph-burrier.fr",
+        "name": "Château de Beauregard",
+        "phone": "+333 85 35 60 76",
+        "website": "https://www.joseph-burrier.com/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.750423,
+          46.2897671
+        ]
+      },
+      "id": "node/7173165750"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7616302870",
+        "addr:street": "Sentier de la Bergère",
+        "craft": "winery",
+        "name": "Franck Givaudin",
+        "operator": "Franck Givaudin"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.6691696,
+          47.7147332
+        ]
+      },
+      "id": "node/7616302870"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7616302871",
+        "contact:city": "Irancy",
+        "contact:housenumber": "73",
+        "contact:postcode": "89290",
+        "contact:street": "Rue Soufflot",
+        "craft": "winery",
+        "name": "Domaine Gabin & Félix Richoux",
+        "opening_hours": "Mo-Sa 09:30-12:00,14:00-18:00",
+        "operator": "Gabin & Félix Richoux",
+        "phone": "+33386422160",
+        "website": "https://domainerichoux.fr/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.6691531,
+          47.7141522
+        ]
+      },
+      "id": "node/7616302871"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7616302874",
+        "craft": "winery",
+        "name": "William Charriat",
+        "operator": "William Charriat"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.6680004,
+          47.7141183
+        ]
+      },
+      "id": "node/7616302874"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7616302875",
+        "craft": "winery",
+        "name": "Benoit Cantin",
+        "operator": "Benoit Cantin"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.6682931,
+          47.7141183
+        ]
+      },
+      "id": "node/7616302875"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7632656279",
+        "addr:city": "Irancy",
+        "addr:street": "Chemin des Fossés",
+        "craft": "winery",
+        "name": "Benoit Cantin"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.6669954,
+          47.7147379
+        ]
+      },
+      "id": "node/7632656279"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7635029424",
+        "craft": "winery",
+        "name": "Charriat"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.6652869,
+          47.7136843
+        ]
+      },
+      "id": "node/7635029424"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7635029425",
+        "craft": "winery",
+        "name": "Colinot"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.6650223,
+          47.7135993
+        ]
+      },
+      "id": "node/7635029425"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7636418750",
+        "craft": "winery",
+        "name": "Éric Darles"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.6647406,
+          47.7126578
+        ]
+      },
+      "id": "node/7636418750"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7815214869",
+        "addr:city": "Santenay",
+        "addr:postcode": "21590",
+        "contact:email": "contact@domainechapelle.com",
+        "craft": "winery",
+        "description": "Depuis quatre générations le travail du vin rythme la vie de la Famille CHAPELLE.",
+        "name": "Domaine Chapelle",
+        "opening_hours": "mo-fr 09:00-12:00, 13:30-17:00",
+        "organic": "only",
+        "phone": "+33 3 80 20 60 09",
+        "website": "https://www.domainechapelle.com"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.6847892,
+          46.9134912
+        ]
+      },
+      "id": "node/7815214869"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8511197788",
+        "addr:city": "Saint Amour Bellevue",
+        "addr:postcode": "71570",
+        "addr:street": "La Piat",
+        "craft": "winery",
+        "name": "Domaine des Duc",
+        "phone": "+33 3 85 37 10 08"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7476517,
+          46.2359839
+        ]
+      },
+      "id": "node/8511197788"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8554577442",
+        "addr:city": "Savigny-lès-Beaune",
+        "addr:housenumber": "9",
+        "addr:postcode": "21420",
+        "addr:street": "Rue du Jarron",
+        "check_date": "2024-08-05",
+        "craft": "winery",
+        "email": "contact@cremant-parigot.com",
+        "name": "PARIGOT & RICHARD",
+        "opening_hours": "Mo-Sa 09:00-18:00",
+        "phone": "+33 3 80 21 50 66",
+        "website": "https://www.cremant-parigot.com"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.8194601,
+          47.0636434
+        ]
+      },
+      "id": "node/8554577442"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8951300508",
+        "addr:city": "Pouilly-sur-Loire",
+        "addr:housenumber": "58",
+        "addr:postcode": "58150",
+        "craft": "winery",
+        "name": "Domaine Tinel Blondelet",
+        "opening_hours": "Mo-Su 08:00-17:30",
+        "operator": "Tinel Blondelet",
+        "phone": "+33 3 86 39 13 83",
+        "website": "https://www.tinel-blondelet.com/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          2.962834,
+          47.278892
+        ]
+      },
+      "id": "node/8951300508"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9167448163",
+        "craft": "winery",
+        "name": "Domaine de la Buissière",
+        "operator": "Jean Moreau"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.6957634,
+          46.914146
+        ]
+      },
+      "id": "node/9167448163"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9168955908",
+        "craft": "winery",
+        "name": "Prosper Maufoux"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.6992234,
+          46.9116304
+        ]
+      },
+      "id": "node/9168955908"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9732469635",
+        "contact:mobile": "+33 6 75 31 39 44",
+        "craft": "winery",
+        "drink:wine": "retail",
+        "email": "domainelafouge@orange.fr",
+        "name": "Domaine Lafouge",
+        "phone": "+33 3 80 21 68 17",
+        "shop": "alcohol",
+        "tourism": "wine_cellar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7468378,
+          46.9861412
+        ]
+      },
+      "id": "node/9732469635"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9743036155",
+        "craft": "winery",
+        "drink:wine": "retail",
+        "name": "Domaine Guyot",
+        "operator": "Baptiste Guyot",
+        "phone": "+33 3 80 22 46 55",
+        "shop": "alcohol",
+        "tourism": "wine_cellar",
+        "was:name": "Ferme de l’Abbaye Saint-Martin",
+        "website": "https://www.domaine-baptiste-guyot.fr"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.8289719,
+          47.0283459
+        ]
+      },
+      "id": "node/9743036155"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9743108065",
+        "addr:city": "Pouilly-sur-Loire",
+        "addr:postcode": "58150",
+        "addr:street": "Château du Nozet",
+        "craft": "winery",
+        "name": "Château du Nozet",
+        "operator": "de Ladoucette",
+        "shop": "wine"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          2.958216,
+          47.2990071
+        ]
+      },
+      "id": "node/9743108065"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10089483063",
+        "addr:housenumber": "8",
+        "addr:street": "Boulevard Pasteur",
+        "craft": "winery",
+        "name": "Domaine Château Grenouilles",
+        "phone": "+33 (0)3 86 42 89 89",
+        "website": "https://chablisienne.com/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.8033112,
+          47.8209401
+        ]
+      },
+      "id": "node/10089483063"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10871174131",
+        "craft": "winery",
+        "name": "Domaine des Grands Rouvres",
+        "operator": "Guillaume Durdilly"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7726785,
+          46.2116918
+        ]
+      },
+      "id": "node/10871174131"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11007139795",
+        "addr:housenumber": "45",
+        "addr:street": "Rue Auxerroise",
+        "craft": "winery",
+        "name": "Domaine Long-Depaquit"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.7962665,
+          47.8152417
+        ]
+      },
+      "id": "node/11007139795"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11007145844",
+        "craft": "winery",
+        "name": "Vrignaud",
+        "phone": "+33 03 86 42 15 69",
+        "website": "https://www.domaine-vrignaud.com/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.8132741,
+          47.848129
+        ]
+      },
+      "id": "node/11007145844"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11007225090",
+        "craft": "winery",
+        "dog": "yes",
+        "name": "Clotilde Davenne",
+        "reservation": "yes",
+        "website": "https://www.clotildedavenne.fr/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.7592958,
+          47.7562407
+        ]
+      },
+      "id": "node/11007225090"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11020812088",
+        "craft": "winery",
+        "name": "Jean Paul et Benoit Droin",
+        "wikimedia_commons": "File:Jean Paul et Benoit Droin Winery.jpg"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.8051346,
+          47.8172504
+        ]
+      },
+      "id": "node/11020812088"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11020812094",
+        "craft": "winery",
+        "name": "Antoine & Laurent Robin",
+        "website": "https://www.antoineetlaurentrobin.com/",
+        "wheelchair": "yes",
+        "wikimedia_commons": "File:Antoine & Laurent Robin.jpg"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.8047591,
+          47.8175602
+        ]
+      },
+      "id": "node/11020812094"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11093637611",
+        "craft": "winery",
+        "name": "Les Caves Tannaysiennes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.5914178,
+          47.368088
+        ]
+      },
+      "id": "node/11093637611"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11218768611",
+        "craft": "winery",
+        "name": "Domaine Jean-François et Pierre-Louis Bersan",
+        "website": "https://www.domainebersan.com/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.6484334,
+          47.744103
+        ]
+      },
+      "id": "node/11218768611"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11218768612",
+        "craft": "winery",
+        "name": "Domaine Jean-Louis et Jean-Christophe Bersan",
+        "website": "https://bersan.fr/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.6483302,
+          47.7442822
+        ]
+      },
+      "id": "node/11218768612"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11218768617",
+        "craft": "winery",
+        "name": "Domaine Petitjean",
+        "website": "https://www.bourgogne-petitjean.com/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.647677,
+          47.7435571
+        ]
+      },
+      "id": "node/11218768617"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11218768620",
+        "craft": "winery",
+        "name": "Lheritier Duchene",
+        "website": "https://www.domaine-lheritierduchene.com/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.6516757,
+          47.7437982
+        ]
+      },
+      "id": "node/11218768620"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11218768621",
+        "craft": "winery",
+        "name": "Domaine Felix",
+        "website": "https://domaine-felix.com/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.6507209,
+          47.7442617
+        ]
+      },
+      "id": "node/11218768621"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11218768622",
+        "craft": "winery",
+        "name": "Cave Tabit Earl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.6485813,
+          47.7452681
+        ]
+      },
+      "id": "node/11218768622"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11218768624",
+        "craft": "winery",
+        "name": "Domaine Grand Roche",
+        "website": "http://www.grandroche.fr/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.6555072,
+          47.7444143
+        ]
+      },
+      "id": "node/11218768624"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11219289862",
+        "craft": "winery",
+        "name": "La Cave du Maître de Poste",
+        "operator": "Domaine Sorin",
+        "website": "https://maitre-de-poste.fr/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.6499945,
+          47.7447496
+        ]
+      },
+      "id": "node/11219289862"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11219289863",
+        "craft": "winery",
+        "name": "Domaine Sorin de France",
+        "website": "http://www.domaine-sorin-defrance.com/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.6501796,
+          47.7449768
+        ]
+      },
+      "id": "node/11219289863"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11485637967",
+        "craft": "winery",
+        "name": "Domaine Pérette",
+        "website": "https://domaine-perrette.business.site/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.9092801,
+          47.5401606
+        ]
+      },
+      "id": "node/11485637967"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11724308729",
+        "addr:city": "Puligny-Montrachet",
+        "addr:housenumber": "15",
+        "addr:postcode": "21190",
+        "addr:street": "Rue de l'Abreuvoir",
+        "craft": "winery",
+        "email": "info@domaineannebavardbrooks.com",
+        "name": "Domaine Anne Bavard-Brooks",
+        "opening_hours": "\"sur rendez-vous\"",
+        "phone": "+33 06 07 74 80 07",
+        "website": "https://www.domaineannebavardbrooks.com/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7527456,
+          46.9454019
+        ]
+      },
+      "id": "node/11724308729"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11879365105",
+        "craft": "winery",
+        "name": "Domaine Borgnat",
+        "phone": "+33 3 86 53 35 28",
+        "website": "https://www.domaine-borgnat.fr/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.60546,
+          47.7201529
+        ]
+      },
+      "id": "node/11879365105"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11879379672",
+        "craft": "winery",
+        "name": "Clotilde Davenne",
+        "website": "https://www.clotildedavenne.fr/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.7602938,
+          47.7566762
+        ]
+      },
+      "id": "node/11879379672"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11917492426",
+        "craft": "winery",
+        "name": "Domaine Dupont Yves et Delphine vins de Vézelay"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.7650287,
+          47.4572916
+        ]
+      },
+      "id": "node/11917492426"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11991719453",
+        "craft": "winery",
+        "name": "Domaine BRUCHARD Marie-Claude",
+        "website": "https://domaine.bruchard.fr/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7398067,
+          47.0514234
+        ]
+      },
+      "id": "node/11991719453"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12139429478",
+        "craft": "winery",
+        "drink:wine": "retail",
+        "name": "Domaine Cruchandeau",
+        "operator": "Julien Cruchandeau",
+        "phone": "+33 6 74 85 79 62",
+        "shop": "alcohol",
+        "tourism": "wine_cellar",
+        "website": "https://www.domaine-cruchandeau.com"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9057525,
+          47.1295255
+        ]
+      },
+      "id": "node/12139429478"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12140791610",
+        "craft": "winery",
+        "name": "Auvigue"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7449484,
+          46.2794634
+        ]
+      },
+      "id": "node/12140791610"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12140791611",
+        "craft": "winery",
+        "name": "Château des Rontets",
+        "website": "https://www.chateaurontets.com/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7429638,
+          46.2739751
+        ]
+      },
+      "id": "node/12140791611"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12222950579",
+        "craft": "winery",
+        "name": "Gaël Martin"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.733201,
+          46.2520342
+        ]
+      },
+      "id": "node/12222950579"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12259673096",
+        "craft": "winery",
+        "name": "Domaine la Croix Montjoie",
+        "ref:FR:SIRET": "50989836700024",
+        "website": "https://www.lacroixmontjoie.com/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.804509,
+          47.4600668
+        ]
+      },
+      "id": "node/12259673096"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12259736338",
+        "craft": "winery",
+        "name": "Domaine Eypert",
+        "opening_hours": "\"sur rendez-vous\"",
+        "ref:FR:SIRET": "53267243300028",
+        "website": "https://www.vinsdevezelay.com/herveeypert"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.8044644,
+          47.4622045
+        ]
+      },
+      "id": "node/12259736338"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12305718163",
+        "craft": "winery",
+        "name": "Chateau Armand Heitz",
+        "tourism": "guest_house",
+        "website": "https://armandheitz.com/en/pages/le-chateau-armand-heitz"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7998747,
+          46.9241967
+        ]
+      },
+      "id": "node/12305718163"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12348828205",
+        "craft": "winery",
+        "name": "La Cuve en Ville"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.0372154,
+          47.319255
+        ]
+      },
+      "id": "node/12348828205"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12543324074",
+        "addr:city": "Beaune",
+        "addr:housenumber": "78",
+        "addr:postcode": "21200",
+        "addr:street": "Rue du Faubourg Saint-Nicolas",
+        "craft": "winery",
+        "email": "contact@domaine-besancenot.fr",
+        "name": "Domaine Besancenot",
+        "opening_hours": "Tu-Sa 10:00-12:00,14:00-17:45",
+        "phone": "+333 80 22 18 76",
+        "ref:FR:SIRET": "52917200900019",
+        "website": "https://www.domaine-besancenot.fr/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.8418134,
+          47.0305308
+        ]
+      },
+      "id": "node/12543324074"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12561424260",
+        "addr:housenumber": "5",
+        "addr:street": "Rue Haute",
+        "check_date": "2025-02-06",
+        "craft": "winery",
+        "name": "Domaine Coquard-Fleurot",
+        "phone": "+33 3 80 62 87 88"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9798134,
+          47.1657863
+        ]
+      },
+      "id": "node/12561424260"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12679530054",
+        "addr:city": "Auxey-Duresses",
+        "addr:housenumber": "7",
+        "addr:postcode": "21190",
+        "addr:street": "Rue d'Amont",
+        "craft": "winery",
+        "name": "Domaine de la Roche Aiguë",
+        "operator": "Guillemard",
+        "phone": "+33380212833",
+        "website": "https://domainedelarocheaigue.com/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7084762,
+          46.9809104
+        ]
+      },
+      "id": "node/12679530054"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13031333070",
+        "craft": "winery",
+        "name": "Domaine Camus Frères",
+        "ref:FR:SIRET": "42562022600059",
+        "website": "https://camu.deladoucette.fr/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.7481117,
+          47.4624167
+        ]
+      },
+      "id": "node/13031333070"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13082231167",
+        "addr:city": "Noyers",
+        "addr:housenumber": "3",
+        "addr:postcode": "89310",
+        "addr:street": "Route d'Avallon",
+        "craft": "winery",
+        "name": "Domaine de la Borde",
+        "operator": "Bardet et Fils"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.9959561,
+          47.6896399
+        ]
+      },
+      "id": "node/13082231167"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13146834933",
+        "craft": "winery",
+        "description": "Vins des Coteaux du Giennois",
+        "name": "Domaine de Villargeau"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.0355839,
+          47.3806764
+        ]
+      },
+      "id": "node/13146834933"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13156023342",
+        "craft": "winery",
+        "name": "Domaine Dureuil-Janthial"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7478167,
+          46.8748356
+        ]
+      },
+      "id": "node/13156023342"
+    }
+  ]
+}
