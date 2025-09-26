@@ -142,23 +142,134 @@
     <div class="item"><span class="swatch vi"></span> Village</div>
     <div class="item"><span class="swatch re"></span> Régionale / 其他</div>
   </div>
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <title>Burgundy AOC (搜尋穩定版＋等級上色)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <style>
+    html,body,#map{height:100%;margin:0}
+    .ui{position:absolute;z-index:1000;top:12px;left:12px;background:#fff;padding:10px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.18);width:min(88vw,480px);font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+    .row{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+    .ui input{flex:1;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font:inherit}
+    .btn{padding:6px 10px;border:1px solid #ddd;border-radius:8px;background:#f8f8f8;cursor:pointer;font:12px;white-space:nowrap}
+    .btn:hover{background:#eee}
+    .chips{display:flex;gap:6px;flex-wrap:wrap;max-height:120px;overflow:auto} /* 稍微增加最大高度 */
+    .hint{color:#666;font-size:12px}
+    .legend{position:absolute;z-index:1000;right:12px;bottom:12px;background:#fff;padding:10px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.18);font:13px system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+    .legend .item{display:flex;align-items:center;gap:8px;margin:4px 0}
+    .swatch{width:16px;height:12px;border:2px solid #000;border-radius:3px}
+    .swatch.gc{border-color:#cc0033;background:#cc003322}
+    .swatch.pc{border-color:#ff7f0e;background:#ff7f0e33}
+    .swatch.vi{border-color:#1f77b4;background:#1f77b433}
+    .swatch.re{border-color:#2ca02c;background:#2ca02c33}
+    .collapsible .hidden-chip { display: none; }
+    .collapsible.expanded .hidden-chip { display: inline-block; }
+    .toggle-btn { color: #007bff; text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <div class="ui">
+    <div class="row">
+      <b>篩選 AOC 名稱</b>
+      <span class="hint">（支援無重音/空白/連字號/撇號，例如「romanee conti」「la romanee」「richbourge」）</span>
+    </div>
+    <div class="row">
+      <input id="q" type="text" placeholder="例如：Meursault / Nuits-Saint-Georges / La Romanee / Romanee Conti">
+      <button class="btn" id="clear">清除</button>
+      <button class="btn" id="all">全部</button>
+    </div>
+    <div class="row hint">快捷（Grand Cru）</div>
+    <div class="row chips" id="chips">
+      <button class="btn" data-k="romanee-conti">Romanée-Conti</button>
+      <button class="btn" data-k="la romanee">La Romanée</button>
+      <button class="btn" data-k="romanee-saint-vivant">Romanée-Saint-Vivant</button>
+      <button class="btn" data-k="la tache">La Tâche</button>
+      <button class="btn" data-k="la grande rue">La Grande Rue</button>
+      <button class="btn" data-k="richebourg">Richebourg</button>
+      <button class="btn" data-k="echezeaux">Échezeaux</button>
+      <button class="btn" data-k="grands-echezeaux">Grands-Échezeaux</button>
+      <button class="btn" data-k="musigny">Musigny</button>
+      <button class="btn" data-k="bonnes mares">Bonnes-Mares</button>
+      <button class="btn" data-k="chambertin">Chambertin</button>
+      <button class="btn" data-k="chambertin-clos de beze">Chambertin-Clos de Bèze</button>
+      <button class="btn" data-k="clos de vougeot">Clos de Vougeot</button>
+      <button class="btn" data-k="montrachet">Montrachet</button>
+    </div>
+    
+    <div class="row hint">
+      快捷（村莊級）
+      <button class="btn toggle-btn" id="toggle-villages">顯示全部</button>
+    </div>
+    <div class="row chips collapsible" id="village-chips">
+      <!-- 預設顯示的重要村莊 -->
+      <button class="btn" data-k="gevrey-chambertin">Gevrey-Chambertin</button>
+      <button class="btn" data-k="morey-saint-denis">Morey-Saint-Denis</button>
+      <button class="btn" data-k="chambolle-musigny">Chambolle-Musigny</button>
+      <button class="btn" data-k="vosne-romanee">Vosne-Romanée</button>
+      <button class="btn" data-k="nuits-saint-georges">Nuits-Saint-Georges</button>
+      <button class="btn" data-k="pommard">Pommard</button>
+      <button class="btn" data-k="volnay">Volnay</button>
+      <button class="btn" data-k="meursault">Meursault</button>
+      <button class="btn" data-k="puligny-montrachet">Puligny-Montrachet</button>
+      <button class="btn" data-k="chassagne-montrachet">Chassagne-Montrachet</button>
+      <button class="btn" data-k="aloxe-corton">Aloxe-Corton</button>
+      <button class="btn" data-k="mercurey">Mercurey</button>
+      <button class="btn" data-k="pouilly-fuisse">Pouilly-Fuissé</button>
+      
+      <!-- 預設隱藏的村莊 (class="hidden-chip") -->
+      <button class="btn hidden-chip" data-k="marsannay">Marsannay</button>
+      <button class="btn hidden-chip" data-k="fixin">Fixin</button>
+      <button class="btn hidden-chip" data-k="vougeot">Vougeot</button>
+      <button class="btn hidden-chip" data-k="pernand-vergelesses">Pernand-Vergelesses</button>
+      <button class="btn hidden-chip" data-k="chorey-les-beaune">Chorey-lès-Beaune</button>
+      <button class="btn hidden-chip" data-k="savigny-les-beaune">Savigny-lès-Beaune</button>
+      <button class="btn hidden-chip" data-k="beaune">Beaune</button>
+      <button class="btn hidden-chip" data-k="monthelie">Monthelie</button>
+      <button class="btn hidden-chip" data-k="auxey-duresses">Auxey-Duresses</button>
+      <button class="btn hidden-chip" data-k="saint-romain">Saint-Romain</button>
+      <button class="btn hidden-chip" data-k="blagny">Blagny</button>
+      <button class="btn hidden-chip" data-k="saint-aubin">Saint-Aubin</button>
+      <button class="btn hidden-chip" data-k="santenay">Santenay</button>
+      <button class="btn hidden-chip" data-k="maranges">Maranges</button>
+      <button class="btn hidden-chip" data-k="bouzeron">Bouzeron</button>
+      <button class="btn hidden-chip" data-k="rully">Rully</button>
+      <button class="btn hidden-chip" data-k="givry">Givry</button>
+      <button class="btn hidden-chip" data-k="montagny">Montagny</button>
+      <button class="btn hidden-chip" data-k="pouilly-loche">Pouilly-Loché</button>
+      <button class="btn hidden-chip" data-k="pouilly-vinzelles">Pouilly-Vinzelles</button>
+      <button class="btn hidden-chip" data-k="saint-veran">Saint-Véran</button>
+      <button class="btn hidden-chip" data-k="vire-clesse">Viré-Clessé</button>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="item"><span class="swatch gc"></span> Grand Cru</div>
+    <div class="item"><span class="swatch pc"></span> Premier Cru</div>
+    <div class="item"><span class="swatch vi"></span> Village</div>
+    <div class="item"><span class="swatch re"></span> Régionale / 其他</div>
+  </div>
 
   <script>
-    // ===== 1. 初始化地圖和變數 =====
+    // ===== 1. 初始化地圖和變數 (不變) =====
     const DATA_FILE = './burgundy.geojson';
     const map = L.map('map').setView([47.0, 4.8], 9);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '© OpenStreetMap · INAO/IGN data.geopf.fr (Open Licence 2.0)'
     }).addTo(map);
-    
     let rawFC = null, layer = null, META = {};
     const input = document.getElementById('q');
     const btnClear = document.getElementById('clear');
     const btnAll   = document.getElementById('all');
     const chipsBox = document.getElementById('chips');
-    // ===== 新增：獲取村莊按鈕的容器 =====
     const villageChipsBox = document.getElementById('village-chips');
+    const toggleBtn = document.getElementById('toggle-villages');
 
     // ===== 2. 定義所有我們需要的工具函式 (不變) =====
     function norm(s=''){ return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/['’·.`´]+/g,'').replace(/[-\s\u00A0\u2000-\u200D\u2010-\u2015]+/g,'').trim(); }
@@ -198,7 +309,6 @@
       btnClear.onclick = () => { input.value = ''; draw(''); };
       btnAll.onclick = () => { input.value = ''; draw(''); };
       
-      // 特級園快捷按鈕：啟用精確模式
       chipsBox.addEventListener('click', (e) => {
         const k = e.target?.dataset?.k;
         if (!k) return;
@@ -206,19 +316,29 @@
         draw(k, true);
       });
 
-      // ===== 新增：村莊快捷按鈕的事件綁定 =====
-      // 村莊快捷按鈕：使用模糊搜尋模式
       villageChipsBox.addEventListener('click', (e) => {
         const k = e.target?.dataset?.k;
         if (!k) return;
         input.value = e.target.innerText;
-        draw(k, false); // 第二個參數設為 false，使用模糊搜尋！
+        draw(k, false);
+      });
+
+      toggleBtn.addEventListener('click', () => {
+        const container = document.getElementById('village-chips');
+        container.classList.toggle('expanded');
+        if (container.classList.contains('expanded')) {
+          toggleBtn.innerText = '收摺';
+        } else {
+          toggleBtn.innerText = '顯示全部';
+        }
       });
     }
 
     // ===== 4. 執行主函式 (不變) =====
     main();
   </script>
+</body>
+</html>
 </body>
 </html>
 </body>
