@@ -62,13 +62,53 @@
     // ===== 2. 定義所有我們需要的工具函式 (不變) =====
     // ... norm(), ALIASES, GRAND_CRU, VILLAGES, classify(), styleByProps(), highlightStyle(), popupHtmlFromProps() ...
     
-    function drawAOC(queryRaw, exactMode = false){
-      // ... draw() 函式的主體邏輯完全不變，只是把 layer 變數換成 aocLayer ...
-      if (aocLayer) map.removeLayer(aocLayer);
-      // ...
-      aocLayer = L.geoJSON({ type:'FeatureCollection', features:feats }, { /* ... */ }).addTo(map);
-      // ...
+   // ===== 修正版的 drawAOC 函式 =====
+function drawAOC(queryRaw, exactMode = false){
+  let q = norm(queryRaw || '');
+  if (ALIASES[q]) q = ALIASES[q];
+  if (aocLayer) map.removeLayer(aocLayer);
+
+  // 篩選後的結果，儲存在 `feats` 這個變數裡
+  const feats = (rawFC?.features || []).filter(f => {
+    if (!q) return true;
+    const denom = f.properties?.denom || '';
+    const names = denom.split(',').map(s => s.trim()).filter(Boolean);
+    if (exactMode) { return names.some(n => norm(n) === q); }
+    const score = Math.max(...names.map(n => {
+      const nn = norm(n);
+      if (nn === q) return 100;
+      if (nn.startsWith(q)) return 50;
+      if (nn.includes(q)) return 10;
+      return 0;
+    }));
+    return score > 0;
+  });
+
+  if (!exactMode && feats.length > 1) {
+    feats.sort((a, b) => {
+      const scoreA = Math.max(...(a.properties.denom.split(',').map(n => norm(n) === q ? 100 : (norm(n).startsWith(q) ? 50 : (norm(n).includes(q) ? 10 : 0)))));
+      const scoreB = Math.max(...(b.properties.denom.split(',').map(n => norm(n) === q ? 100 : (norm(n).startsWith(q) ? 50 : (norm(n).includes(q) ? 10 : 0)))));
+      return scoreB - scoreA;
+    });
+  }
+  
+  // 繪製圖層時，使用正確的 `feats` 變數
+  aocLayer = L.geoJSON({ type:'FeatureCollection', features: feats }, { // <-- 這裡已修正
+    style: (f)=> styleByProps(f.properties || {}),
+    onEachFeature: (f, l) => {
+      l.bindPopup(popupHtmlFromProps(f.properties || {}));
+      l.on('mouseover', ()=> l.setStyle(highlightStyle(f.properties||{})));
+      l.on('mouseout',  ()=> l.setStyle(styleByProps(f.properties||{})));
+      l.on('click',     ()=> { try { map.fitBounds(l.getBounds(), { maxZoom: 16 }); } catch(e){} });
     }
+  }).addTo(map);
+
+  if (feats.length) {
+    map.fitBounds(aocLayer.getBounds(), { padding:[20,20] }); // 這裡也建議用 aocLayer.getBounds()
+  } else {
+    console.warn('找不到結果：', queryRaw);
+  }
+}
 
     // ===== 新增：繪製酒莊圖釘的函式 =====
     function drawWineries(wineries) {
