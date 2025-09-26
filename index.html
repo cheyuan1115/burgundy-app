@@ -85,11 +85,14 @@
     let rawFC=null, layer=null, META={};
 
     // ===== 工具：正規化（小寫、去重音、移除空白與各種連字號） =====
-    function norm(s=''){
-      return s.toLowerCase()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-        .replace(/[-\s\u2010-\u2015]+/g,'');
-    }
+function norm(s=''){
+  return s
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')     // 去重音
+    .replace(/['’·.`´]+/g,'')                            // 去撇號/點號
+    .replace(/[-\s\u00A0\u2000-\u200D\u2010-\u2015]+/g,'') // 去各種空白/連字號（含不換行空白等）
+    .trim();
+}
 
     // —— 官方 33 Grand Cru（不細分 Chablis 7 個 climat）— 可自行增補 ——
     const GRAND_CRU = [
@@ -210,43 +213,53 @@
     // —— 載入 GeoJSON 並繪製 —— 
     fetch('./burgundy.geojson').then(r=>r.json()).then(fc => { rawFC = fc; draw(''); });
 
-    function draw(queryRaw){
-      const q = norm(queryRaw||'');
-      if (layer) map.removeLayer(layer);
+    <script>
+function draw(queryRaw){
+  // 正規化 + 別名修正
+  let q = norm(queryRaw || '');
+  if (ALIASES && ALIASES[q]) q = ALIASES[q];
 
-      const feats = (rawFC?.features||[]).filter(f=>{
-        const d = f.properties?.denom || '';
-        return q==='' || norm(d).includes(q);
-      });
+  if (layer) map.removeLayer(layer);
 
-      layer = L.geoJSON({type:'FeatureCollection', features:feats}, {
-        style: (f)=> styleByProps(f.properties || {}),
-        onEachFeature: (f, l) => {
-          l.bindPopup(popupHtmlFromProps(f.properties || {}));
-          l.on('mouseover', ()=> l.setStyle(highlightStyle(f.properties||{})));
-          l.on('mouseout',  ()=> l.setStyle(styleByProps(f.properties||{})));
-          l.on('click',     ()=> { try { map.fitBounds(l.getBounds(), { maxZoom: 15 }); } catch(e){} });
-        }
-      }).addTo(map);
+  const feats = (rawFC?.features || []).filter(f => {
+    if (!q) return true;
 
-      if (feats.length) map.fitBounds(layer.getBounds(), { padding:[20,20] });
+    const denom = f.properties?.denom || '';
+    // A) 先整串（未分割）做一次比對，避免分隔符差異
+    const whole = norm(denom);
+    if (whole.includes(q)) return true;
+
+    // B) 再把 denom 依逗點切成「完整名稱」逐一比對
+    const names = denom.split(',').map(s => s.trim()).filter(Boolean);
+    for (const n of names) {
+      const nn = norm(n);
+      // 包含 or 被包含（應付縮寫/簡寫）
+      if (nn.includes(q) || q.includes(nn)) return true;
+
+      // 額外：把連字號換空白來試（如 "la romanee" vs "la-romanee"）
+      const nn2 = nn.replace(/-/g,'');
+      if (nn2.includes(q)) return true;
     }
+    return false;
+  });
 
-    // —— UI 事件 —— 
-    const input = document.getElementById('q');
-    const btnClear = document.getElementById('clear');
-    const btnAll   = document.getElementById('all');
-    const chipsBox = document.getElementById('chips');
-    let t=null;
-    input.addEventListener('input', ()=>{ clearTimeout(t); t=setTimeout(()=> draw(input.value), 220); });
-    btnClear.onclick = ()=> { input.value=''; draw(''); };
-    btnAll.onclick   = ()=> { input.value=''; draw(''); };
-    chipsBox.addEventListener('click', (e)=>{
-      const k = e.target?.dataset?.k;
-      if (!k) return;
-      input.value = k;
-      draw(k);
-    });
+  // 繪製
+  layer = L.geoJSON({ type:'FeatureCollection', features:feats }, {
+    style: (f)=> styleByProps(f.properties || {}),
+    onEachFeature: (f, l) => {
+      l.bindPopup(popupHtmlFromProps(f.properties || {}));
+      l.on('mouseover', ()=> l.setStyle(highlightStyle(f.properties||{})));
+      l.on('mouseout',  ()=> l.setStyle(styleByProps(f.properties||{})));
+      l.on('click',     ()=> { try { map.fitBounds(l.getBounds(), { maxZoom: 16 }); } catch(e){} });
+    }
+  }).addTo(map);
+
+  if (feats.length) {
+    map.fitBounds(layer.getBounds(), { padding:[20,20] });
+  } else {
+    console.warn('找不到結果：', queryRaw);
+  }
+});
   </script>
 </body>
 </html>
