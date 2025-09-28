@@ -160,14 +160,26 @@
     // ★ 地形陰影（Wikimedia Hillshading）— 免費、免金鑰
     // 來源：SRTM/ASTER 陰影渲染；用 opacity 疊在底圖上
 // ★ 地形陰影（Esri World Hillshade）— 穩定、免金鑰
+// ★ 地形陰影（Esri World Hillshade）— 設定 maxNativeZoom 避免出現「Map data not yet available」
 const hillshade = L.tileLayer(
   'https://server.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}',
   {
-    opacity: 0.7,                    // 先給高一點，之後滑桿可調
-    attribution: 'Esri World Hillshade © Esri, USGS, NOAA',
-    className: 'hs-tile'             // 讓 CSS 混合模式生效
+    opacity: 0.7,
+    // 這兩行是關鍵：13 是這個來源常見的原生極限，Leaflet 超過就會自動放大，不再出現佔位圖
+    maxNativeZoom: 13,
+    maxZoom: 19,
+    className: 'hs-tile',  // 讓混合模式生效（下一段 CSS）
+    attribution: 'Esri World Hillshade © Esri, USGS, NOAA'
   }
 ).addTo(map);
+const hillshadeDark = L.tileLayer(
+  'https://server.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade_Dark/MapServer/tile/{z}/{y}/{x}',
+  { opacity: 0.7, maxNativeZoom: 13, maxZoom: 19, className: 'hs-tile',
+    attribution: 'Esri World Hillshade (Dark) © Esri' }
+);
+
+// 加到圖層控制（把你原本的 overlayMaps 增加一個選項即可）
+overlayMaps["地形陰影（Dark）"] = hillshadeDark;
 
 
     let rawAOC_FC=null, aocLayer=null, wineryLayer=null, META={};
