@@ -34,6 +34,8 @@
       font-size: 14px; font-weight: bold; color: #6A0DAD;
     }
     .small{font-size:12px;color:#666}
+    .leaflet-tile.hs-tile { mix-blend-mode: multiply; }
+
   </style>
 </head>
 <body>
@@ -157,10 +159,16 @@
 
     // ★ 地形陰影（Wikimedia Hillshading）— 免費、免金鑰
     // 來源：SRTM/ASTER 陰影渲染；用 opacity 疊在底圖上
-    const hillshade = L.tileLayer('https://tiles.wmflabs.org/hillshading/{z}/{x}/{y}.png', {
-      opacity: 0.45,
-      attribution: 'Hillshade © Wikimedia, SRTM/ASTER'
-    }).addTo(map);
+// ★ 地形陰影（Esri World Hillshade）— 穩定、免金鑰
+const hillshade = L.tileLayer(
+  'https://server.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}',
+  {
+    opacity: 0.7,                    // 先給高一點，之後滑桿可調
+    attribution: 'Esri World Hillshade © Esri, USGS, NOAA',
+    className: 'hs-tile'             // 讓 CSS 混合模式生效
+  }
+).addTo(map);
+
 
     let rawAOC_FC=null, aocLayer=null, wineryLayer=null, META={};
 
