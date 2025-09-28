@@ -103,48 +103,48 @@
     // ===================================================================
     // ===== 升級版的 drawWineries 函式 =====
     // ===================================================================
-    function drawWineries(wineryFC) {
-      const markers = [];
-      const wineryIcon = L.divIcon({
-        className: 'winery-icon',
-        html: '🍷',
-        iconSize: [20, 20],
-        iconAnchor: [10, 10]
-      });
-      for (const feature of wineryFC.features) {
-        const props = feature.properties;
-        const coords = feature.geometry.coordinates;
-        if (props.name && coords) {
-          // 建立地址字串，只顯示存在的資訊
-          const addressParts = [
-            props['addr:street'],
-            props['addr:housenumber']
-          ].filter(Boolean); // 過濾掉空值
-          const address = addressParts.join(' ');
-
-          const cityParts = [
-            props['addr:postcode'],
-            props['addr:city']
-          ].filter(Boolean);
-          const city = cityParts.join(' ');
-
-          // 建立彈窗的 HTML 內容
-          let popupContent = `<b>${props.name}</b>`;
-          if (address) {
-            popupContent += `<br>${address}`;
-          }
-          if (city) {
-            popupContent += `<br>${city}`;
-          }
-          
-          // 建立標記並綁定彈窗
-          const marker = L.marker([coords[1], coords[0]], { icon: wineryIcon });
-          marker.bindPopup(popupContent);
-          markers.push(marker);
-        }
+   // ===================================================================
+// ===== 升級版的 drawWineries 函式 =====
+// ===================================================================
+function drawWineries(wineryFC) {
+  const markers = [];
+  const wineryIcon = L.divIcon({
+    className: 'winery-icon',
+    html: '🍷',
+    iconSize: [20, 20],
+    iconAnchor: [10, 10]
+  });
+  for (const feature of wineryFC.features) {
+    const props = feature.properties;
+    const coords = feature.geometry.coordinates;
+    if (props.name && coords) {
+      // 建立彈窗的 HTML 內容
+      let popupContent = `<b>${props.name}</b>`;
+      
+      // 檢查並加入地址 (根據您最新的資料格式)
+      if (props.address) {
+        popupContent += `<br>📍 ${props.address}`;
       }
-      return L.layerGroup(markers);
+      
+      // 檢查並加入電話，並建立可點擊的電話連結
+      if (props.phone) {
+        // .replace(/\s/g, '') 會移除電話號碼中的所有空白，讓電話連結能正常運作
+        popupContent += `<br>☎️ <a href="tel:${props.phone.replace(/\s/g, '')}">${props.phone}</a>`;
+      }
+      
+      // 檢查並加入網址，並建立可點擊的網址連結
+      if (props.website) {
+        popupContent += `<br>🌐 <a href="${props.website}" target="_blank">官方網站</a>`;
+      }
+      
+      // 建立標記並綁定彈窗
+      const marker = L.marker([coords[1], coords[0]], { icon: wineryIcon });
+      marker.bindPopup(popupContent);
+      markers.push(marker);
     }
+  }
+  return L.layerGroup(markers);
+}
 
     // ===== 3. 建立主函式 (不變) =====
     async function main() {
