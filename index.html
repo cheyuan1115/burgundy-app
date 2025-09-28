@@ -172,14 +172,7 @@ const hillshade = L.tileLayer(
     attribution: 'Esri World Hillshade © Esri, USGS, NOAA'
   }
 ).addTo(map);
-const hillshadeDark = L.tileLayer(
-  'https://server.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade_Dark/MapServer/tile/{z}/{y}/{x}',
-  { opacity: 0.7, maxNativeZoom: 13, maxZoom: 19, className: 'hs-tile',
-    attribution: 'Esri World Hillshade (Dark) © Esri' }
-);
 
-// 加到圖層控制（把你原本的 overlayMaps 增加一個選項即可）
-overlayMaps["地形陰影（Dark）"] = hillshadeDark;
 
 
     let rawAOC_FC=null, aocLayer=null, wineryLayer=null, META={};
