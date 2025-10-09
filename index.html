@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8" />
-  <title>Burgundy AOC (最終整合版＋地形陰影)</title>
+  <title>Burgundy AOC（最終整合版＋強化地形陰影）</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -34,8 +34,19 @@
       font-size: 14px; font-weight: bold; color: #6A0DAD;
     }
     .small{font-size:12px;color:#666}
-    .leaflet-tile.hs-tile { mix-blend-mode: multiply; }
 
+    /* ——強化地形陰影——
+       第一層：multiply 與適度對比
+       第二層：overlay 當「Boost」層，拉出山脊與陰影層次 */
+    .leaflet-tile.hs-tile {
+      mix-blend-mode: multiply;
+      filter: contrast(1.3) brightness(1.05) saturate(1.05);
+    }
+    .leaflet-tile.hs-boost {
+      mix-blend-mode: overlay;
+      filter: contrast(1.2) brightness(0.95);
+      opacity: 0.35; /* 會被 JS 動態覆寫 */
+    }
   </style>
 </head>
 <body>
@@ -54,6 +65,13 @@
       <label class="small">地形陰影透明度</label>
       <input id="hsOpacity" type="range" min="0" max="100" value="45" style="flex:1">
       <span id="hsVal" class="small">45%</span>
+    </div>
+
+    <!-- 地形誇張度（對比/立體感） -->
+    <div class="row">
+      <label class="small">地形誇張度（對比/立體感）</label>
+      <input id="hsExg" type="range" min="0" max="200" value="100" style="flex:1">
+      <span id="hsExgVal" class="small">100%</span>
     </div>
 
     <div id="accordion-container">
@@ -157,27 +175,40 @@
       attribution: '© OpenStreetMap · INAO/IGN data.geopf.fr (Open Licence 2.0)'
     }).addTo(map);
 
-    // ★ 地形陰影（Wikimedia Hillshading）— 免費、免金鑰
-    // 來源：SRTM/ASTER 陰影渲染；用 opacity 疊在底圖上
-// ★ 地形陰影（Esri World Hillshade）— 穩定、免金鑰
-// ★ 地形陰影（Esri World Hillshade）— 設定 maxNativeZoom 避免出現「Map data not yet available」
-const hillshade = L.tileLayer(
-  'https://server.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}',
-  {
-    opacity: 0.7,
-    // 這兩行是關鍵：13 是這個來源常見的原生極限，Leaflet 超過就會自動放大，不再出現佔位圖
-    maxNativeZoom: 13,
-    maxZoom: 19,
-    className: 'hs-tile',  // 讓混合模式生效（下一段 CSS）
-    attribution: 'Esri World Hillshade © Esri, USGS, NOAA'
-  }
-).addTo(map);
+    // OpenTopoMap（含等高線）供切換比對
+    const openTopo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+      maxZoom: 17,
+      attribution: '© OpenTopoMap (CC-BY-SA)'
+    });
 
+    // ——地形陰影：雙層（主陰影 + 加強層）——
+    // 主陰影：multiply，原生到 z=13，超過 Leaflet 會自動放大
+    const hillshade = L.tileLayer(
+      'https://server.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}',
+      {
+        opacity: 0.45,          // 與滑桿初始 45% 對應
+        maxNativeZoom: 13,
+        maxZoom: 19,
+        className: 'hs-tile',
+        attribution: 'Esri World Hillshade © Esri, USGS, NOAA'
+      }
+    ).addTo(map);
 
+    // 加強層：overlay，強化山脊與陰影層次
+    const hillshadeBoost = L.tileLayer(
+      'https://server.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}',
+      {
+        opacity: 0.12,          // 由透明度滑桿動態計算
+        maxNativeZoom: 13,
+        maxZoom: 19,
+        className: 'hs-boost',
+        attribution: ''
+      }
+    ).addTo(map);
 
     let rawAOC_FC=null, aocLayer=null, wineryLayer=null, META={};
 
-    // ===== 2) 工具函式 / 名單（沿用你的版本）=====
+    // ===== 2) 工具函式 / 名單 =====
     function norm(s=''){ return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/['’·.`´]+/g,'').replace(/[-\s\u00A0\u2000-\u200D\u2010-\u2015]+/g,'').trim(); }
     const ALIASES = (() => { const pairs = [['romanee conti','romanee-conti'],['rc','romanee-conti'],['la tachi','la tache'],['latachi','la tache'],['richbourge','richebourg'],['la romanée','la romanee'],['laromanee','la romanee']]; const m={}; for (const [k,v] of pairs) m[norm(k)]=norm(v); return m; })();
     const GRAND_CRU = ["Chambertin","Chambertin-Clos de Bèze","Mazis-Chambertin","Charmes-Chambertin","Griotte-Chambertin","Latricières-Chambertin","Ruchottes-Chambertin","Mazoyères-Chambertin","Clos de la Roche","Clos Saint-Denis","Clos des Lambrays","Clos de Tart","Bonnes-Mares","Musigny","Clos de Vougeot","Échezeaux","Grands Échezeaux","Richebourg","Romanée-Conti","La Romanée","Romanée-Saint-Vivant","La Tâche","La Grande Rue","Corton","Corton-Charlemagne","Charlemagne","Montrachet","Bâtard-Montrachet","Chevalier-Montrachet","Criots-Bâtard-Montrachet","Bienvenues-Bâtard-Montrachet","Chablis Grand Cru"];
@@ -254,7 +285,7 @@ const hillshade = L.tileLayer(
       else { console.warn('找不到結果：', queryRaw); }
     }
 
-    // ===== 4) 酒莊（你的新版函式）=====
+    // ===== 4) 酒莊 =====
     function drawWineries(wineryFC) {
       const markers = [];
       const wineryIcon = L.divIcon({ className:'winery-icon', html:'🍷', iconSize:[20,20], iconAnchor:[10,10] });
@@ -296,13 +327,17 @@ const hillshade = L.tileLayer(
 
         wineryLayer = drawWineries(wineryFC);
 
-        // 圖層控制：把地形陰影也放進去（可開關）
-        const overlayMaps = {
-          "AOC 產區": aocLayer,
-          "酒莊位置": wineryLayer,
-          "地形陰影": hillshade
-        };
-        L.control.layers({ "OpenStreetMap": baseOSM }, overlayMaps, { collapsed: false }).addTo(map);
+        // 圖層控制：把地形陰影（兩層）與 OpenTopoMap 都放進去
+        L.control.layers(
+          { "OpenStreetMap": baseOSM, "OpenTopoMap（地形/等高線）": openTopo },
+          {
+            "AOC 產區": aocLayer,
+            "酒莊位置": wineryLayer,
+            "地形陰影（主）": hillshade,
+            "地形陰影（加強）": hillshadeBoost
+          },
+          { collapsed: false }
+        ).addTo(map);
 
       } catch (err) {
         console.error("無法載入必要的資料檔案:", err);
@@ -346,13 +381,39 @@ const hillshade = L.tileLayer(
         });
       });
 
-      // 地形陰影透明度滑桿
+      // 地形陰影透明度滑桿（同時控制主陰影 + 加強層）
       const hsSlider = document.getElementById('hsOpacity');
       const hsVal = document.getElementById('hsVal');
       hsSlider.oninput = ()=> {
         const v = Number(hsSlider.value) || 0;
         hillshade.setOpacity(v/100);
+        // 讓加強層在 30% 以後才逐漸浮現，避免低透明時太花
+        const boost = Math.max(0, (v - 30)) / 100 * 0.8; // 0~0.56
+        hillshadeBoost.setOpacity(boost);
         hsVal.textContent = v + '%';
+      };
+
+      // 地形誇張度（對比/立體感）：動態改 CSS 濾鏡
+      const hsExg = document.getElementById('hsExg');
+      const hsExgVal = document.getElementById('hsExgVal');
+      hsExg.oninput = () => {
+        const v = Number(hsExg.value) || 100; // 100 為基準
+        const contrast = 1.0 + (v - 100) / 100 * 0.6;   // 100%→1.0, 200%→1.6
+        const bright   = 1.0 + (v - 100) / 100 * 0.15;  // 適度調亮避免過暗
+        const sat      = 1.0 + (v - 100) / 100 * 0.2;
+
+        const styleId = 'hs-dynamic-style';
+        let styleTag = document.getElementById(styleId);
+        if (!styleTag) {
+          styleTag = document.createElement('style');
+          styleTag.id = styleId;
+          document.head.appendChild(styleTag);
+        }
+        styleTag.textContent = `
+          .leaflet-tile.hs-tile  { filter: contrast(${contrast}) brightness(${bright}) saturate(${sat}); }
+          .leaflet-tile.hs-boost { filter: contrast(${Math.min(contrast+0.2, 2.0)}) brightness(${bright*0.95}); }
+        `;
+        hsExgVal.textContent = v + '%';
       };
     }
 
