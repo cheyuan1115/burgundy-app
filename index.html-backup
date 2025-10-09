@@ -2,13 +2,13 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8" />
-  <title>Burgundy AOC (最終整合版)</title>
+  <title>Burgundy AOC (最終整合版＋地形陰影)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <style>
     html,body,#map{height:100%;margin:0}
-    .ui{position:absolute;z-index:1000;top:12px;left:12px;background:#fff;padding:10px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.18);width:min(88vw,480px);font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+    .ui{position:absolute;z-index:1000;top:12px;left:12px;background:#fff;padding:10px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.18);width:min(88vw,520px);font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
     .row{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
     .ui input{flex:1;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font:inherit}
     .btn{padding:6px 10px;border:1px solid #ddd;border-radius:8px;background:#f8f8f8;cursor:pointer;font:12px;white-space:nowrap}
@@ -24,25 +24,23 @@
     .accordion-title { background: #f1f1f1; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; }
     .accordion-title:hover { background: #e1e1e1; }
     .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; padding-top: 0; }
-    .accordion-content.show { max-height: 200px; padding-top: 8px; }
-    
-    /* ===== 酒莊圖示樣式 ===== */
+    .accordion-content.show { max-height: 220px; padding-top: 8px; }
+
+    /* 酒莊圖示 */
     .winery-icon {
       background-color: rgba(255, 255, 255, 0.8);
-      border: 2px solid #6A0DAD; /* 紫色邊框 */
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      text-align: center;
-      line-height: 16px;
-      font-size: 14px;
-      font-weight: bold;
-      color: #6A0DAD;
+      border: 2px solid #6A0DAD; border-radius: 50%;
+      width: 20px; height: 20px; text-align: center; line-height: 16px;
+      font-size: 14px; font-weight: bold; color: #6A0DAD;
     }
+    .small{font-size:12px;color:#666}
+    .leaflet-tile.hs-tile { mix-blend-mode: multiply; }
+
   </style>
 </head>
 <body>
   <div id="map"></div>
+
   <div class="ui">
     <div class="row"><b>篩選 AOC 名稱</b></div>
     <div class="row">
@@ -50,103 +48,231 @@
       <button class="btn" id="clear">清除</button>
       <button class="btn" id="all">全部</button>
     </div>
+
+    <!-- 地形陰影：透明度 -->
+    <div class="row">
+      <label class="small">地形陰影透明度</label>
+      <input id="hsOpacity" type="range" min="0" max="100" value="45" style="flex:1">
+      <span id="hsVal" class="small">45%</span>
+    </div>
+
     <div id="accordion-container">
       <div class="accordion-title">Grand Cru</div>
-      <div class="accordion-content"><div class="chips" id="chips"><button class="btn" data-k="romanee-conti">Romanée-Conti</button><button class="btn" data-k="la romanee">La Romanée</button><button class="btn" data-k="romanee-saint-vivant">Romanée-Saint-Vivant</button><button class="btn" data-k="la tache">La Tâche</button><button class="btn" data-k="la grande rue">La Grande Rue</button><button class="btn" data-k="richebourg">Richebourg</button><button class="btn" data-k="echezeaux">Échezeaux</button><button class="btn" data-k="grands-echezeaux">Grands-Échezeaux</button><button class="btn" data-k="musigny">Musigny</button><button class="btn" data-k="bonnes mares">Bonnes-Mares</button><button class="btn" data-k="chambertin">Chambertin</button><button class="btn" data-k="chambertin-clos de beze">Chambertin-Clos de Bèze</button><button class="btn" data-k="clos de vougeot">Clos de Vougeot</button><button class="btn" data-k="montrachet">Montrachet</button></div></div>
+      <div class="accordion-content">
+        <div class="chips" id="chips">
+          <button class="btn" data-k="romanee-conti">Romanée-Conti</button>
+          <button class="btn" data-k="la romanee">La Romanée</button>
+          <button class="btn" data-k="romanee-saint-vivant">Romanée-Saint-Vivant</button>
+          <button class="btn" data-k="la tache">La Tâche</button>
+          <button class="btn" data-k="la grande rue">La Grande Rue</button>
+          <button class="btn" data-k="richebourg">Richebourg</button>
+          <button class="btn" data-k="echezeaux">Échezeaux</button>
+          <button class="btn" data-k="grands-echezeaux">Grands-Échezeaux</button>
+          <button class="btn" data-k="musigny">Musigny</button>
+          <button class="btn" data-k="bonnes mares">Bonnes-Mares</button>
+          <button class="btn" data-k="chambertin">Chambertin</button>
+          <button class="btn" data-k="chambertin-clos de beze">Chambertin-Clos de Bèze</button>
+          <button class="btn" data-k="clos de vougeot">Clos de Vougeot</button>
+          <button class="btn" data-k="montrachet">Montrachet</button>
+        </div>
+      </div>
+
       <div class="accordion-title">Chablis</div>
-      <div class="accordion-content"><div class="chips" id="cha-chips"><button class="btn" data-k="chablis">Chablis</button></div></div>
+      <div class="accordion-content">
+        <div class="chips" id="cha-chips"><button class="btn" data-k="chablis">Chablis</button></div>
+      </div>
+
       <div class="accordion-title">Côte de Nuits</div>
-      <div class="accordion-content"><div class="chips" id="cdn-chips"><button class="btn" data-k="marsannay">Marsannay</button><button class="btn" data-k="fixin">Fixin</button><button class="btn" data-k="gevrey-chambertin">Gevrey-Chambertin</button><button class="btn" data-k="morey-saint-denis">Morey-Saint-Denis</button><button class="btn" data-k="chambolle-musigny">Chambolle-Musigny</button><button class="btn" data-k="vougeot">Vougeot</button><button class="btn" data-k="vosne-romanee">Vosne-Romanée</button><button class="btn" data-k="nuits-saint-georges">Nuits-Saint-Georges</button></div></div>
+      <div class="accordion-content">
+        <div class="chips" id="cdn-chips">
+          <button class="btn" data-k="marsannay">Marsannay</button>
+          <button class="btn" data-k="fixin">Fixin</button>
+          <button class="btn" data-k="gevrey-chambertin">Gevrey-Chambertin</button>
+          <button class="btn" data-k="morey-saint-denis">Morey-Saint-Denis</button>
+          <button class="btn" data-k="chambolle-musigny">Chambolle-Musigny</button>
+          <button class="btn" data-k="vougeot">Vougeot</button>
+          <button class="btn" data-k="vosne-romanee">Vosne-Romanée</button>
+          <button class="btn" data-k="nuits-saint-georges">Nuits-Saint-Georges</button>
+        </div>
+      </div>
+
       <div class="accordion-title">Côte de Beaune</div>
-      <div class="accordion-content"><div class="chips" id="cdb-chips"><button class="btn" data-k="aloxe-corton">Aloxe-Corton</button><button class="btn" data-k="pernand-vergelesses">Pernand-Vergelesses</button><button class="btn" data-k="savigny-les-beaune">Savigny-lès-Beaune</button><button class="btn" data-k="beaune">Beaune</button><button class="btn" data-k="pommard">Pommard</button><button class="btn" data-k="volnay">Volnay</button><button class="btn" data-k="meursault">Meursault</button><button class="btn" data-k="puligny-montrachet">Puligny-Montrachet</button><button class="btn" data-k="chassagne-montrachet">Chassagne-Montrachet</button><button class="btn" data-k="saint-aubin">Saint-Aubin</button><button class="btn" data-k="santenay">Santenay</button></div></div>
+      <div class="accordion-content">
+        <div class="chips" id="cdb-chips">
+          <button class="btn" data-k="aloxe-corton">Aloxe-Corton</button>
+          <button class="btn" data-k="pernand-vergelesses">Pernand-Vergelesses</button>
+          <button class="btn" data-k="savigny-les-beaune">Savigny-lès-Beaune</button>
+          <button class="btn" data-k="beaune">Beaune</button>
+          <button class="btn" data-k="pommard">Pommard</button>
+          <button class="btn" data-k="volnay">Volnay</button>
+          <button class="btn" data-k="meursault">Meursault</button>
+          <button class="btn" data-k="puligny-montrachet">Puligny-Montrachet</button>
+          <button class="btn" data-k="chassagne-montrachet">Chassagne-Montrachet</button>
+          <button class="btn" data-k="saint-aubin">Saint-Aubin</button>
+          <button class="btn" data-k="santenay">Santenay</button>
+        </div>
+      </div>
+
       <div class="accordion-title">Côte Chalonnaise</div>
-      <div class="accordion-content"><div class="chips" id="cdc-chips"><button class="btn" data-k="bouzeron">Bouzeron</button><button class="btn" data-k="rully">Rully</button><button class="btn" data-k="mercurey">Mercurey</button><button class="btn" data-k="givry">Givry</button><button class="btn" data-k="montagny">Montagny</button></div></div>
+      <div class="accordion-content">
+        <div class="chips" id="cdc-chips">
+          <button class="btn" data-k="bouzeron">Bouzeron</button>
+          <button class="btn" data-k="rully">Rully</button>
+          <button class="btn" data-k="mercurey">Mercurey</button>
+          <button class="btn" data-k="givry">Givry</button>
+          <button class="btn" data-k="montagny">Montagny</button>
+        </div>
+      </div>
+
       <div class="accordion-title">Mâconnais</div>
-      <div class="accordion-content"><div class="chips" id="mac-chips"><button class="btn" data-k="pouilly-fuisse">Pouilly-Fuissé</button><button class="btn" data-k="pouilly-loche">Pouilly-Loché</button><button class="btn" data-k="pouilly-vinzelles">Pouilly-Vinzelles</button><button class="btn" data-k="saint-veran">Saint-Véran</button><button class="btn" data-k="vire-clesse">Viré-Clessé</button></div></div>
+      <div class="accordion-content">
+        <div class="chips" id="mac-chips">
+          <button class="btn" data-k="pouilly-fuisse">Pouilly-Fuissé</button>
+          <button class="btn" data-k="pouilly-loche">Pouilly-Loché</button>
+          <button class="btn" data-k="pouilly-vinzelles">Pouilly-Vinzelles</button>
+          <button class="btn" data-k="saint-veran">Saint-Véran</button>
+          <button class="btn" data-k="vire-clesse">Viré-Clessé</button>
+        </div>
+      </div>
     </div>
   </div>
-  <div class="legend"><div class="item"><span class="swatch gc"></span> Grand Cru</div><div class="item"><span class="swatch pc"></span> Premier Cru</div><div class="item"><span class="swatch vi"></span> Village</div><div class="item"><span class="swatch re"></span> Régionale / 其他</div></div>
 
-   <script>
-    // ===== 1. 初始化地圖和變數 (不變) =====
-    const AOC_DATA_FILE = './burgundy.geojson';
+  <div class="legend">
+    <div class="item"><span class="swatch gc"></span> Grand Cru</div>
+    <div class="item"><span class="swatch pc"></span> Premier Cru</div>
+    <div class="item"><span class="swatch vi"></span> Village</div>
+    <div class="item"><span class="swatch re"></span> Régionale / 其他</div>
+  </div>
+
+  <script>
+    // ===== 1) 初始化地圖與底圖 =====
+    const AOC_DATA_FILE = './burgundy.geojson';   // 若用精簡檔，改成 './burgundy_min.geojson'
     const WINERY_DATA_FILE = './wineries.geojson';
+
     const map = L.map('map').setView([47.0, 4.8], 9);
-    const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+
+    // OSM 底圖
+    const baseOSM = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '© OpenStreetMap · INAO/IGN data.geopf.fr (Open Licence 2.0)'
     }).addTo(map);
-    let rawAOC_FC = null, aocLayer = null, wineryLayer = null, META = {};
-    const input = document.getElementById('q');
-    const btnClear = document.getElementById('clear');
-    const btnAll   = document.getElementById('all');
-    const chipsBox = document.getElementById('chips');
-    const cdnChipsBox = document.getElementById('cdn-chips');
-    const cdbChipsBox = document.getElementById('cdb-chips');
-    const cdcChipsBox = document.getElementById('cdc-chips');
-    const macChipsBox = document.getElementById('mac-chips');
-    const chaChipsBox = document.getElementById('cha-chips');
 
-    // ===== 2. 定義所有我們需要的工具函式 (大部分不變) =====
+    // ★ 地形陰影（Wikimedia Hillshading）— 免費、免金鑰
+    // 來源：SRTM/ASTER 陰影渲染；用 opacity 疊在底圖上
+// ★ 地形陰影（Esri World Hillshade）— 穩定、免金鑰
+// ★ 地形陰影（Esri World Hillshade）— 設定 maxNativeZoom 避免出現「Map data not yet available」
+const hillshade = L.tileLayer(
+  'https://server.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}',
+  {
+    opacity: 0.7,
+    // 這兩行是關鍵：13 是這個來源常見的原生極限，Leaflet 超過就會自動放大，不再出現佔位圖
+    maxNativeZoom: 13,
+    maxZoom: 19,
+    className: 'hs-tile',  // 讓混合模式生效（下一段 CSS）
+    attribution: 'Esri World Hillshade © Esri, USGS, NOAA'
+  }
+).addTo(map);
+
+
+
+    let rawAOC_FC=null, aocLayer=null, wineryLayer=null, META={};
+
+    // ===== 2) 工具函式 / 名單（沿用你的版本）=====
     function norm(s=''){ return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/['’·.`´]+/g,'').replace(/[-\s\u00A0\u2000-\u200D\u2010-\u2015]+/g,'').trim(); }
     const ALIASES = (() => { const pairs = [['romanee conti','romanee-conti'],['rc','romanee-conti'],['la tachi','la tache'],['latachi','la tache'],['richbourge','richebourg'],['la romanée','la romanee'],['laromanee','la romanee']]; const m={}; for (const [k,v] of pairs) m[norm(k)]=norm(v); return m; })();
     const GRAND_CRU = ["Chambertin","Chambertin-Clos de Bèze","Mazis-Chambertin","Charmes-Chambertin","Griotte-Chambertin","Latricières-Chambertin","Ruchottes-Chambertin","Mazoyères-Chambertin","Clos de la Roche","Clos Saint-Denis","Clos des Lambrays","Clos de Tart","Bonnes-Mares","Musigny","Clos de Vougeot","Échezeaux","Grands Échezeaux","Richebourg","Romanée-Conti","La Romanée","Romanée-Saint-Vivant","La Tâche","La Grande Rue","Corton","Corton-Charlemagne","Charlemagne","Montrachet","Bâtard-Montrachet","Chevalier-Montrachet","Criots-Bâtard-Montrachet","Bienvenues-Bâtard-Montrachet","Chablis Grand Cru"];
     const GRAND_CRU_NORM = GRAND_CRU.map(n => norm(n));
     const VILLAGES = ["Chablis","Marsannay","Fixin","Gevrey-Chambertin","Morey-Saint-Denis","Chambolle-Musigny","Vougeot","Flagey-Échezeaux","Vosne-Romanée","Nuits-Saint-Georges","Côte de Nuits-Villages","Ladoix","Aloxe-Corton","Pernand-Vergelesses","Chorey-lès-Beaune","Savigny-lès-Beaune","Beaune","Pommard","Volnay","Monthelie","Auxey-Duresses","Saint-Romain","Meursault","Blagny","Puligny-Montrachet","Chassagne-Montrachet","Saint-Aubin","Santenay","Maranges","Côte de Beaune-Villages","Bouzeron","Rully","Mercurey","Givry","Montagny","Pouilly-Fuissé","Pouilly-Loché","Pouilly-Vinzelles","Saint-Véran","Viré-Clessé","Mâcon","Saint-Amour","Juliénas","Chénas"];
     const VILLAGES_NORM = VILLAGES.map(n => norm(n));
-    function classify(props){ const denom = props?.denom || ''; if (denom.toLowerCase().includes('clos de vougeot')) return 'GC'; const names = denom.split(',').map(s=>s.trim()).filter(Boolean); const namesN = names.map(norm); if (namesN.some(n => GRAND_CRU_NORM.includes(n))) return 'GC'; if (names.some(n => n.toLowerCase().includes('grand cru'))) return 'GC'; if (names.some(n => n.toLowerCase().includes('premier cru'))) return 'PC'; if (namesN.some(n => VILLAGES_NORM.includes(n))) return 'VI'; return 'RE'; }
-    function styleByProps(props){ const lvl = classify(props); if (lvl === 'GC') return { color:'#cc0033', weight:1.6, fillColor:'#cc0033', fillOpacity:0.18 }; if (lvl === 'PC') return { color:'#ff7f0e', weight:1.4, fillColor:'#ff7f0e', fillOpacity:0.16 }; if (lvl === 'VI') return { color:'#1f77b4', weight:1.2, fillColor:'#1f77b4', fillOpacity:0.14 }; return { color:'#2ca02c', weight:1.0, fillColor:'#2ca02c', fillOpacity:0.12 }; }
-    function highlightStyle(props){ const s = styleByProps(props); return { ...s, weight: s.weight + 0.8, fillOpacity: Math.min(0.35, (s.fillOpacity||0.15)+0.12) }; }
-    function popupHtmlFromProps(props){ const denom = props?.denom || ''; const names = denom.split(',').map(s=>s.trim()).filter(Boolean); const score = (name) => { const n = norm(name); if (GRAND_CRU_NORM.includes(n)) return 100; if (n.toLowerCase().includes('grand cru')) return 90; if (n.toLowerCase().includes('premier cru')) return 60; if (VILLAGES_NORM.includes(n)) return 40; return 10; }; names.sort((a, b) => score(b) - score(a)); let hitName = null, hitMeta = null; for (const n of names){ const k = norm(n); if (META[k]){ hitName = n; hitMeta = META[k]; break; } } if (hitMeta){ const link = hitMeta.link ? `<br><a href="${hitMeta.link}" target="_blank">更多</a>` : ''; const moreId = 'm'+Math.random().toString(36).slice(2); const otherNames = names.filter(n => n !== hitName); const more = otherNames.length ? `<div style="margin-top:6px"><a href="#" onclick="const e=document.getElementById('${moreId}');e.style.display=e.style.display?'':'block';this.remove();return false;">+ 顯示其他適用名稱</a><div id="${moreId}" style="display:none;margin-top:4px;font-size:12px;color:#555">${otherNames.join('<br>')}</div></div>` : ''; return `<b>${hitMeta.zh || hitName}</b><br>等級：${hitMeta.level || ''}${hitMeta.village ? `（${hitMeta.village}）` : ''}<br>${hitMeta.notes || ''}${link}<hr style="border:none;border-top:1px solid #eee;margin:8px 0"><small>地圖名稱：${hitName}</small>${more}`; } else { const titles = names.slice(0,2); const moreId = 'm'+Math.random().toString(36).slice(2); const more = names.slice(2).length ? `<div style="margin-top:6px"><a href="#" onclick="const e=document.getElementById('${moreId}');e.style.display=e.style.display?'':'block';this.remove();return false;">+ 顯示其他適用名稱</a><div id="${moreId}" style="display:none;margin-top:4px;font-size:12px;color:#555">${names.slice(2).join('<br>')}</div></div>` : ''; return `<b>${titles.join('<br>') || 'AOC'}</b>${more}`; } }
-    function drawAOC(queryRaw, exactMode = false){ let q = norm(queryRaw || ''); if (ALIASES[q]) q = ALIASES[q]; if (aocLayer) aocLayer.clearLayers(); const feats = (rawAOC_FC?.features || []).filter(f => { if (!q) return true; const denom = f.properties?.denom || ''; if (exactMode && q === 'closdevougeot') { return denom.toLowerCase().includes('clos de vougeot'); } const names = denom.split(',').map(s => s.trim()).filter(Boolean); if (exactMode) { return names.some(n => norm(n) === q); } const score = Math.max(...names.map(n => { const nn = norm(n); if (nn === q) return 100; if (nn.startsWith(q)) return 50; if (nn.includes(q)) return 10; return 0; })); return score > 0; }); if (!exactMode && feats.length > 1) { feats.sort((a, b) => { const scoreA = Math.max(...(a.properties.denom.split(',').map(n => norm(n) === q ? 100 : (norm(n).startsWith(q) ? 50 : (norm(n).includes(q) ? 10 : 0))))); const scoreB = Math.max(...(b.properties.denom.split(',').map(n => norm(n) === q ? 100 : (norm(n).startsWith(q) ? 50 : (norm(n).includes(q) ? 10 : 0))))); return scoreB - scoreA; }); } aocLayer.addData({ type:'FeatureCollection', features:feats }); if (feats.length) { map.fitBounds(aocLayer.getBounds(), { padding:[20,20] }); } else { console.warn('找不到結果：', queryRaw); } }
 
-    // ===================================================================
-    // ===== 升級版的 drawWineries 函式 =====
-    // ===================================================================
-   // ===================================================================
-// ===== 升級版的 drawWineries 函式 =====
-// ===================================================================
-function drawWineries(wineryFC) {
-  const markers = [];
-  const wineryIcon = L.divIcon({
-    className: 'winery-icon',
-    html: '🍷',
-    iconSize: [20, 20],
-    iconAnchor: [10, 10]
-  });
-  for (const feature of wineryFC.features) {
-    const props = feature.properties;
-    const coords = feature.geometry.coordinates;
-    if (props.name && coords) {
-      // 建立彈窗的 HTML 內容
-      let popupContent = `<b>${props.name}</b>`;
-      
-      // 檢查並加入地址 (根據您最新的資料格式)
-      if (props.address) {
-        popupContent += `<br>📍 ${props.address}`;
-      }
-      
-      // 檢查並加入電話，並建立可點擊的電話連結
-      if (props.phone) {
-        // .replace(/\s/g, '') 會移除電話號碼中的所有空白，讓電話連結能正常運作
-        popupContent += `<br>☎️ <a href="tel:${props.phone.replace(/\s/g, '')}">${props.phone}</a>`;
-      }
-      
-      // 檢查並加入網址，並建立可點擊的網址連結
-      if (props.website) {
-        popupContent += `<br>🌐 <a href="${props.website}" target="_blank">官方網站</a>`;
-      }
-      
-      // 建立標記並綁定彈窗
-      const marker = L.marker([coords[1], coords[0]], { icon: wineryIcon });
-      marker.bindPopup(popupContent);
-      markers.push(marker);
+    function classify(props){
+      const denom = props?.denom || '';
+      if (denom.toLowerCase().includes('clos de vougeot')) return 'GC';
+      const names = denom.split(',').map(s=>s.trim()).filter(Boolean);
+      const namesN = names.map(norm);
+      if (namesN.some(n => GRAND_CRU_NORM.includes(n))) return 'GC';
+      if (names.some(n => n.toLowerCase().includes('grand cru'))) return 'GC';
+      if (names.some(n => n.toLowerCase().includes('premier cru'))) return 'PC';
+      if (namesN.some(n => VILLAGES_NORM.includes(n))) return 'VI';
+      return 'RE';
     }
-  }
-  return L.layerGroup(markers);
-}
+    function styleByProps(props){ const lvl = classify(props);
+      if (lvl === 'GC') return { color:'#cc0033', weight:1.6, fillColor:'#cc0033', fillOpacity:0.18 };
+      if (lvl === 'PC') return { color:'#ff7f0e', weight:1.4, fillColor:'#ff7f0e', fillOpacity:0.16 };
+      if (lvl === 'VI') return { color:'#1f77b4', weight:1.2, fillColor:'#1f77b4', fillOpacity:0.14 };
+      return { color:'#2ca02c', weight:1.0, fillColor:'#2ca02c', fillOpacity:0.12 };
+    }
+    function highlightStyle(props){ const s = styleByProps(props); return { ...s, weight: s.weight + 0.8, fillOpacity: Math.min(0.35, (s.fillOpacity||0.15)+0.12) }; }
+    function popupHtmlFromProps(props){
+      const denom = props?.denom || '';
+      const names = denom.split(',').map(s=>s.trim()).filter(Boolean);
+      const score = (name) => { const n = norm(name);
+        if (GRAND_CRU_NORM.includes(n)) return 100;
+        if (n.includes('grandcru')) return 90;
+        if (n.includes('premiercru')) return 60;
+        if (VILLAGES_NORM.includes(n)) return 40;
+        return 10;
+      };
+      names.sort((a,b)=>score(b)-score(a));
+      let hitName=null, hitMeta=null;
+      for (const n of names){ const k=norm(n); if (META[k]){ hitName=n; hitMeta=META[k]; break; } }
+      if (hitMeta){
+        const link = hitMeta.link ? `<br><a href="${hitMeta.link}" target="_blank">更多</a>` : '';
+        const moreId = 'm'+Math.random().toString(36).slice(2);
+        const other = names.filter(n=>n!==hitName);
+        const more = other.length ? `<div style="margin-top:6px"><a href="#" onclick="const e=document.getElementById('${moreId}');e.style.display=e.style.display?'':'block';this.remove();return false;">+ 顯示其他適用名稱</a><div id="${moreId}" style="display:none;margin-top:4px;font-size:12px;color:#555">${other.join('<br>')}</div></div>` : '';
+        return `<b>${hitMeta.zh || hitName}</b><br>等級：${hitMeta.level || ''}${hitMeta.village ? `（${hitMeta.village}）` : ''}<br>${hitMeta.notes || ''}${link}<hr style="border:none;border-top:1px solid #eee;margin:8px 0"><small>地圖名稱：${hitName}</small>${more}`;
+      } else {
+        const titles = names.slice(0,2);
+        const moreId = 'm'+Math.random().toString(36).slice(2);
+        const more = names.slice(2).length ? `<div style="margin-top:6px"><a href="#" onclick="const e=document.getElementById('${moreId}');e.style.display=e.style.display?'':'block';this.remove();return false;">+ 顯示其他適用名稱</a><div id="${moreId}" style="display:none;margin-top:4px;font-size:12px;color:#555">${names.slice(2).join('<br>')}</div></div>` : '';
+        return `<b>${titles.join('<br>') || 'AOC'}</b>${more}`;
+      }
+    }
 
-    // ===== 3. 建立主函式 (不變) =====
+    // ===== 3) AOC 繪製與搜尋 =====
+    function drawAOC(queryRaw, exactMode = false){
+      let q = norm(queryRaw || ''); if (ALIASES[q]) q = ALIASES[q];
+      if (aocLayer) aocLayer.clearLayers();
+      const feats = (rawAOC_FC?.features || []).filter(f => {
+        if (!q) return true;
+        const denom = f.properties?.denom || '';
+        if (exactMode && q === 'closdevougeot') { return denom.toLowerCase().includes('clos de vougeot'); }
+        const names = denom.split(',').map(s => s.trim()).filter(Boolean);
+        if (exactMode) { return names.some(n => norm(n) === q); }
+        const score = Math.max(...names.map(n => { const nn = norm(n); if (nn === q) return 100; if (nn.startsWith(q)) return 50; if (nn.includes(q)) return 10; return 0; }));
+        return score > 0;
+      });
+      if (!exactMode && feats.length > 1) {
+        feats.sort((a,b)=>{
+          const sc = fc => Math.max(...(fc.properties.denom.split(',').map(n => { const nn = norm(n); if (nn === q) return 100; if (nn.startsWith(q)) return 50; if (nn.includes(q)) return 10; return 0; })));
+          return sc(b)-sc(a);
+        });
+      }
+      aocLayer.addData({ type:'FeatureCollection', features:feats });
+      if (feats.length) { map.fitBounds(aocLayer.getBounds(), { padding:[20,20] }); }
+      else { console.warn('找不到結果：', queryRaw); }
+    }
+
+    // ===== 4) 酒莊（你的新版函式）=====
+    function drawWineries(wineryFC) {
+      const markers = [];
+      const wineryIcon = L.divIcon({ className:'winery-icon', html:'🍷', iconSize:[20,20], iconAnchor:[10,10] });
+      for (const f of wineryFC.features) {
+        const p = f.properties, c = f.geometry.coordinates;
+        if (p.name && c) {
+          let html = `<b>${p.name}</b>`;
+          if (p.address) html += `<br>📍 ${p.address}`;
+          if (p.phone)   html += `<br>☎️ <a href="tel:${p.phone.replace(/\s/g,'')}">${p.phone}</a>`;
+          if (p.website) html += `<br>🌐 <a href="${p.website}" target="_blank">官方網站</a>`;
+          const m = L.marker([c[1], c[0]], { icon: wineryIcon }).bindPopup(html);
+          markers.push(m);
+        }
+      }
+      return L.layerGroup(markers);
+    }
+
+    // ===== 5) 主程式 =====
     async function main() {
       try {
         const [metaRes, aocRes, wineryRes] = await Promise.all([
@@ -170,35 +296,66 @@ function drawWineries(wineryFC) {
 
         wineryLayer = drawWineries(wineryFC);
 
+        // 圖層控制：把地形陰影也放進去（可開關）
         const overlayMaps = {
           "AOC 產區": aocLayer,
-          "酒莊位置": wineryLayer
+          "酒莊位置": wineryLayer,
+          "地形陰影": hillshade
         };
-        L.control.layers(null, overlayMaps, { collapsed: false }).addTo(map);
+        L.control.layers({ "OpenStreetMap": baseOSM }, overlayMaps, { collapsed: false }).addTo(map);
 
-      } catch (error) {
-        console.error("無法載入必要的資料檔案:", error);
-        alert("錯誤：無法載入地圖資料！請檢查 burgundy.geojson, wineries.geojson 和 meta.json 檔案是否存在。");
+      } catch (err) {
+        console.error("無法載入必要的資料檔案:", err);
+        alert("錯誤：無法載入地圖資料！請確認 burgundy.geojson / wineries.geojson / meta.json 存在。");
         return;
       }
 
       drawAOC('');
 
-      let t = null;
-      input.addEventListener('input', () => { clearTimeout(t); t = setTimeout(() => drawAOC(input.value, false), 220); });
-      btnClear.onclick = () => { input.value = ''; drawAOC(''); };
-      btnAll.onclick = () => { input.value = ''; drawAOC(''); };
-      chipsBox.addEventListener('click', (e) => { const k = e.target?.dataset?.k; if (!k) return; input.value = e.target.innerText; drawAOC(k, true); });
-      const villageClickHandler = (e) => { const k = e.target?.dataset?.k; if (!k) return; input.value = e.target.innerText; drawAOC(k, false); };
-      chaChipsBox.addEventListener('click', villageClickHandler);
-      cdnChipsBox.addEventListener('click', villageClickHandler);
-      cdbChipsBox.addEventListener('click', villageClickHandler);
-      cdcChipsBox.addEventListener('click', villageClickHandler);
-      macChipsBox.addEventListener('click', villageClickHandler);
-      document.querySelectorAll('.accordion-title').forEach(title => { title.addEventListener('click', () => { const content = title.nextElementSibling; document.querySelectorAll('.accordion-content.show').forEach(openContent => { if (openContent !== content) { openContent.classList.remove('show'); } }); content.classList.toggle('show'); }); });
+      // 搜尋/快捷
+      const input = document.getElementById('q');
+      const btnClear = document.getElementById('clear');
+      const btnAll   = document.getElementById('all');
+      const chipsBox = document.getElementById('chips');
+      const cdnChipsBox = document.getElementById('cdn-chips');
+      const cdbChipsBox = document.getElementById('cdb-chips');
+      const cdcChipsBox = document.getElementById('cdc-chips');
+      const macChipsBox = document.getElementById('mac-chips');
+      const chaChipsBox = document.getElementById('cha-chips');
+
+      let t=null;
+      input.addEventListener('input', ()=>{ clearTimeout(t); t=setTimeout(()=> drawAOC(input.value, false), 220); });
+      btnClear.onclick = ()=> { input.value=''; drawAOC(''); };
+      btnAll.onclick   = ()=> { input.value=''; drawAOC(''); };
+      chipsBox.addEventListener('click', (e)=>{ const k = e.target?.dataset?.k; if (!k) return; input.value = e.target.innerText; drawAOC(k, true); });
+      const villageClick = (e)=>{ const k = e.target?.dataset?.k; if (!k) return; input.value = e.target.innerText; drawAOC(k, false); };
+      chaChipsBox.addEventListener('click', villageClick);
+      cdnChipsBox.addEventListener('click', villageClick);
+      cdbChipsBox.addEventListener('click', villageClick);
+      cdcChipsBox.addEventListener('click', villageClick);
+      macChipsBox.addEventListener('click', villageClick);
+
+      // 手風琴
+      document.querySelectorAll('.accordion-title').forEach(title => {
+        title.addEventListener('click', () => {
+          const content = title.nextElementSibling;
+          document.querySelectorAll('.accordion-content.show').forEach(open => {
+            if (open !== content) open.classList.remove('show');
+          });
+          content.classList.toggle('show');
+        });
+      });
+
+      // 地形陰影透明度滑桿
+      const hsSlider = document.getElementById('hsOpacity');
+      const hsVal = document.getElementById('hsVal');
+      hsSlider.oninput = ()=> {
+        const v = Number(hsSlider.value) || 0;
+        hillshade.setOpacity(v/100);
+        hsVal.textContent = v + '%';
+      };
     }
 
-    // ===== 4. 執行主函式 (不變) =====
     main();
   </script>
 </body>
