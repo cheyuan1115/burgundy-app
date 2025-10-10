@@ -139,6 +139,16 @@
       if (namesN.some(n => VILLAGES_NORM.includes(n))) return 'VI';
       return 'RE';
     }
+function _firstVillage(names) {
+  for (const n of names) if (VILLAGES_NORM.includes(norm(n))) return n;
+  return null;
+}
+function _cleanClimat(s) {
+  return (s || '')
+    .replace(/^climat\s+de\s+bourgogne\s*/i, '')
+    .replace(/^(de|du|des|la|le|les|l’|l')\s+/i, '')
+    .trim();
+}
 
     // 依等級選唯一顯示名稱（可用 meta 覆蓋）
   // 依等級挑出要顯示的一個主名稱（GC=園名、PC=climat、VI=村名；有 meta 就覆蓋）
