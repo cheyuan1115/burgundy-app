@@ -143,6 +143,7 @@
     // 依等級選唯一顯示名稱（可用 meta 覆蓋）
   // 依等級挑出要顯示的一個主名稱（GC=園名、PC=climat、VI=村名；有 meta 就覆蓋）
 // 依等級挑出要顯示的一個主名稱（GC=園名、PC=climat、VI=村名；有 meta 就覆蓋）
+// 依等級挑出主名稱（GC=園名、PC=climat、VI=村名；有 meta 則覆蓋）
 function pickPrimaryName(props, META) {
   const denom = props?.denom || '';
   const names = denom.split(',').map(s => s.trim()).filter(Boolean);
@@ -155,6 +156,19 @@ function pickPrimaryName(props, META) {
     return (m?.zh || m?.name || label);
   };
 
+  // ——— 常見泛稱（排除用）———
+  const GENERIC_EXCLUDE = new Set([
+    'bourgogne', 'climatdebougogne', 'climat de bourgogne',
+    'cotedebeaune', 'cotedenuits', 'cotedenuitsvillages', 'cotedebeaunevillages'
+  ]);
+  const isGeneric = (s) => {
+    const n = norm(s);
+    if (GENERIC_EXCLUDE.has(n)) return true;
+    if (n.startsWith('climatdebougogne')) return true;
+    if (n.includes('cote') && n.includes('villages')) return true;
+    return false;
+  };
+
   // === Grand Cru ===
   if (lvl === 'GC') {
     for (let i = 0; i < names.length; i++) {
@@ -165,32 +179,47 @@ function pickPrimaryName(props, META) {
     return applyMeta(names.sort((a, b) => a.length - b.length)[0] || 'Grand Cru');
   }
 
-  // === Premier Cru ===
+  // === Premier Cru（強化版）===
   if (lvl === 'PC') {
-    // 先找含 Premier/1er 的那一條
+    // 1) 直接從帶 Premier/1er 的那一條抓 climat（dash/冒號 後面）
     const target = names.find(n => /(1er\s+Cru|Premier\s+Cru)/i.test(n));
     if (target) {
-      // dash/冒號 後面通常就是 climat 名
       let m = target.match(/(?:Premier\s+Cru|1er\s+Cru)\s*[-–—:]\s*(.+)$/i);
       if (m && m[1]) return applyMeta(m[1].trim());
 
-      // 沒分隔符：直接抓關鍵詞後的字串
+      // 沒分隔符，就抓關鍵詞後面的字串
       m = target.match(/(?:Premier\s+Cru|1er\s+Cru)\s+(.+)$/i);
       if (m && m[1]) {
-        const climat = m[1].replace(/^(de\s+|du\s+|la\s+|le\s+)/i, '').trim();
-        if (climat && climat.length > 2) return applyMeta(climat);
+        const climat = m[1].replace(/^(de\s+|du\s+|des\s+|la\s+|le\s+|les\s+|l’|l')/i, '').trim();
+        if (climat && climat.length > 2 && !isGeneric(climat)) return applyMeta(climat);
       }
     }
 
-    // 取最短且不是純村名/不是 GC/PC 字樣的名稱
-    const others = names.filter((n, i) =>
+    // 2) 從其他名稱挑「像 climat」的：不是村名、不是泛稱、也不含 GC/PC 字樣
+    const candidates = names.filter((n, i) =>
       !VILLAGES_NORM.includes(namesN[i]) &&
       !/grand\s+cru/i.test(n) &&
-      !/(?:Premier\s+Cru|1er\s+Cru)/i.test(n)
+      !/(?:Premier\s+Cru|1er\s+Cru)/i.test(n) &&
+      !isGeneric(n)
     );
-    if (others.length) return applyMeta(others.sort((a, b) => a.length - b.length)[0]);
 
-    // 退回：村名→第一個名稱
+    if (candidates.length) {
+      // 打分：有空白 +1；以 Les/Le/La/L’/L' 開頭 +2；字越短越好
+      const score = (s) => {
+        let sc = 0;
+        if (/\s/.test(s)) sc += 1;
+        if (/^(Les|Le|La|L’|L')\b/.test(s)) sc += 2;
+        return sc;
+      };
+      candidates.sort((a, b) => {
+        const sa = score(a), sb = score(b);
+        if (sa !== sb) return sb - sa;             // 高分優先
+        return a.length - b.length;                // 再比長度（短優先）
+      });
+      return applyMeta(candidates[0]);
+    }
+
+    // 3) fallback：回到村名；再不行第一個名稱
     for (let i = 0; i < names.length; i++) {
       if (VILLAGES_NORM.includes(namesN[i])) return applyMeta(names[i]);
     }
@@ -208,9 +237,6 @@ function pickPrimaryName(props, META) {
   // === 其他 ===
   return applyMeta(names[0] || 'AOC');
 }
-
-
-
 
     // ====== 資料載入 ======
     let masterAOC = null, META = {};
