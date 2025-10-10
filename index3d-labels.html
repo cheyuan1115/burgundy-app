@@ -2,11 +2,10 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8" />
-  <title>Burgundy AOC — 3D 傾斜＋地塊內標籤（MapLibre）</title>
+  <title>Burgundy AOC — 3D 可傾斜版（Popup 簡化名稱）</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <link href="https://unpkg.com/maplibre-gl@3.6.1/dist/maplibre-gl.css" rel="stylesheet"/>
   <script src="https://unpkg.com/maplibre-gl@3.6.1/dist/maplibre-gl.js"></script>
-  <script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
   <style>
     html, body, #map { height: 100%; margin: 0; }
     .ui{
@@ -36,14 +35,11 @@
   <div id="map"></div>
 
   <div class="ui">
-    <div class="row"><b>搜尋 AOC（顯示簡化名稱，直接標在地塊上）</b></div>
+    <div class="row"><b>篩選 AOC 名稱（Popup 顯示簡化名稱）</b></div>
     <div class="row">
       <input id="q" type="text" placeholder="例如：Meursault / Les Amoureuses / La Tâche">
       <button class="btn" id="clear">清除</button>
       <button class="btn" id="showAll">全部</button>
-      <label class="small" style="display:flex;align-items:center;gap:6px;">
-        <input type="checkbox" id="toggleLabels" checked/> 顯示地塊標籤
-      </label>
     </div>
 
     <div class="row">
@@ -85,9 +81,10 @@
       container: 'map',
       style: {
         version: 8,
-            glyphs: 'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',
-
+        // 🔧 glyphs：讓符號/文字可顯示
+        glyphs: 'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',
         sources: {
+          // 基礎底圖：OSM Raster
           'osm': {
             type: 'raster',
             tiles: [
@@ -99,6 +96,7 @@
             maxzoom: 19,
             attribution: '© OpenStreetMap contributors'
           },
+          // DEM：Terrarium
           'terrain-dem': {
             type: 'raster-dem',
             tiles: ['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],
@@ -120,9 +118,13 @@
     map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
 
     // ====== 名稱正規化與分級 ======
-    function norm(s=''){ return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/['’·.`´]+/g,'').replace(/[-\\s\\u00A0\\u2000-\\u200D\\u2010-\\u2015]+/g,'').trim(); }
+    function norm(s=''){ return s.toLowerCase().normalize('NFD')
+      .replace(/[\u0300-\u036f]/g,'').replace(/['’·.`´]+/g,'')
+      .replace(/[-\s\u00A0\u2000-\u200D\u2010-\u2015]+/g,'').trim(); }
+
     const GRAND_CRU = ["Chambertin","Chambertin-Clos de Bèze","Mazis-Chambertin","Charmes-Chambertin","Griotte-Chambertin","Latricières-Chambertin","Ruchottes-Chambertin","Mazoyères-Chambertin","Clos de la Roche","Clos Saint-Denis","Clos des Lambrays","Clos de Tart","Bonnes-Mares","Musigny","Clos de Vougeot","Échezeaux","Grands Échezeaux","Richebourg","Romanée-Conti","La Romanée","Romanée-Saint-Vivant","La Tâche","La Grande Rue","Corton","Corton-Charlemagne","Charlemagne","Montrachet","Bâtard-Montrachet","Chevalier-Montrachet","Criots-Bâtard-Montrachet","Bienvenues-Bâtard-Montrachet","Chablis Grand Cru"];
     const GRAND_CRU_NORM = GRAND_CRU.map(n => norm(n));
+
     const VILLAGES = ["Chablis","Marsannay","Fixin","Gevrey-Chambertin","Morey-Saint-Denis","Chambolle-Musigny","Vougeot","Flagey-Échezeaux","Vosne-Romanée","Nuits-Saint-Georges","Côte de Nuits-Villages","Ladoix","Aloxe-Corton","Pernand-Vergelesses","Chorey-lès-Beaune","Savigny-lès-Beaune","Beaune","Pommard","Volnay","Monthelie","Auxey-Duresses","Saint-Romain","Meursault","Blagny","Puligny-Montrachet","Chassagne-Montrachet","Saint-Aubin","Santenay","Maranges","Côte de Beaune-Villages","Bouzeron","Rully","Mercurey","Givry","Montagny","Pouilly-Fuissé","Pouilly-Loché","Pouilly-Vinzelles","Saint-Véran","Viré-Clessé","Mâcon","Saint-Amour","Juliénas","Chénas"];
     const VILLAGES_NORM = VILLAGES.map(n => norm(n));
 
@@ -145,232 +147,247 @@
       const namesN = names.map(norm);
       const lvl = classify(props);
 
-      // 嘗試從 meta 找到對應的中文名（優先）
-      const firstMeta = (() => {
-        for (let i=0;i<names.length;i++){ const k = namesN[i]; if (META && META[k]) return META[k].zh || META[k].name; }
+      // 先看 meta 是否有中文/主名
+      const metaHit = (() => {
+        for (let i=0;i<names.length;i++){
+          const k = namesN[i];
+          if (META && META[k]) return META[k].zh || META[k].name || names[i];
+        }
         return null;
       })();
 
       if (lvl === 'GC') {
-        for (let i=0;i<names.length;i++){ if (GRAND_CRU_NORM.includes(namesN[i])) return firstMeta || names[i]; }
+        for (let i=0;i<names.length;i++){ if (GRAND_CRU_NORM.includes(namesN[i])) return metaHit || names[i]; }
         const idxGC = names.findIndex(n => n.toLowerCase().includes('grand cru'));
-        if (idxGC >= 0) return firstMeta || names[idxGC];
-        return firstMeta || (names.sort((a,b)=>a.length-b.length)[0] || 'Grand Cru');
+        if (idxGC >= 0) return metaHit || names[idxGC];
+        return metaHit || (names.sort((a,b)=>a.length-b.length)[0] || 'Grand Cru');
       }
       if (lvl === 'PC') {
-        // 去掉 "Premier Cru" 與村名，留下 climat
-        const cleaned = names.map(n => n.replace(/\\b(Premier\\s+Cru|1er\\s+Cru)\\b/ig,'').trim());
-        // 排除純村名
+        // 去掉 "Premier Cru"/"1er Cru"，排除純村名，取最短（climat）
+        const cleaned = names.map(n => n.replace(/\b(Premier\s+Cru|1er\s+Cru)\b/ig,'').trim());
         const candidates = cleaned.filter((n,i)=>!VILLAGES_NORM.includes(namesN[i]));
         const best = (candidates.length?candidates:names).sort((a,b)=>a.length-b.length)[0];
-        return firstMeta || best;
+        return metaHit || best;
       }
       if (lvl === 'VI') {
-        // 取與 village 清單相符者
-        for (let i=0;i<names.length;i++){ if (VILLAGES_NORM.includes(namesN[i])) return firstMeta || names[i]; }
-        return firstMeta || (names[0] || 'Village');
+        for (let i=0;i<names.length;i++){ if (VILLAGES_NORM.includes(namesN[i])) return metaHit || names[i]; }
+        return metaHit || (names[0] || 'Village');
       }
-      return firstMeta || (names[0] || 'AOC');
+      return metaHit || (names[0] || 'AOC');
     }
 
-    // ====== 全域資料 ======
-    let masterAOC = null;         // polygon FC
-    let labelPointsFC = null;     // point-on-surface FC
-    let META = {};                // meta.json
-    let currentFilterQ = '';
-
+    // ====== 資料載入 ======
+    let masterAOC = null, META = {};
     map.on('load', async () => {
       // Sky + Hillshade
       map.addLayer({
-        id: 'sky', type: 'sky',
-        paint: { 'sky-type':'atmosphere', 'sky-atmosphere-sun':[0.0,0.0], 'sky-atmosphere-sun-intensity':12 }
+        id: 'sky',
+        type: 'sky',
+        paint: { 'sky-type':'atmosphere','sky-atmosphere-sun':[0.0,0.0],'sky-atmosphere-sun-intensity':12 }
       });
       map.addLayer({
-        id: 'hillshade', type: 'hillshade', source: 'terrain-dem',
+        id: 'hillshade',
+        type: 'hillshade',
+        source: 'terrain-dem',
         layout: { visibility: 'visible' },
-        paint: { 'hillshade-exaggeration': 0.5, 'hillshade-shadow-color': 'rgba(0,0,0,0.55)', 'hillshade-illumination-direction': 315 }
+        paint: { 'hillshade-exaggeration': 0.5, 'hillshade-shadow-color':'rgba(0,0,0,0.55)', 'hillshade-illumination-direction':315 }
       });
 
-      // 載入資料
+      // AOC & meta
       const [metaRes, aocRes] = await Promise.all([fetch(META_FILE), fetch(AOC_DATA_FILE)]);
       try { META = await metaRes.json(); } catch(e){ META = {}; }
       masterAOC = await aocRes.json();
 
-      // enrich：加 lvl / label / area_km2
-      const enriched = {
-        type: 'FeatureCollection',
-        features: (masterAOC.features||[]).map((f, i) => {
-          const p = f.properties || {};
-          const lvl = classify(p);
-          const label = pickPrimaryName(p, META);
-          let area_km2 = 0;
-          try { area_km2 = turf.area(f)/1e6; } catch(e){}
-          return { ...f, properties: { ...p, lvl, label, area_km2, _id: i } };
-        })
-      };
+      // Source & layers
+      map.addSource('aoc', { type: 'geojson', data: masterAOC, promoteId: 'id', generateId: true });
 
-      // label points：pointOnSurface（一定在面內）
-      const pts = [];
-      for (const f of enriched.features) {
-        try {
-          const pt = turf.pointOnSurface(f);
-          pt.properties = {
-            lvl: f.properties.lvl,
-            label: f.properties.label,
-            area_km2: f.properties.area_km2,
-            _id: f.properties._id
-          };
-          pts.push(pt);
-        } catch(e){ /* 忽略失敗者 */ }
-      }
-      labelPointsFC = { type:'FeatureCollection', features: pts };
-
-      // Sources
-      map.addSource('aoc', { type:'geojson', data: enriched, promoteId: '_id' });
-      map.addSource('aoc-labels', { type:'geojson', data: labelPointsFC });
-
-      // 填色
       map.addLayer({
-        id: 'aoc-fill', type: 'fill', source: 'aoc',
+        id: 'aoc-fill',
+        type: 'fill',
+        source: 'aoc',
         paint: {
           'fill-color': [
-            'match', ['get', 'lvl'],
+            'match', ['literal',['GC','PC','VI','RE']].indexOf('x') // dummy to keep array compact
+          ],
+          // 直接用 expression match（更直白寫法如下）
+          'fill-color': [
+            'match', ['to-string', ['case',
+              ['==', ['literal', 1], 1], '' // no-op
+            ]],
+            '', '#000', '#000' // 占位；下行生效
+          ]
+        }
+      }); // 先占位，馬上用 setStyle 方式重加（兼容性更好）
+
+      // 重新設定 aoc-fill / aoc-line（實際樣式）
+      map.removeLayer('aoc-fill');
+      map.addLayer({
+        id: 'aoc-fill',
+        type: 'fill',
+        source: 'aoc',
+        paint: {
+          'fill-color': [
+            'match',
+            ['literal', ['GC','PC','VI','RE','X']], // 只是為了語法高亮
+            'X', '#000', '#000'
+          ],
+          'fill-color': [
+            'match', ['case',
+              ['==', ['literal', 1], 1], '' // no-op
+            ],
+            '', '#000', '#000'
+          ]
+        }
+      });
+
+      // 真正給顏色（簡單直接：用 get lvl 的 match）
+      map.setPaintProperty('aoc-fill', 'fill-color',
+        ['match',['literal',['GC','PC','VI','RE']].indexOf('x')]); // 先清
+      map.setPaintProperty('aoc-fill', 'fill-color',
+        ['match', ['literal', ['GC','PC','VI','RE']], 'X', '#000', '#000']); // 清
+
+      // 直接用一個簡潔版：
+      map.setPaintProperty('aoc-fill', 'fill-color', [
+        'match', ['case',
+          ['==',['literal',1],1],''
+        ], '', '#000' // no-op
+      ]);
+
+      // 用最清楚的寫法（上面的占位可以忽略）：
+      map.setPaintProperty('aoc-fill', 'fill-color', [
+        'match', ['get','lvlTmp'], // 我們等會點擊時臨時給；預設用屬性判斷
+        'GC', '#cc0033',
+        'PC', '#ff7f0e',
+        'VI', '#1f77b4',
+        /* RE */ '#2ca02c'
+      ]);
+      map.setPaintProperty('aoc-fill', 'fill-opacity', 0.15);
+
+      // 由於 masterAOC 目前沒有 lvlTmp，我們改用另外方式：新建一個帶樣式的層更簡單
+      map.removeLayer('aoc-fill');
+      map.addLayer({
+        id: 'aoc-fill',
+        type: 'fill',
+        source: 'aoc',
+        paint: {
+          'fill-color': [
+            'match',
+            ['case',
+              ['boolean', ['==', ['literal', true], true], true], ['get','lvl'], // 如果後面補 lvl 就用
+              /* fallback：動態計算不行，退回預設顏色 */ 'RE'
+            ],
             'GC', '#cc0033',
             'PC', '#ff7f0e',
             'VI', '#1f77b4',
             /* RE */ '#2ca02c'
           ],
-          'fill-opacity': [
-            'match', ['get', 'lvl'],
-            'GC', 0.18, 'PC', 0.16, 'VI', 0.14, 0.12
-          ]
+          'fill-opacity': 0.15
         }
       });
 
       // 邊線
       map.addLayer({
-        id: 'aoc-line', type: 'line', source: 'aoc',
+        id: 'aoc-line',
+        type: 'line',
+        source: 'aoc',
         paint: {
           'line-color': [
-            'match', ['get', 'lvl'], 'GC', '#cc0033', 'PC', '#ff7f0e', 'VI', '#1f77b4', '#2ca02c'
+            'match',
+            ['case',['boolean',['==',['literal',true],true],true], ['get','lvl'], 'RE'],
+            'GC', '#cc0033',
+            'PC', '#ff7f0e',
+            'VI', '#1f77b4',
+            /* RE */ '#2ca02c'
           ],
           'line-width': 1.2
         }
       });
 
-      // 點擊高亮層（透過 filter 指向被點選的 _id）
-      map.addLayer({
-        id: 'aoc-click-hl', type: 'line', source: 'aoc',
-        filter: ['==', ['get','_id'], -1],
-        paint: { 'line-color': '#111', 'line-width': 3.0 }
-      });
-
-      // —— 地塊內標籤（Symbol）——
-      // 依等級設定 minzoom 與字級；排序：GC>PC>VI>RE，面積越大越優先
-      const priorityExpr = [
-        'case',
-        ['==',['get','lvl'],'GC'], 4,
-        ['==',['get','lvl'],'PC'], 3,
-        ['==',['get','lvl'],'VI'], 2,
-        1
-      ];
-      map.addLayer({
-        id: 'aoc-labels',
-        type: 'symbol',
-        source: 'aoc-labels',
-        layout: {
-          'text-field': ['get','label'],
-'text-font': ['Noto Sans Regular','Open Sans Regular','Arial Unicode MS Regular'],
-          'text-allow-overlap': false,
-          'text-pitch-alignment': 'viewport',
-          'symbol-z-order': 'auto',
-          'symbol-sort-key': ['+', ['*', priorityExpr, 1000], ['get','area_km2']],
-          'text-size': [
-            'interpolate', ['linear'], ['zoom'],
-            8.0, ['case',['==',['get','lvl'],'GC'], 13, ['==',['get','lvl'],'PC'], 11, 10],
-            12.0,['case',['==',['get','lvl'],'GC'], 16, ['==',['get','lvl'],'PC'], 14, 12],
-            14.0,['case',['==',['get','lvl'],'GC'], 18, ['==',['get','lvl'],'PC'], 16, 13]
-          ],
-          // 分級顯示門檻
-          'minzoom': 8
-        },
-        paint: {
-          'text-color': '#111',
-          'text-halo-color': '#ffffff',
-          'text-halo-width': 1.4,
-          'text-opacity': [
-            'case',
-            ['==',['get','lvl'],'GC'], 1,
-            ['all',['==',['get','lvl'],'VI'], ['<', ['zoom'], 9.5]], 1,  // Village 9.5 之後才顯示
-            ['all',['==',['get','lvl'],'PC'], ['<', ['zoom'], 12.5]], 1, // PC 12.5 之後才顯示
-            1
-          ]
-        }
-      });
-
-      // 互動：點擊地塊→定位＋短暫高亮
-      map.on('click','aoc-fill',(e)=>{
+      // —— 點擊：彈出簡化名稱 Popup ——
+      map.on('click', 'aoc-fill', (e) => {
         const f = e.features?.[0]; if (!f) return;
-        const id = f.properties?._id;
-        // bounds
-        const b = new maplibregl.LngLatBounds();
-        const add = (coords)=>{ if (typeof coords[0]==='number') b.extend(coords); else coords.forEach(add); };
-        add(f.geometry.coordinates);
-        map.fitBounds(b, { padding: 20, maxZoom: 14, duration: 550, pitch: map.getPitch(), bearing: map.getBearing() });
+        const props = f.properties || {};
+        const lvl = classify(props);
+        const label = pickPrimaryName(props, META);
+        const lvlText = { GC:'Grand Cru', PC:'Premier Cru', VI:'Village', RE:'Régionale/其他' }[lvl] || 'AOC';
 
-        // highlight 1.2 秒
-        map.setFilter('aoc-click-hl', ['==',['get','_id'], id]);
-        setTimeout(()=> map.setFilter('aoc-click-hl', ['==',['get','_id'], -1]), 1200);
+        const html = `<b>${label}</b><br><span style="color:#666">等級：${lvlText}</span>`;
+        new maplibregl.Popup({ closeOnClick: true })
+          .setLngLat(e.lngLat)
+          .setHTML(html)
+          .addTo(map);
       });
 
-      // ====== 搜尋（篩選 + zoom）======
-      async function applySearch(qRaw){
-        currentFilterQ = norm(qRaw || '');
-        const feats = (enriched.features || []).filter(f => {
-          if (!currentFilterQ) return true;
-          const names = (f.properties?.denom || '').split(',').map(s=>s.trim()).filter(Boolean);
-          const score = Math.max(...names.map(n => {
-            const nn = norm(n);
-            if (nn === currentFilterQ) return 100;
-            if (nn.startsWith(currentFilterQ)) return 50;
-            if (nn.includes(currentFilterQ)) return 10;
-            return 0;
-          }));
-        return score > 0;
+      // —— 酒莊（可留可去）——
+      try {
+        const wRes = await fetch(WINERY_DATA_FILE);
+        const wFC = await wRes.json();
+        map.addSource('wineries', { type: 'geojson', data: wFC });
+        map.addLayer({
+          id: 'wineries',
+          type: 'symbol',
+          source: 'wineries',
+          layout: {
+            'text-field': '🍷',
+            'text-font': ['Open Sans Regular','Noto Sans Regular','Arial Unicode MS Regular'],
+            'text-size': 16,
+            'text-offset': [0, -0.2],
+            'text-allow-overlap': true
+          }
         });
+        map.on('click', 'wineries', (e) => {
+          const f = e.features?.[0]; if (!f) return;
+          const p = f.properties || {};
+          let html = `<b>${p.name || 'Winery'}</b>`;
+          if (p.address) html += `<br>📍 ${p.address}`;
+          if (p.phone)   html += `<br>☎️ ${p.phone}`;
+          if (p.website) html += `<br>🌐 <a href="${p.website}" target="_blank">官方網站</a>`;
+          new maplibregl.Popup({ closeOnClick: true }).setLngLat(e.lngLat).setHTML(html).addTo(map);
+        });
+      } catch (e) {}
 
-        const filteredPoly = { type:'FeatureCollection', features: feats };
-        const filteredPts  = { type:'FeatureCollection', features: labelPointsFC.features.filter(pt => feats.some(f => f.properties._id === pt.properties._id)) };
+      // ======（可選）搜尋：依 denom 關鍵字過濾並 zoom ======
+      let enriched = {
+        type:'FeatureCollection',
+        features: (masterAOC.features||[]).map(f=>{
+          const p = f.properties || {};
+          return { ...f, properties: { ...p, lvl: classify(p) } };
+        })
+      };
+      map.getSource('aoc').setData(enriched);
 
-        map.getSource('aoc').setData(filteredPoly);
-        map.getSource('aoc-labels').setData(filteredPts);
+      async function applySearch(qRaw){
+        const q = (qRaw||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+        const feats = (enriched.features||[]).filter(f=>{
+          if (!q) return true;
+          const denom = f.properties?.denom || '';
+          const names = denom.split(',').map(s=>s.trim()).filter(Boolean);
+          const score = Math.max(...names.map(n=>{
+            const nn = n.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+            if (nn === q) return 100; if (nn.startsWith(q)) return 50; if (nn.includes(q)) return 10; return 0;
+          }));
+          return score>0;
+        });
+        const fc = { type:'FeatureCollection', features: feats };
+        map.getSource('aoc').setData(fc);
 
         if (feats.length){
           const b = new maplibregl.LngLatBounds();
-          feats.forEach(f => {
-            const add = (coords) => { if (typeof coords[0]==='number') b.extend(coords); else coords.forEach(add); };
+          feats.forEach(f=>{
+            const add=(c)=>{ if (typeof c[0]==='number') b.extend(c); else c.forEach(add); };
             add(f.geometry.coordinates);
           });
-          map.fitBounds(b, { padding: 20, maxZoom: 14, duration: 600, pitch: map.getPitch(), bearing: map.getBearing() });
+          map.fitBounds(b,{ padding:20, maxZoom:14, duration:600, pitch:map.getPitch(), bearing:map.getBearing() });
         }
       }
 
-      // 綁定 UI
-      const q = document.getElementById('q');
+      const qEl = document.getElementById('q');
       const btnClear = document.getElementById('clear');
-      const btnAll = document.getElementById('showAll');
-      const chkLabels = document.getElementById('toggleLabels');
-
-      let t = null;
-      q.addEventListener('input', ()=>{ clearTimeout(t); t = setTimeout(()=> applySearch(q.value), 220); });
-      btnClear.onclick = ()=> { q.value=''; applySearch(''); };
-      btnAll.onclick   = ()=> { q.value=''; applySearch(''); };
-      chkLabels.onchange = ()=> {
-        const vis = chkLabels.checked ? 'visible' : 'none';
-        map.setLayoutProperty('aoc-labels','visibility', vis);
-      };
-
-      // 初始顯示
+      const btnAll   = document.getElementById('showAll');
+      let t=null;
+      qEl.addEventListener('input', ()=>{ clearTimeout(t); t=setTimeout(()=>applySearch(qEl.value), 220); });
+      btnClear.onclick = ()=>{ qEl.value=''; applySearch(''); };
+      btnAll.onclick   = ()=>{ qEl.value=''; applySearch(''); };
       applySearch('');
     });
 
