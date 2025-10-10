@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <title>Burgundy AOC — 3D 傾斜＋地塊內標籤（MapLibre）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link href="https://unpkg.com/maplibre-gl@3.6.1/dist/maplibre-gl.css" rel="stylesheet"/>
+  <script src="https://unpkg.com/maplibre-gl@3.6.1/dist/maplibre-gl.js"></script>
+  <script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
+  <style>
+    html, body, #map { height: 100%; margin: 0; }
+    .ui{
+      position: absolute; z-index: 10; top: 12px; left: 12px;
+      background: #fff; padding: 10px; border-radius: 10px;
+      box-shadow: 0 6px 20px rgba(0,0,0,.18);
+      width: min(88vw, 560px); font: 14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+    }
+    .row{ display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap; }
+    .ui input[type="text"]{ flex:1; padding:8px 10px; border:1px solid #ddd; border-radius:8px; font:inherit; }
+    .btn{ padding:6px 10px; border:1px solid #ddd; border-radius:8px; background:#f8f8f8; cursor:pointer; font:12px; white-space:nowrap; }
+    .btn:hover{ background:#eee; }
+    label.small{ font-size:12px; color:#666; }
+    .legend{
+      position:absolute; z-index:10; right:12px; bottom:12px; background:#fff; padding:10px;
+      border-radius:10px; box-shadow:0 6px 20px rgba(0,0,0,.18); font:13px system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+    }
+    .legend .item{ display:flex; align-items:center; gap:8px; margin:4px 0; }
+    .swatch{ width:16px; height:12px; border:2px solid #000; border-radius:3px }
+    .gc{ border-color:#cc0033; background:#cc003322 }
+    .pc{ border-color:#ff7f0e; background:#ff7f0e33 }
+    .vi{ border-color:#1f77b4; background:#1f77b433 }
+    .re{ border-color:#2ca02c; background:#2ca02c33 }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <div class="ui">
+    <div class="row"><b>搜尋 AOC（顯示簡化名稱，直接標在地塊上）</b></div>
+    <div class="row">
+      <input id="q" type="text" placeholder="例如：Meursault / Les Amoureuses / La Tâche">
+      <button class="btn" id="clear">清除</button>
+      <button class="btn" id="showAll">全部</button>
+      <label class="small" style="display:flex;align-items:center;gap:6px;">
+        <input type="checkbox" id="toggleLabels" checked/> 顯示地塊標籤
+      </label>
+    </div>
+
+    <div class="row">
+      <label class="small">傾斜 Pitch</label>
+      <input id="pitch" type="range" min="0" max="70" value="45" style="flex:1">
+      <span id="pitchVal" class="small">45°</span>
+    </div>
+    <div class="row">
+      <label class="small">朝向 Bearing</label>
+      <input id="bearing" type="range" min="-180" max="180" value="0" style="flex:1">
+      <span id="bearingVal" class="small">0°</span>
+      <button class="btn" id="resetView">重置視角</button>
+    </div>
+    <div class="row">
+      <label class="small">地形誇張度</label>
+      <input id="exg" type="range" min="50" max="300" value="150" style="flex:1">
+      <span id="exgVal" class="small">150%</span>
+      <button class="btn" id="toggleShade">Hillshade 開/關</button>
+      <button class="btn" id="toggleSky">Sky 開/關</button>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="item"><span class="swatch gc"></span> Grand Cru</div>
+    <div class="item"><span class="swatch pc"></span> Premier Cru</div>
+    <div class="item"><span class="swatch vi"></span> Village</div>
+    <div class="item"><span class="swatch re"></span> Régionale / 其他</div>
+  </div>
+
+  <script>
+    // ====== 檔案與初始視角 ======
+    const AOC_DATA_FILE = './burgundy.geojson';
+    const WINERY_DATA_FILE = './wineries.geojson';
+    const META_FILE = './meta.json';
+    const START = { lng: 4.80, lat: 47.00, zoom: 8.8, pitch: 45, bearing: 0 };
+
+    // ====== Map 初始化（MapLibre GL）======
+    const map = new maplibregl.Map({
+      container: 'map',
+      style: {
+        version: 8,
+        sources: {
+          'osm': {
+            type: 'raster',
+            tiles: [
+              'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
+              'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
+              'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'
+            ],
+            tileSize: 256,
+            maxzoom: 19,
+            attribution: '© OpenStreetMap contributors'
+          },
+          'terrain-dem': {
+            type: 'raster-dem',
+            tiles: ['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],
+            tileSize: 256,
+            maxzoom: 15,
+            encoding: 'terrarium'
+          }
+        },
+        layers: [{ id: 'osm', type: 'raster', source: 'osm' }],
+        terrain: { source: 'terrain-dem', exaggeration: 1.5 }
+      },
+      center: [START.lng, START.lat],
+      zoom: START.zoom,
+      pitch: START.pitch,
+      bearing: START.bearing,
+      antialias: true
+    });
+
+    map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
+
+    // ====== 名稱正規化與分級 ======
+    function norm(s=''){ return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/['’·.`´]+/g,'').replace(/[-\\s\\u00A0\\u2000-\\u200D\\u2010-\\u2015]+/g,'').trim(); }
+    const GRAND_CRU = ["Chambertin","Chambertin-Clos de Bèze","Mazis-Chambertin","Charmes-Chambertin","Griotte-Chambertin","Latricières-Chambertin","Ruchottes-Chambertin","Mazoyères-Chambertin","Clos de la Roche","Clos Saint-Denis","Clos des Lambrays","Clos de Tart","Bonnes-Mares","Musigny","Clos de Vougeot","Échezeaux","Grands Échezeaux","Richebourg","Romanée-Conti","La Romanée","Romanée-Saint-Vivant","La Tâche","La Grande Rue","Corton","Corton-Charlemagne","Charlemagne","Montrachet","Bâtard-Montrachet","Chevalier-Montrachet","Criots-Bâtard-Montrachet","Bienvenues-Bâtard-Montrachet","Chablis Grand Cru"];
+    const GRAND_CRU_NORM = GRAND_CRU.map(n => norm(n));
+    const VILLAGES = ["Chablis","Marsannay","Fixin","Gevrey-Chambertin","Morey-Saint-Denis","Chambolle-Musigny","Vougeot","Flagey-Échezeaux","Vosne-Romanée","Nuits-Saint-Georges","Côte de Nuits-Villages","Ladoix","Aloxe-Corton","Pernand-Vergelesses","Chorey-lès-Beaune","Savigny-lès-Beaune","Beaune","Pommard","Volnay","Monthelie","Auxey-Duresses","Saint-Romain","Meursault","Blagny","Puligny-Montrachet","Chassagne-Montrachet","Saint-Aubin","Santenay","Maranges","Côte de Beaune-Villages","Bouzeron","Rully","Mercurey","Givry","Montagny","Pouilly-Fuissé","Pouilly-Loché","Pouilly-Vinzelles","Saint-Véran","Viré-Clessé","Mâcon","Saint-Amour","Juliénas","Chénas"];
+    const VILLAGES_NORM = VILLAGES.map(n => norm(n));
+
+    function classify(props){
+      const denom = (props?.denom || '').toLowerCase();
+      if (denom.includes('clos de vougeot')) return 'GC';
+      const names = (props?.denom || '').split(',').map(s=>s.trim()).filter(Boolean);
+      const namesN = names.map(norm);
+      if (namesN.some(n => GRAND_CRU_NORM.includes(n))) return 'GC';
+      if (names.some(n => n.toLowerCase().includes('grand cru'))) return 'GC';
+      if (names.some(n => n.toLowerCase().includes('premier cru'))) return 'PC';
+      if (namesN.some(n => VILLAGES_NORM.includes(n))) return 'VI';
+      return 'RE';
+    }
+
+    // 依等級選唯一顯示名稱（可用 meta 覆蓋）
+    function pickPrimaryName(props, META){
+      const denom = props?.denom || '';
+      const names = denom.split(',').map(s=>s.trim()).filter(Boolean);
+      const namesN = names.map(norm);
+      const lvl = classify(props);
+
+      // 嘗試從 meta 找到對應的中文名（優先）
+      const firstMeta = (() => {
+        for (let i=0;i<names.length;i++){ const k = namesN[i]; if (META && META[k]) return META[k].zh || META[k].name; }
+        return null;
+      })();
+
+      if (lvl === 'GC') {
+        for (let i=0;i<names.length;i++){ if (GRAND_CRU_NORM.includes(namesN[i])) return firstMeta || names[i]; }
+        const idxGC = names.findIndex(n => n.toLowerCase().includes('grand cru'));
+        if (idxGC >= 0) return firstMeta || names[idxGC];
+        return firstMeta || (names.sort((a,b)=>a.length-b.length)[0] || 'Grand Cru');
+      }
+      if (lvl === 'PC') {
+        // 去掉 "Premier Cru" 與村名，留下 climat
+        const cleaned = names.map(n => n.replace(/\\b(Premier\\s+Cru|1er\\s+Cru)\\b/ig,'').trim());
+        // 排除純村名
+        const candidates = cleaned.filter((n,i)=>!VILLAGES_NORM.includes(namesN[i]));
+        const best = (candidates.length?candidates:names).sort((a,b)=>a.length-b.length)[0];
+        return firstMeta || best;
+      }
+      if (lvl === 'VI') {
+        // 取與 village 清單相符者
+        for (let i=0;i<names.length;i++){ if (VILLAGES_NORM.includes(namesN[i])) return firstMeta || names[i]; }
+        return firstMeta || (names[0] || 'Village');
+      }
+      return firstMeta || (names[0] || 'AOC');
+    }
+
+    // ====== 全域資料 ======
+    let masterAOC = null;         // polygon FC
+    let labelPointsFC = null;     // point-on-surface FC
+    let META = {};                // meta.json
+    let currentFilterQ = '';
+
+    map.on('load', async () => {
+      // Sky + Hillshade
+      map.addLayer({
+        id: 'sky', type: 'sky',
+        paint: { 'sky-type':'atmosphere', 'sky-atmosphere-sun':[0.0,0.0], 'sky-atmosphere-sun-intensity':12 }
+      });
+      map.addLayer({
+        id: 'hillshade', type: 'hillshade', source: 'terrain-dem',
+        layout: { visibility: 'visible' },
+        paint: { 'hillshade-exaggeration': 0.5, 'hillshade-shadow-color': 'rgba(0,0,0,0.55)', 'hillshade-illumination-direction': 315 }
+      });
+
+      // 載入資料
+      const [metaRes, aocRes] = await Promise.all([fetch(META_FILE), fetch(AOC_DATA_FILE)]);
+      try { META = await metaRes.json(); } catch(e){ META = {}; }
+      masterAOC = await aocRes.json();
+
+      // enrich：加 lvl / label / area_km2
+      const enriched = {
+        type: 'FeatureCollection',
+        features: (masterAOC.features||[]).map((f, i) => {
+          const p = f.properties || {};
+          const lvl = classify(p);
+          const label = pickPrimaryName(p, META);
+          let area_km2 = 0;
+          try { area_km2 = turf.area(f)/1e6; } catch(e){}
+          return { ...f, properties: { ...p, lvl, label, area_km2, _id: i } };
+        })
+      };
+
+      // label points：pointOnSurface（一定在面內）
+      const pts = [];
+      for (const f of enriched.features) {
+        try {
+          const pt = turf.pointOnSurface(f);
+          pt.properties = {
+            lvl: f.properties.lvl,
+            label: f.properties.label,
+            area_km2: f.properties.area_km2,
+            _id: f.properties._id
+          };
+          pts.push(pt);
+        } catch(e){ /* 忽略失敗者 */ }
+      }
+      labelPointsFC = { type:'FeatureCollection', features: pts };
+
+      // Sources
+      map.addSource('aoc', { type:'geojson', data: enriched, promoteId: '_id' });
+      map.addSource('aoc-labels', { type:'geojson', data: labelPointsFC });
+
+      // 填色
+      map.addLayer({
+        id: 'aoc-fill', type: 'fill', source: 'aoc',
+        paint: {
+          'fill-color': [
+            'match', ['get', 'lvl'],
+            'GC', '#cc0033',
+            'PC', '#ff7f0e',
+            'VI', '#1f77b4',
+            /* RE */ '#2ca02c'
+          ],
+          'fill-opacity': [
+            'match', ['get', 'lvl'],
+            'GC', 0.18, 'PC', 0.16, 'VI', 0.14, 0.12
+          ]
+        }
+      });
+
+      // 邊線
+      map.addLayer({
+        id: 'aoc-line', type: 'line', source: 'aoc',
+        paint: {
+          'line-color': [
+            'match', ['get', 'lvl'], 'GC', '#cc0033', 'PC', '#ff7f0e', 'VI', '#1f77b4', '#2ca02c'
+          ],
+          'line-width': 1.2
+        }
+      });
+
+      // 點擊高亮層（透過 filter 指向被點選的 _id）
+      map.addLayer({
+        id: 'aoc-click-hl', type: 'line', source: 'aoc',
+        filter: ['==', ['get','_id'], -1],
+        paint: { 'line-color': '#111', 'line-width': 3.0 }
+      });
+
+      // —— 地塊內標籤（Symbol）——
+      // 依等級設定 minzoom 與字級；排序：GC>PC>VI>RE，面積越大越優先
+      const priorityExpr = [
+        'case',
+        ['==',['get','lvl'],'GC'], 4,
+        ['==',['get','lvl'],'PC'], 3,
+        ['==',['get','lvl'],'VI'], 2,
+        1
+      ];
+      map.addLayer({
+        id: 'aoc-labels',
+        type: 'symbol',
+        source: 'aoc-labels',
+        layout: {
+          'text-field': ['get','label'],
+          'text-font': ['Noto Sans Regular','Arial Unicode MS Regular'],
+          'text-allow-overlap': false,
+          'text-pitch-alignment': 'viewport',
+          'symbol-z-order': 'auto',
+          'symbol-sort-key': ['+', ['*', priorityExpr, 1000], ['get','area_km2']],
+          'text-size': [
+            'interpolate', ['linear'], ['zoom'],
+            8.0, ['case',['==',['get','lvl'],'GC'], 13, ['==',['get','lvl'],'PC'], 11, 10],
+            12.0,['case',['==',['get','lvl'],'GC'], 16, ['==',['get','lvl'],'PC'], 14, 12],
+            14.0,['case',['==',['get','lvl'],'GC'], 18, ['==',['get','lvl'],'PC'], 16, 13]
+          ],
+          // 分級顯示門檻
+          'minzoom': 8.5
+        },
+        paint: {
+          'text-color': '#111',
+          'text-halo-color': '#ffffff',
+          'text-halo-width': 1.4,
+          'text-opacity': [
+            'case',
+            ['==',['get','lvl'],'GC'], 1,
+            ['all',['==',['get','lvl'],'VI'], ['<', ['zoom'], 9.5]], 0,  // Village 9.5 之後才顯示
+            ['all',['==',['get','lvl'],'PC'], ['<', ['zoom'], 12.5]], 0, // PC 12.5 之後才顯示
+            1
+          ]
+        }
+      });
+
+      // 互動：點擊地塊→定位＋短暫高亮
+      map.on('click','aoc-fill',(e)=>{
+        const f = e.features?.[0]; if (!f) return;
+        const id = f.properties?._id;
+        // bounds
+        const b = new maplibregl.LngLatBounds();
+        const add = (coords)=>{ if (typeof coords[0]==='number') b.extend(coords); else coords.forEach(add); };
+        add(f.geometry.coordinates);
+        map.fitBounds(b, { padding: 20, maxZoom: 14, duration: 550, pitch: map.getPitch(), bearing: map.getBearing() });
+
+        // highlight 1.2 秒
+        map.setFilter('aoc-click-hl', ['==',['get','_id'], id]);
+        setTimeout(()=> map.setFilter('aoc-click-hl', ['==',['get','_id'], -1]), 1200);
+      });
+
+      // ====== 搜尋（篩選 + zoom）======
+      async function applySearch(qRaw){
+        currentFilterQ = norm(qRaw || '');
+        const feats = (enriched.features || []).filter(f => {
+          if (!currentFilterQ) return true;
+          const names = (f.properties?.denom || '').split(',').map(s=>s.trim()).filter(Boolean);
+          const score = Math.max(...names.map(n => {
+            const nn = norm(n);
+            if (nn === currentFilterQ) return 100;
+            if (nn.startsWith(currentFilterQ)) return 50;
+            if (nn.includes(currentFilterQ)) return 10;
+            return 0;
+          }));
+        return score > 0;
+        });
+
+        const filteredPoly = { type:'FeatureCollection', features: feats };
+        const filteredPts  = { type:'FeatureCollection', features: labelPointsFC.features.filter(pt => feats.some(f => f.properties._id === pt.properties._id)) };
+
+        map.getSource('aoc').setData(filteredPoly);
+        map.getSource('aoc-labels').setData(filteredPts);
+
+        if (feats.length){
+          const b = new maplibregl.LngLatBounds();
+          feats.forEach(f => {
+            const add = (coords) => { if (typeof coords[0]==='number') b.extend(coords); else coords.forEach(add); };
+            add(f.geometry.coordinates);
+          });
+          map.fitBounds(b, { padding: 20, maxZoom: 14, duration: 600, pitch: map.getPitch(), bearing: map.getBearing() });
+        }
+      }
+
+      // 綁定 UI
+      const q = document.getElementById('q');
+      const btnClear = document.getElementById('clear');
+      const btnAll = document.getElementById('showAll');
+      const chkLabels = document.getElementById('toggleLabels');
+
+      let t = null;
+      q.addEventListener('input', ()=>{ clearTimeout(t); t = setTimeout(()=> applySearch(q.value), 220); });
+      btnClear.onclick = ()=> { q.value=''; applySearch(''); };
+      btnAll.onclick   = ()=> { q.value=''; applySearch(''); };
+      chkLabels.onchange = ()=> {
+        const vis = chkLabels.checked ? 'visible' : 'none';
+        map.setLayoutProperty('aoc-labels','visibility', vis);
+      };
+
+      // 初始顯示
+      applySearch('');
+    });
+
+    // ====== 視角 & 地形誇張度 控制 ======
+    const pitchEl = document.getElementById('pitch'), pitchVal = document.getElementById('pitchVal');
+    const bearingEl = document.getElementById('bearing'), bearingVal = document.getElementById('bearingVal');
+    const exgEl = document.getElementById('exg'), exgVal = document.getElementById('exgVal');
+
+    pitchEl.oninput = () => { const v=+pitchEl.value||0; map.setPitch(v); pitchVal.textContent = v + '°'; };
+    bearingEl.oninput = () => { const v=+bearingEl.value||0; map.setBearing(v); bearingVal.textContent = v + '°'; };
+    exgEl.oninput = () => {
+      const v = (+exgEl.value||150)/100; exgVal.textContent = (v*100).toFixed(0)+'%';
+      const st = map.getStyle(); if (st && st.terrain) map.setTerrain({ source:'terrain-dem', exaggeration: v });
+    };
+    document.getElementById('resetView').onclick = () => {
+      map.flyTo({ center:[START.lng, START.lat], zoom: START.zoom, pitch: START.pitch, bearing: START.bearing, duration: 700 });
+      pitchEl.value = START.pitch; pitchVal.textContent = START.pitch + '°';
+      bearingEl.value = START.bearing; bearingVal.textContent = START.bearing + '°';
+      exgEl.value = 150; exgVal.textContent = '150%';
+      const st = map.getStyle(); if (st && st.terrain) map.setTerrain({ source:'terrain-dem', exaggeration: 1.5 });
+    };
+    document.getElementById('toggleShade').onclick = () => {
+      const vis = map.getLayoutProperty('hillshade', 'visibility') === 'visible' ? 'none' : 'visible';
+      map.setLayoutProperty('hillshade', 'visibility', vis);
+    };
+    document.getElementById('toggleSky').onclick = () => {
+      const vis = map.getLayoutProperty('sky', 'visibility') === 'visible' ? 'none' : 'visible';
+      map.setLayoutProperty('sky', 'visibility', vis);
+    };
+  </script>
+</body>
+</html>
