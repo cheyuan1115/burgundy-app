@@ -209,17 +209,7 @@ function pickPrimaryName(props, META) {
   return applyMeta(names[0] || 'AOC');
 }
 
-  // === Village ===
-  if (lvl === 'VI') {
-    for (let i=0;i<names.length;i++){
-      if (VILLAGES_NORM.includes(namesN[i])) return applyMeta(names[i]);
-    }
-    return applyMeta(names[0] || 'Village');
-  }
 
-  // === 其他 ===
-  return applyMeta(names[0] || 'AOC');
-}
 
   // —— Village：直接回村名 —— 
   if (lvl === 'VI') {
