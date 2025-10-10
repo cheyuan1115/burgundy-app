@@ -154,28 +154,89 @@ function _cleanClimat(s) {
   // 依等級挑出要顯示的一個主名稱（GC=園名、PC=climat、VI=村名；有 meta 就覆蓋）
 // 依等級挑出要顯示的一個主名稱（GC=園名、PC=climat、VI=村名；有 meta 就覆蓋）
 // 依等級挑出主名稱（GC=園名、PC=climat、VI=村名；有 meta 則覆蓋）
-function pickPrimaryName(props) {
+function pickPrimaryName(props, META) {
   const denom = props?.denom || '';
-  const names = denom.split(',').map(s => s.trim());
+  const names = denom.split(',').map(s => s.trim()).filter(Boolean);
+  const namesN = names.map(norm);
+  const lvl = classify(props);
 
-  // 1️⃣ 有 Grand Cru
-  const grand = names.find(n => /grand\s*cru/i.test(n));
-  if (grand) return grand.replace(/\bcru\b/i, 'Cru');
+  const applyMeta = (label) => {
+    const k = norm(label);
+    const m = META && META[k];
+    return (m?.zh || m?.name || label);
+  };
 
-  // 2️⃣ 有 Premier Cru 或 1er Cru
-  const premier = names.find(n => /(premier|1er)\s*cru/i.test(n));
-  if (premier) return premier.replace(/\bcru\b/i, 'Cru');
+  // ---- Grand Cru：優先抓「Grand Cru - X / X Grand Cru / 精準 GC 名」----
+  if (lvl === 'GC') {
+    // 1) 精準 GC 名單
+    for (let i = 0; i < names.length; i++) {
+      if (GRAND_CRU_NORM.includes(namesN[i])) {
+        const village = _firstVillage(names);
+        return { title: applyMeta(names[i]), subtitle: village ? `${village} Grand Cru` : 'Grand Cru', levelText: 'Grand Cru' };
+      }
+    }
+    // 2) "Grand Cru - X"
+    for (const n of names) {
+      const m = n.match(/Grand\s*Cru\s*[-–—:]\s*(.+)$/i);
+      if (m && m[1]) {
+        const x = _cleanClimat(m[1]);
+        const village = _firstVillage(names);
+        return { title: applyMeta(x), subtitle: village ? `${village} Grand Cru` : 'Grand Cru', levelText: 'Grand Cru' };
+      }
+    }
+    // 3) "X Grand Cru"（例如 Corton Grand Cru）
+    for (const n of names) {
+      const m = n.match(/^(.+?)\s+Grand\s*Cru$/i);
+      if (m && m[1]) {
+        const x = _cleanClimat(m[1]);
+        const village = _firstVillage(names);
+        return { title: applyMeta(x), subtitle: village ? `${village} Grand Cru` : 'Grand Cru', levelText: 'Grand Cru' };
+      }
+    }
+    // 4) 保險：回村名 GC
+    const village = _firstVillage(names);
+    return { title: applyMeta(village || names[0] || 'Grand Cru'), subtitle: village ? `${village} Grand Cru` : 'Grand Cru', levelText: 'Grand Cru' };
+  }
 
-  // 3️⃣ 有明確 Village appellation
-  const village = names.find(n =>
-    !/crémant|aligoté|mousseux|ordinaire|grand\s*ordinaire|coteaux/i.test(n)
-  );
-  if (village) return village;
+  // ---- Premier Cru：抓 climat；沒有就顯示「<村名> Premier Cru」----
+  if (lvl === 'PC') {
+    const target = names.find(n => /(1er\s*Cru|Premier\s*Cru)/i.test(n)) || '';
+    let climat = '';
+    let village = _firstVillage(names);
 
-  // 4️⃣ fallback（都沒有就第一個）
-  return names[0] || 'AOC';
+    if (target) {
+      let m = target.match(/(?:Premier\s*Cru|1er\s*Cru)\s*[-–—:]\s*(.+)$/i);
+      if (!m) m = target.match(/(?:Premier\s*Cru|1er\s*Cru)\s+(.+)$/i);
+      if (m && m[1]) climat = _cleanClimat(m[1]);
+      if (!village) {
+        const m2 = target.match(/^(.+?)\s+(?:Premier\s*Cru|1er\s*Cru)/i);
+        if (m2) village = m2[1].trim();
+      }
+    }
+    if (!climat) {
+      const GENERIC = /crémant|aligot[eé]|mousseux|grand\s+ordinaire|ordinaire|coteaux|climat\s+de\s+bourgogne/i;
+      const cand = names.filter((n, i) =>
+        !VILLAGES_NORM.includes(namesN[i]) &&
+        !/(Grand|Premier|1er)\s+Cru/i.test(n) &&
+        !GENERIC.test(n)
+      );
+      if (cand.length) climat = cand.sort((a, b) => a.length - b.length)[0];
+    }
+
+    const title = applyMeta(climat || (village ? `${village} Premier Cru` : 'Premier Cru'));
+    const subtitle = village ? `${village} Premier Cru` : 'Premier Cru';
+    return { title, subtitle, levelText: 'Premier Cru' };
+  }
+
+  // ---- Village：回村名 ----
+  if (lvl === 'VI') {
+    const v = _firstVillage(names) || names[0] || 'Village';
+    return { title: applyMeta(v), subtitle: 'Village', levelText: 'Village' };
+  }
+
+  // ---- Regional / 其他 ----
+  return { title: applyMeta(names[0] || 'AOC'), subtitle: 'Régionale / 其他', levelText: 'Régionale / 其他' };
 }
-
 
     // ====== 資料載入 ======
     let masterAOC = null, META = {};
