@@ -255,18 +255,224 @@
         if (hoveredId !== null) map.setFeatureState({ source: 'aoc', id: hoveredId }, { hover: false });
         hoveredId = null;
       });
+// ---- 主函式：解析 props.denom，傳回 {level, title, subtitle} ----
+function parseAOC(props) {
+  const denom = String(props?.denom || '');
+  const parts = denom.split(',').map(s => s.trim()).filter(Boolean);
+  const norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/['’·.`´]/g, '').trim();
+
+  const GRAND_CRU = [
+    "Chambertin","Chambertin-Clos de Bèze","Mazis-Chambertin","Charmes-Chambertin","Griotte-Chambertin","Latricières-Chambertin","Ruchottes-Chambertin","Mazoyères-Chambertin",
+    "Clos de la Roche","Clos Saint-Denis","Clos des Lambrays","Clos de Tart","Bonnes-Mares","Musigny","Clos de Vougeot",
+    "Échezeaux","Grands Échezeaux","Richebourg","Romanée-Conti","La Romanée","Romanée-Saint-Vivant","La Tâche","La Grande Rue",
+    "Corton","Corton-Charlemagne","Charlemagne",
+    "Montrachet","Bâtard-Montrachet","Chevalier-Montrachet","Criots-Bâtard-Montrachet","Bienvenues-Bâtard-Montrachet",
+    "Chablis Grand Cru"
+  ];
+  const GC_VILLAGES = {
+    "Chambertin":["Gevrey-Chambertin"],
+    "Chambertin-Clos de Bèze":["Gevrey-Chambertin"],
+    "Clos de Vougeot":["Vougeot"],
+    "Richebourg":["Vosne-Romanée"],
+    "Romanée-Conti":["Vosne-Romanée"],
+    "Montrachet":["Puligny-Montrachet","Chassagne-Montrachet"],
+    "Corton":["Aloxe-Corton","Pernand-Vergelesses","Ladoix-Serrigny"],
+    "Chablis Grand Cru":["Chablis"]
+  };
+
+  const VILLAGES = [
+    "Chablis","Marsannay","Fixin","Gevrey-Chambertin","Morey-Saint-Denis","Chambolle-Musigny","Vougeot",
+    "Vosne-Romanée","Nuits-Saint-Georges","Beaune","Pommard","Volnay","Meursault","Puligny-Montrachet","Chassagne-Montrachet"
+  ];
+  const normSet = list => list.map(norm);
+
+  const GC_N = normSet(GRAND_CRU);
+  const VILL_N = normSet(VILLAGES);
+  const allText = norm(denom);
+
+  // ---- 1) Grand Cru ----
+  for (let i=0; i<GC_N.length; i++) {
+    if (allText.includes(GC_N[i])) {
+      const gc = GRAND_CRU[i];
+      const villages = GC_VILLAGES[gc] || [];
+      return {
+        level: 'GC',
+        title: gc,
+        subtitle: villages.length ? `地點：${villages.join(' / ')}` : ''
+      };
+    }
+  }
+
+  // ---- 2) Premier Cru ----
+  const pcPart = parts.find(p => /premier|1er/i.test(p));
+  if (pcPart) {
+    const match = pcPart.match(/(?:premier|1er)\s*cru\s*(?:[-–:]\s*|\s+)(.+)$/i);
+    const climat = match ? match[1] : null;
+    const village = parts.find(p => VILL_N.includes(norm(p))) || '';
+    return {
+      level: 'PC',
+      title: climat || `${village || ''} Premier Cru`,
+      subtitle: village ? `${village} Premier Cru` : ''
+    };
+  }
+
+  // ---- 3) Village ----
+  for (let i=0; i<VILL_N.length; i++) {
+    if (allText.includes(VILL_N[i])) {
+      return { level: 'VI', title: VILLAGES[i], subtitle: 'Village' };
+    }
+  }
+
+  // ---- 4) Regional ----
+  return { level: 'RE', title: parts[0] || 'AOC', subtitle: 'Régionale / 其他' };
+}
 
       // 點擊 popup
-      map.on('click', 'aoc-fill', (e) => {
-        const f = e.features?.[0]; if (!f) return;
-        const denom = (f.properties?.denom || '').split(',').map(s => s.trim()).filter(Boolean);
-        const lvl = f.properties?.lvl || '';
-        const html = `<b>${denom.slice(0,2).join('<br>') || 'AOC'}</b><br>等級：${lvl}`;
-        new maplibregl.Popup({ closeOnClick: true })
-          .setLngLat(e.lngLat)
-          .setHTML(html)
-          .addTo(map);
-      });
+
+// 正規化
+function _norm(s=''){
+  return s.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/['’`´\.·]/g,'')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+
+// Grand Cru 名單（正名）
+const GC_LIST = [
+  "Chambertin","Chambertin-Clos de Bèze","Mazis-Chambertin","Charmes-Chambertin","Griotte-Chambertin","Latricières-Chambertin","Ruchottes-Chambertin","Mazoyères-Chambertin",
+  "Clos de la Roche","Clos Saint-Denis","Clos des Lambrays","Clos de Tart","Bonnes-Mares","Musigny","Clos de Vougeot",
+  "Échezeaux","Grands Échezeaux","Richebourg","Romanée-Conti","La Romanée","Romanée-Saint-Vivant","La Tâche","La Grande Rue",
+  "Corton","Corton-Charlemagne","Charlemagne",
+  "Montrachet","Bâtard-Montrachet","Chevalier-Montrachet","Criots-Bâtard-Montrachet","Bienvenues-Bâtard-Montrachet",
+  "Chablis Grand Cru"
+];
+const GC_NORM = GC_LIST.map(_norm);
+
+// 必要別名 → 對應的 GC 正名（用來完全比對，而不是 contains）
+const GC_ALIASES = new Map([
+  [_norm("Clos Vougeot"), "Clos de Vougeot"],
+  [_norm("Clos de Vougeot ou Clos Vougeot"), "Clos de Vougeot"],
+]);
+
+// GC 所屬村莊（副標）
+const GC_HOME = {
+  "Chambertin": ["Gevrey-Chambertin"],
+  "Chambertin-Clos de Bèze": ["Gevrey-Chambertin"],
+  "Clos de Vougeot": ["Vougeot"],
+  "Richebourg": ["Vosne-Romanée"],
+  "Romanée-Conti": ["Vosne-Romanée"],
+  "Montrachet": ["Puligny-Montrachet","Chassagne-Montrachet"],
+  "Corton": ["Aloxe-Corton","Pernand-Vergelesses","Ladoix-Serrigny"],
+  "Chablis Grand Cru": ["Chablis"]
+};
+
+// 村莊級（完全比對）
+const VILLAGES = [
+  "Chablis","Marsannay","Fixin","Gevrey-Chambertin","Morey-Saint-Denis","Chambolle-Musigny","Vougeot",
+  "Vosne-Romanée","Nuits-Saint-Georges","Beaune","Pommard","Volnay","Meursault",
+  "Puligny-Montrachet","Chassagne-Montrachet","Aloxe-Corton","Pernand-Vergelesses","Ladoix-Serrigny"
+];
+const VILL_NORM = VILLAGES.map(_norm);
+
+// 解析一個 feature 的 props，回傳 {level:'GC|PC|VI|RE', title, subtitle}
+function parseAOC(props){
+  const raw = String(props?.denom || '');
+  const parts = raw.split(',').map(s=>s.trim()).filter(Boolean);
+
+  // 先做一個「完全相等」的查表（避免 Musigny / Chambertin 誤判）
+  const partsNorm = parts.map(_norm);
+
+  // 1) Grand Cru：只接受「完全相等」或在 GC_ALIASES 中
+  for (let i=0;i<parts.length;i++){
+    const pn = partsNorm[i];
+    let gcCanon = null;
+    const aliasHit = GC_ALIASES.get(pn);
+    if (aliasHit) gcCanon = aliasHit;
+    else {
+      const idx = GC_NORM.indexOf(pn);
+      if (idx !== -1) gcCanon = GC_LIST[idx];
+    }
+    if (gcCanon){
+      const home = GC_HOME[gcCanon] || [];
+      return {
+        level:'GC',
+        title: gcCanon,
+        subtitle: home.length ? `地點：${home.join(' / ')}` : ''
+      };
+    }
+  }
+
+  // 2) Premier Cru：找含 "premier cru" / "1er cru" 的片段
+  //   標題 = 氣候名（若有），副標 = "<村名> Premier Cru"
+  for (let i=0;i<parts.length;i++){
+    const p = parts[i];
+    const hasPC = /(premier|1er)\s*cru/i.test(p);
+    if (!hasPC) continue;
+
+    // 嘗試從整體 parts 找村名（完全相等）
+    let village = '';
+    for (let j=0;j<parts.length;j++){
+      if (VILL_NORM.includes(partsNorm[j])) { village = parts[j]; break; }
+    }
+    // 若找不到，嘗試從同一片段開頭抓村名（ex: "Nuits-Saint-Georges premier cru Aux Boudots"）
+    if (!village){
+      for (let v of VILLAGES){
+        const vn = _norm(v);
+        if (partsNorm[i].startsWith(vn+' ')){ village = v; break; }
+      }
+    }
+
+    // 擷取 climat（在 "premier cru" 後面的東西）
+    let climat = '';
+    const m = p.match(/(?:premier|1er)\s*cru\s*(.*)$/i);
+    if (m && m[1]) climat = m[1].trim().replace(/^[-–:]\s*/,'').trim();
+
+    if (climat){
+      return { level:'PC', title: climat, subtitle: village ? `${village} Premier Cru` : 'Premier Cru' };
+    } else {
+      // 沒有具名氣候，就直接顯示「<村名> Premier Cru」或原片段
+      const title = village ? `${village} Premier Cru` : p.replace(/\s+/g,' ').trim();
+      return { level:'PC', title, subtitle: '' };
+    }
+  }
+
+  // 3) Village：完全相等
+  for (let i=0;i<parts.length;i++){
+    const idx = VILL_NORM.indexOf(partsNorm[i]);
+    if (idx !== -1){
+      return { level:'VI', title: VILLAGES[idx], subtitle:'Village' };
+    }
+  }
+
+  // 4) Régionale / 其他：優先回傳第一個片段（通常是 Bourgogne…）
+  return { level:'RE', title: parts[0] || 'AOC', subtitle: 'Régionale / 其他' };
+}
+
+
+
+
+      
+     // --- 點擊顯示彈窗（改成正確命名版本）---
+map.on('click', 'aoc-fill', (e) => {
+  const f = e.features && e.features[0];
+  if (!f) return;
+
+  const info = parseAOC(f.properties || {});
+  const levelText = { GC:'Grand Cru', PC:'Premier Cru', VI:'Village', RE:'Régionale / 其他' }[info.level] || 'AOC';
+  const sub = info.subtitle ? `（${info.subtitle}）` : '';
+
+  new maplibregl.Popup({ closeOnClick: true })
+    .setLngLat(e.lngLat)
+    .setHTML(
+      `<div style="min-width:260px">
+         <div style="font-weight:700">${info.title}</div>
+         <div class="small" style="color:#666;margin-top:6px">等級：${levelText} ${sub}</div>
+       </div>`
+    )
+    .addTo(map);
+});
+
 
       // 酒莊：用 🍷 符號（也可換自訂 icon）
       const wRes = await fetch(WINERY_DATA_FILE);
