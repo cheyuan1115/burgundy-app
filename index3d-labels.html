@@ -117,6 +117,161 @@
 
     map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
 
+// ===== Grand Cru ⇄ 所在村（或跨村）對應 =====
+const GC_VILLAGES = {
+  // Gevrey-Chambertin
+  "Chambertin": ["Gevrey-Chambertin"],
+  "Chambertin-Clos de Bèze": ["Gevrey-Chambertin"],
+  "Mazis-Chambertin": ["Gevrey-Chambertin"],
+  "Charmes-Chambertin": ["Gevrey-Chambertin"],
+  "Griotte-Chambertin": ["Gevrey-Chambertin"],
+  "Latricières-Chambertin": ["Gevrey-Chambertin"],
+  "Ruchottes-Chambertin": ["Gevrey-Chambertin"],
+  "Mazoyères-Chambertin": ["Gevrey-Chambertin"],
+
+  // Morey-Saint-Denis / Chambolle-Musigny
+  "Clos de la Roche": ["Morey-Saint-Denis"],
+  "Clos Saint-Denis": ["Morey-Saint-Denis"],
+  "Clos des Lambrays": ["Morey-Saint-Denis"],
+  "Clos de Tart": ["Morey-Saint-Denis"],
+  "Bonnes-Mares": ["Chambolle-Musigny","Morey-Saint-Denis"],
+  "Musigny": ["Chambolle-Musigny"],
+
+  // Vougeot / Flagey / Vosne
+  "Clos de Vougeot": ["Vougeot"],
+  "Échezeaux": ["Flagey-Échezeaux"],
+  "Grands Échezeaux": ["Flagey-Échezeaux"],
+  "Richebourg": ["Vosne-Romanée"],
+  "Romanée-Conti": ["Vosne-Romanée"],
+  "La Romanée": ["Vosne-Romanée"],
+  "Romanée-Saint-Vivant": ["Vosne-Romanée"],
+  "La Tâche": ["Vosne-Romanée"],
+  "La Grande Rue": ["Vosne-Romanée"],
+
+  // Corton / 白丘
+  "Corton": ["Aloxe-Corton","Pernand-Vergelesses","Ladoix-Serrigny"],
+  "Corton-Charlemagne": ["Aloxe-Corton","Pernand-Vergelesses","Ladoix-Serrigny"],
+  "Charlemagne": ["Aloxe-Corton","Pernand-Vergelesses"],
+
+  // Montrachet 群
+  "Montrachet": ["Puligny-Montrachet","Chassagne-Montrachet"],
+  "Bâtard-Montrachet": ["Puligny-Montrachet","Chassagne-Montrachet"],
+  "Chevalier-Montrachet": ["Puligny-Montrachet"],
+  "Criots-Bâtard-Montrachet": ["Chassagne-Montrachet"],
+  "Bienvenues-Bâtard-Montrachet": ["Puligny-Montrachet"],
+
+  // Chablis
+  "Chablis Grand Cru": ["Chablis"]
+};
+
+// 你的既有清單：GRAND_CRU / VILLAGES 與 NORM（已存在）
+// 若缺少，確保有：GRAND_CRU_NORM = GRAND_CRU.map(n => norm(n));
+//                   VILLAGES_NORM   = VILLAGES.map(n => norm(n));
+
+function isRegionalName(n){
+  return /bourgogne|côte d'or|hautes côtes|aligot|mousseux|crémant|coteaux bourguignons|grand ordinaire|ordinaire/i.test(n);
+}
+function extractVillage(names){
+  for (const n of names){
+    if (VILLAGES_NORM.includes(norm(n))) return n;
+  }
+  return null;
+}
+function cleanClimatLabel(s){
+  return (s||'')
+    .replace(/^climat\s+de\s+bourgogne\s*/i,'')
+    .replace(/^\s*(de|du|des|la|le|les|l’|l')\s+/i,'')
+    .trim();
+}
+
+// 從 denom 中抽出「主顯示」：地塊（GC/PC）、或村名
+function parseDenomPrimary(props){
+  const denom = String(props?.denom||'');
+  const names = denom.split(',').map(s=>s.trim()).filter(Boolean);
+  const namesN = names.map(norm);
+
+  // 1) Grand Cru：先找精準 GC 名
+  for (let i=0;i<names.length;i++){
+    if (GRAND_CRU_NORM.includes(namesN[i])){
+      const gc = names[i];
+      const villages = GC_VILLAGES[gc] || [extractVillage(names)].filter(Boolean);
+      return { level:'GC', title: gc, villages };
+    }
+  }
+  // 1b) Pattern: "Grand Cru - X" 或 "X Grand Cru"
+  for (const n of names){
+    let m = n.match(/Grand\s*Cru\s*[-–—:]\s*(.+)$/i);
+    if (!m) m = n.match(/^(.+?)\s+Grand\s*Cru$/i);
+    if (m && m[1]){
+      const gc = cleanClimatLabel(m[1]);
+      const villages = GC_VILLAGES[gc] || [extractVillage(names)].filter(Boolean);
+      return { level:'GC', title: gc, villages };
+    }
+  }
+
+  // 2) Premier Cru：挑帶 climat 的，否則顯示「<村> Premier Cru」
+  const pcStr = names.find(n=>/(premier|1er)\s*cru/i.test(n));
+  if (pcStr){
+    const vGuess = extractVillage(names) || (pcStr.match(/^(.+?)\s+(?:premier|1er)\s*cru/i)?.[1] ?? null);
+    let climat = pcStr.match(/(?:premier|1er)\s*cru\s*[-–—:]\s*(.+)$/i)?.[1]
+              ||  pcStr.match(/(?:premier|1er)\s*cru\s+(.+)$/i)?.[1]
+              ||  null;
+    climat = cleanClimatLabel(climat);
+
+    // 若此 polygon 另列出非 regional/非 GC/非 PC 之短名，把它當 climat 候選
+    if (!climat){
+      const cand = names.filter(n=>!isRegionalName(n) && !/(grand|premier|1er)\s*cru/i.test(n) && !VILLAGES_NORM.includes(norm(n)));
+      if (cand.length) climat = cand.sort((a,b)=>a.length-b.length)[0];
+    }
+    const title = climat ? climat : (vGuess ? `${vGuess} Premier Cru` : 'Premier Cru');
+    return { level:'PC', title, villages: vGuess ? [vGuess] : [] };
+  }
+
+  // 3) Village
+  const v = extractVillage(names);
+  if (v) return { level:'VI', title: v, villages:[v] };
+
+  // 4) Regional / 其他：顯示第一個
+  return { level:'RE', title: names[0]||'AOC', villages: [] };
+}
+
+// 產出 Popup HTML（主標＋副標；帶「更多名稱」可展開）
+function popupSmart(props){
+  const denom = String(props?.denom||'');
+  const all = denom.split(',').map(s=>s.trim()).filter(Boolean);
+
+  const info = parseDenomPrimary(props);
+  const levelText = {GC:'Grand Cru', PC:'Premier Cru', VI:'Village', RE:'Régionale / 其他'}[info.level]||'AOC';
+
+  const sub =
+    info.level==='GC' && info.villages.length ? `地點：${info.villages.join(' / ')}`
+  : info.level==='PC' && info.villages.length ? `${info.villages[0]} Premier Cru`
+  : info.level==='VI' ? 'Village'
+  : 'Régionale / 其他';
+
+  // 更多名稱（把主標與副標涉及的名稱濾掉以免重複）
+  const mainKeys = new Set([norm(info.title), ...info.villages.map(norm)]);
+  const more = all.filter(n=>!mainKeys.has(norm(n)));
+
+  const moreId = 'm'+Math.random().toString(36).slice(2);
+  const moreHtml = more.length
+    ? `<div style="margin-top:8px">
+         <a href="#" onclick="const e=document.getElementById('${moreId}'); e.style.display=e.style.display?'':'block'; this.remove(); return false;">+ 顯示所有原始名稱</a>
+         <div id="${moreId}" style="display:none;margin-top:6px;font-size:12px;color:#555">${more.map(n=>`• ${n}`).join('<br>')}</div>
+       </div>`
+    : '';
+
+  const idLine = props?.gml_id ? `<hr style="border:none;border-top:1px solid #eee;margin:8px 0"><small>ID：${props.gml_id}</small>` : '';
+
+  return `<div style="min-width:260px">
+            <div style="font-weight:700">${info.title}</div>
+            <div class="small" style="color:#666;margin-top:4px">等級：${levelText}${sub ? `（${sub}）` : ''}</div>
+            ${moreHtml}
+            ${idLine}
+          </div>`;
+}
+
+    
     // ====== 名稱正規化與分級 ======
     function norm(s=''){ return s.toLowerCase().normalize('NFD')
       .replace(/[\u0300-\u036f]/g,'').replace(/['’·.`´]+/g,'')
@@ -396,10 +551,10 @@ function pickPrimaryName(props, META) {
       });
 
       // —— 點擊：彈出簡化名稱 Popup ——
-     map.on('click', 'aoc-fill', (e) => {
+   map.on('click', 'aoc-fill', (e) => {
   const f = e.features && e.features[0];
   if (!f) return;
-  const html = popupAll(f.properties || {});
+  const html = popupSmart(f.properties || {});
   new maplibregl.Popup({ closeOnClick: true })
     .setLngLat(e.lngLat)
     .setHTML(html)
