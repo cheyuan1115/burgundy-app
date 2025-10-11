@@ -304,17 +304,57 @@ function parseAOC(props) {
   }
 
   // ---- 2) Premier Cru ----
-  const pcPart = parts.find(p => /premier|1er/i.test(p));
-  if (pcPart) {
-    const match = pcPart.match(/(?:premier|1er)\s*cru\s*(?:[-–:]\s*|\s+)(.+)$/i);
-    const climat = match ? match[1] : null;
-    const village = parts.find(p => VILL_N.includes(norm(p))) || '';
-    return {
-      level: 'PC',
-      title: climat || `${village || ''} Premier Cru`,
-      subtitle: village ? `${village} Premier Cru` : ''
-    };
+    // ---- 2) Premier Cru：找含 "premier cru" / "1er cru" 的片段
+  //   標題 = 氣候名（若有），副標 = "<村名> Premier Cru"
+  for (let i = 0; i < parts.length; i++) {
+    const p = parts[i];
+    const pn = partsNorm[i];
+    const hasPC = /(premier|1er)\s*cru/i.test(p);
+    if (!hasPC) continue;
+
+    // 嘗試從所有片段找村名（完全相等）
+    let village = '';
+    for (let j = 0; j < parts.length; j++) {
+      if (VILL_NORM.includes(partsNorm[j])) { village = parts[j]; break; }
+    }
+    // 若找不到，嘗試從同一片段開頭抓村名（ex: "Chambolle-Musigny premier cru Les Gruenchers"）
+    if (!village) {
+      for (const v of VILLAGES) {
+        const vn = _norm(v);
+        if (pn.startsWith(vn + ' ')) { village = v; break; }
+      }
+    }
+
+    // 1) 先抓「premier cru 之後」的內容（支援 : / - – 等）
+    //    例："... premier cru Les Gruenchers"、"... premier cru - Les Amoureuses"
+    let climat = '';
+    const m =
+      p.match(/(?:premier|1er)\s*cru\s*(?:[:\/\-–]\s*|\s+)(.+)$/i) ||
+      p.match(/(?:premier|1er)\s*cru\s*(.+)$/i);
+    if (m && m[1]) climat = m[1].trim();
+
+    // 2) 去除多餘括號、前後標點
+    climat = climat.replace(/^[\s–—-:\/]+/, '').replace(/\s+$/, '');
+    climat = climat.replace(/^\((.*)\)$/, '$1').trim();
+
+    // 3) 若 climat 看起來只是重覆 "Village Premier Cru"（沒有真正地塊名）就視為空
+    const pcGeneric = village ? new RegExp('^' + _norm(village) + '\\s+premier\\s*cru$', 'i') : null;
+    if (climat && pcGeneric && pcGeneric.test(_norm(climat))) climat = '';
+
+    if (climat) {
+      // 例：Aux Boudots / Les Gruenchers …
+      return {
+        level: 'PC',
+        title: climat,
+        subtitle: village ? `${village} Premier Cru` : 'Premier Cru'
+      };
+    } else {
+      // 沒有具名氣候，就直接顯示「<村名> Premier Cru」或原片段
+      const title = village ? `${village} Premier Cru` : p.replace(/\s+/g, ' ').trim();
+      return { level: 'PC', title, subtitle: '' };
+    }
   }
+
 
   // ---- 3) Village ----
   for (let i=0; i<VILL_N.length; i++) {
