@@ -150,10 +150,6 @@ function _cleanClimat(s) {
     .trim();
 }
 
-    // 依等級選唯一顯示名稱（可用 meta 覆蓋）
-  // 依等級挑出要顯示的一個主名稱（GC=園名、PC=climat、VI=村名；有 meta 就覆蓋）
-// 依等級挑出要顯示的一個主名稱（GC=園名、PC=climat、VI=村名；有 meta 就覆蓋）
-// 依等級挑出主名稱（GC=園名、PC=climat、VI=村名；有 meta 則覆蓋）
 function pickPrimaryName(props, META) {
   const denom = props?.denom || '';
   const names = denom.split(',').map(s => s.trim()).filter(Boolean);
@@ -237,6 +233,7 @@ function pickPrimaryName(props, META) {
   // ---- Regional / 其他 ----
   return { title: applyMeta(names[0] || 'AOC'), subtitle: 'Régionale / 其他', levelText: 'Régionale / 其他' };
 }
+
 
     // ====== 資料載入 ======
     let masterAOC = null, META = {};
