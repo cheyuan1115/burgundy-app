@@ -128,17 +128,33 @@
     const VILLAGES = ["Chablis","Marsannay","Fixin","Gevrey-Chambertin","Morey-Saint-Denis","Chambolle-Musigny","Vougeot","Flagey-Échezeaux","Vosne-Romanée","Nuits-Saint-Georges","Côte de Nuits-Villages","Ladoix","Aloxe-Corton","Pernand-Vergelesses","Chorey-lès-Beaune","Savigny-lès-Beaune","Beaune","Pommard","Volnay","Monthelie","Auxey-Duresses","Saint-Romain","Meursault","Blagny","Puligny-Montrachet","Chassagne-Montrachet","Saint-Aubin","Santenay","Maranges","Côte de Beaune-Villages","Bouzeron","Rully","Mercurey","Givry","Montagny","Pouilly-Fuissé","Pouilly-Loché","Pouilly-Vinzelles","Saint-Véran","Viré-Clessé","Mâcon","Saint-Amour","Juliénas","Chénas"];
     const VILLAGES_NORM = VILLAGES.map(n => norm(n));
 
-    function classify(props){
-      const denom = (props?.denom || '').toLowerCase();
-      if (denom.includes('clos de vougeot')) return 'GC';
-      const names = (props?.denom || '').split(',').map(s=>s.trim()).filter(Boolean);
-      const namesN = names.map(norm);
-      if (namesN.some(n => GRAND_CRU_NORM.includes(n))) return 'GC';
-      if (names.some(n => n.toLowerCase().includes('grand cru'))) return 'GC';
-      if (names.some(n => n.toLowerCase().includes('premier cru'))) return 'PC';
-      if (namesN.some(n => VILLAGES_NORM.includes(n))) return 'VI';
-      return 'RE';
-    }
+   function classify(props) {
+  const denom = (props?.denom || '').toLowerCase();
+
+  // ---- Grand Cru ----
+  if (
+    /grand\s*cru/.test(denom) &&
+    !/grand\s*ordinaire/.test(denom) &&
+    !/bourgogne/.test(denom)
+  ) return 'GC';
+
+  // ---- Premier Cru ----
+  if (/(premier|1er)\s*cru/.test(denom)) return 'PC';
+
+  // ---- Village ----
+  // 若含知名村莊名但無 GC/PC
+  if (VILLAGES_NORM.some(v => denom.includes(v.toLowerCase())))
+    return 'VI';
+
+  // ---- Regional ----
+  if (
+    /bourgogne|côte d'or|hautes côtes|aligot|passe-tout-grains|crémant|mousseux|coteaux bourguignons|grand ordinaire|ordinaire/.test(denom)
+  ) return 'RE';
+
+  // ---- 其他 ----
+  return 'RE';
+}
+
 function _firstVillage(names) {
   for (const n of names) if (VILLAGES_NORM.includes(norm(n))) return n;
   return null;
