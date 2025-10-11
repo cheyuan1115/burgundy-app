@@ -367,18 +367,11 @@ function pickPrimaryName(props, META) {
 
       // —— 點擊：彈出簡化名稱 Popup ——
       map.on('click', 'aoc-fill', (e) => {
-        const f = e.features?.[0]; if (!f) return;
-        const props = f.properties || {};
-        const lvl = classify(props);
-        const label = pickPrimaryName(props, META);
-        const lvlText = { GC:'Grand Cru', PC:'Premier Cru', VI:'Village', RE:'Régionale/其他' }[lvl] || 'AOC';
-
-        const html = `<b>${label}</b><br><span style="color:#666">等級：${lvlText}</span>`;
-        new maplibregl.Popup({ closeOnClick: true })
-          .setLngLat(e.lngLat)
-          .setHTML(html)
-          .addTo(map);
-      });
+  const f = e.features?.[0]; if (!f) return;
+  const info = pickPrimaryName(f.properties || {}, META); // 這版回 {title, subtitle, levelText}
+  const html = `<b>${info.title}</b><br><span style="color:#666">等級：${info.levelText}${info.subtitle && info.subtitle!==info.levelText ? '（'+info.subtitle+'）' : ''}</span>`;
+  new maplibregl.Popup({ closeOnClick: true }).setLngLat(e.lngLat).setHTML(html).addTo(map);
+});
 
       // —— 酒莊（可留可去）——
       try {
