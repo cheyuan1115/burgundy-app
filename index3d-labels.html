@@ -166,6 +166,23 @@ function _cleanClimat(s) {
     .trim();
 }
 
+function popupAll(props = {}) {
+  const names = String(props.denom || '')
+    .split(',').map(s => s.trim()).filter(Boolean);
+  const list = names.length
+    ? names.map(n => `<div>• ${n}</div>`).join('')
+    : '<i>（此多邊形沒有 denom 資料）</i>';
+  const id = props.gml_id ? `<hr style="border:none;border-top:1px solid #eee;margin:8px 0">
+                              <small>ID：${props.gml_id}</small>` : '';
+  return `<div style="min-width:240px">
+            <b>全部適用 AOC 名稱</b>
+            <div style="margin-top:6px">${list}</div>${id}
+          </div>`;
+}
+
+
+
+    
 function pickPrimaryName(props, META) {
   const denom = props?.denom || '';
   const names = denom.split(',').map(s => s.trim()).filter(Boolean);
@@ -379,12 +396,16 @@ function pickPrimaryName(props, META) {
       });
 
       // —— 點擊：彈出簡化名稱 Popup ——
-      map.on('click', 'aoc-fill', (e) => {
-  const f = e.features?.[0]; if (!f) return;
-  const info = pickPrimaryName(f.properties || {}, META); // 這版回 {title, subtitle, levelText}
-  const html = `<b>${info.title}</b><br><span style="color:#666">等級：${info.levelText}${info.subtitle && info.subtitle!==info.levelText ? '（'+info.subtitle+'）' : ''}</span>`;
-  new maplibregl.Popup({ closeOnClick: true }).setLngLat(e.lngLat).setHTML(html).addTo(map);
+     map.on('click', 'aoc-fill', (e) => {
+  const f = e.features && e.features[0];
+  if (!f) return;
+  const html = popupAll(f.properties || {});
+  new maplibregl.Popup({ closeOnClick: true })
+    .setLngLat(e.lngLat)
+    .setHTML(html)
+    .addTo(map);
 });
+
 
       // —— 酒莊（可留可去）——
       try {
