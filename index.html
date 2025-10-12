@@ -38,14 +38,21 @@
     .slider-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 13px; }
     .slider-row input[type="range"] { flex-grow: 1; }
     
-    /* ************ CSS 修改：預設隱藏酒莊搜尋欄 ************ */
+    /* ************ 解決 Pop-up 寬度被限制和長文本換行問題 ************ */
+    .maplibregl-popup {
+      max-width: 360px !important; /* 確保 Pop-up 容器可以有 360px 寬 */
+    }
+    .maplibregl-popup-content * {
+      word-wrap: break-word;
+      word-break: break-word;
+    }
+    /* **************************************** */
     .winery-search-box{ 
       margin-top: 10px; 
       border-top: 1px solid #eee; 
       padding-top: 10px; 
       display: none; /* 預設隱藏 */
     }
-    /* **************************************** */
 
 
     .legend{
@@ -71,7 +78,6 @@
       <button class="btn" id="toggleWineries" title="顯示酒莊">🚫🍷</button>
     </div>
     
-    <!-- ************ 新增 ID: winery-search-container ************ -->
     <div class="winery-search-box" id="winery-search-container">
       <div class="row"><b>酒莊搜尋</b></div>
       <div class="row">
@@ -79,7 +85,6 @@
         <button class="btn" id="clear-winery">清除</button>
       </div>
     </div>
-    <!-- ******************************************************** -->
   </div>
 
 
@@ -94,7 +99,7 @@
     // ====== 設定 ======
     const AOC_DATA_FILE = './burgundy.geojson';
     const WINERY_DATA_FILE = './wineries.geojson';
-    const START = { lng: 4.80, lat: 47.00, zoom: 8.8, pitch: 60, bearing: 0 };
+    const START = { lng: 4.80, lat: 47.00, zoom: 8.8, pitch: 45, bearing: 0 };
 
 
     // ====== 名稱正規化 & 分級判定 ======
@@ -160,7 +165,7 @@
         }
         if (gcCanon){
           const home = GC_HOME[gcCanon] || [];
-          return { level:'GC', title: gcCanon, subtitle: home.length ? `地點：${home.join(' / ')}` : '' };
+          return { level:'GC', title: gcCanon, subtitle: home.length ? `地點：${home.join(' / ')}` : '', climats: [gcCanon] }; // GC 視為一個 climat
         }
       }
 
@@ -168,17 +173,15 @@
       const pcParts = parts.filter(p => /(premier|1er)\s*cru/i.test(p));
       if (pcParts.length){
         let titleAOC = 'Premier Cru';
+        let villagePartRaw = ''; // 新增：儲存原始村莊名
         
         // 🚨 最終修復邏輯：從第一個找到的 PC 片段中，直接提取 'premier cru' 前面的所有文字作為村莊名
         for(const p of pcParts) {
-            // 正則：從開頭匹配到 'premier cru'，並將其前面的部分作為 Village 名稱
             const m = p.match(/^(.+?)\s+(premier|1er)\s*cru/i);
             if (m && m[1]) {
-                const villagePartRaw = m[1].trim();
+                villagePartRaw = m[1].trim(); // 儲存村莊名
                 
-                // 檢查是否是無意義的名稱，例如 'bourgogne' 或只有一個字母
                 if (villagePartRaw.length > 2 && villagePartRaw.toLowerCase() !== 'bourgogne') {
-                   // 重新格式化成正確的標題
                    titleAOC = villagePartRaw + ' Premier Cru'; 
                    break;
                 }
@@ -186,7 +189,7 @@
         }
         
         // 提取地塊名稱
-        const climats = pcParts.map(p => {
+        const climatsRaw = pcParts.map(p => {
           let tail = '';
           const m = p.match(/(?:premier|1er)\s*cru\s*([:\/–—\-]*\s*.*)$/i);
           if (m && m[1]) tail = m[1].trim();
@@ -194,26 +197,27 @@
           if (!tail || /premier\s*cru/i.test(tail)) return '';
           return tail;
         }).filter(Boolean);
-        const allClimats = climats
+        const allClimats = climatsRaw
           .flatMap(c => c.split(/\s*,\s*/))
           .map(s => s.trim())
           .filter(Boolean);
 
         const title = titleAOC;
         const subtitle = allClimats.length ? `地塊：${allClimats.join(', ')}` : '';
-        return { level:'PC', title, subtitle };
+        // 傳回所有地塊名稱（已正規化）和村莊原始名稱
+        return { level:'PC', title, subtitle, village: villagePartRaw, climats: allClimats };
       }
 
       // 3) Village
       for (let i=0;i<parts.length;i++){
         const idx = VILL_NORM.indexOf(partsNorm[i]);
         if (idx !== -1){
-          return { level:'VI', title: VILLAGES[idx], subtitle:'Village' };
+          return { level:'VI', title: VILLAGES[idx], subtitle:'Village', climats: [] };
         }
       }
 
       // 4) Régionale / 其他
-      return { level:'RE', title: parts[0] || 'AOC', subtitle: 'Régionale / 其他' };
+      return { level:'RE', title: parts[0] || 'AOC', subtitle: 'Régionale / 其他', climats: [] };
     }
 
     const getLevel = (props) => parseAOC(props).level;
@@ -393,6 +397,33 @@
         const info = parseAOC(f.properties || {});
         const levelText = { GC:'Grand Cru', PC:'Premier Cru', VI:'Village', RE:'Régionale / 其他' }[info.level] || 'AOC';
         
+        
+        // ************ 強化 META 資料查找邏輯 ************
+        let meta = null;
+        let foundKey = '';
+
+        if (info.level === 'PC' && info.climats.length > 0 && info.village) {
+            const villNorm = _norm(info.village);
+            // 1. 嘗試用地塊名 + 村莊名查找 (例如：lesperrieresmeursault)
+            for (const climat of info.climats) {
+                const climatNorm = _norm(climat);
+                foundKey = climatNorm + villNorm;
+                if (META[foundKey]) {
+                    meta = META[foundKey];
+                    break;
+                }
+            }
+        }
+        
+        // 2. 如果地塊名查找失敗，使用通用 AOC 名稱查找（GC、PC-通用、Village、Régionale）
+        if (!meta) {
+            foundKey = _norm(info.title || '');
+            meta = META[foundKey] || null;
+        }
+        
+        // **********************************************
+
+
         // 確保地塊/地點的標籤正確且不重複
         let subText = '';
         if (info.level === 'PC') {
@@ -405,16 +436,21 @@
         
         const subRow = subText ? `<div class="small" style="color:#666;margin-top:2px">${subText}</div>` : ''; 
 
-        const key = _norm(info.title || '');
-        const meta = META[key] || null;
-
+        
         // 只有在有 meta 資料時才顯示 extra 區塊
         const extra = meta ? `
           <div style="margin-top:8px">
           <div class="small" style="margin-top:6px">
-            <b>${meta.zh || info.title}</b>｜${meta.level || levelText}<br>
+            <b>${meta.zh || (foundKey.includes('premiercru') ? info.village + ' ' + (info.climats[0]||'PC') : info.title)}</b>｜${meta.level || levelText}<br>
             村莊：${meta.village || '未知'}
           </div>
+          <div style="margin-top:8px">
+            ${meta.area_ha ? `<div class="small">面積: <b>${meta.area_ha} ha</b></div>` : ''}
+            ${meta.elevation ? `<div class="small">海拔: ${meta.elevation}</div>` : ''}
+            ${meta.aspect ? `<div class="small">坡向: ${meta.aspect}</div>` : ''}
+            ${meta.soil ? `<div class="small">土壤: ${meta.soil}</div>` : ''}
+          </div>
+          ${meta.style_note ? `<div class="small" style="color:#2c7d2c;margin-top:6px">風格: ${meta.style_note}</div>` : ''}
           <div class="small" style="color:#555;margin-top:6px">${meta.notes || ''}</div>
           ${meta.link ? `<div class="small" style="margin-top:4px">
             <a href="${meta.link}" target="_blank" rel="noopener">🔗 Wine-Searcher</a>
@@ -426,7 +462,7 @@
         new maplibregl.Popup({ closeOnClick: true })
           .setLngLat(e.lngLat)
           .setHTML(
-            `<div style="min-width:260px">
+            `<div> 
                <div style="font-weight:700">${info.title}</div>
                <div class="small" style="color:#666;margin-top:6px">等級：${levelText}</div>
                ${subRow}   <!-- 插入地塊/地點名 -->
