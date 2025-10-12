@@ -8,12 +8,15 @@
   <script src="https://unpkg.com/maplibre-gl@3.6.1/dist/maplibre-gl.js"></script>
   <style>
     html, body, #map { height: 100%; margin: 0; }
+    /* ************ 樣式修改開始 ************ */
     .ui{
       position: absolute; z-index: 10; top: 12px; left: 12px;
       background: #fff; padding: 10px; border-radius: 10px;
       box-shadow: 0 6px 20px rgba(0,0,0,.18);
-      width: min(88vw, 560px); font: 14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+      width: min(88vw, 420px); /* 寬度從 560px 縮小到 420px */
+      font: 14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
     }
+    /* ************ 樣式修改結束 ************ */
     .row{ display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap; }
     .ui input[type="text"]{ flex:1; padding:8px 10px; border:1px solid #ddd; border-radius:8px; font:inherit; }
     .btn{ padding:6px 10px; border:1px solid #ddd; border-radius:8px; background:#f8f8f8; cursor:pointer; font:12px; white-space:nowrap; }
@@ -44,12 +47,12 @@
       <input id="q" type="text" placeholder="例如：Meursault / La Romanee">
       <button class="btn" id="clear">清除</button>
       <button class="btn" id="showAll">全部</button>
+      <!-- ************ HTML 結構修改：將酒莊按鈕移到同一行 ************ -->
+      <button class="btn" id="toggleWineries">🍷 酒莊隱藏</button>
+      <!-- ************ HTML 結構修改結束 ************ -->
     </div>
     
-    <!-- 酒莊顯示按鈕 -->
-    <div class="row" style="margin-top: -8px;">
-        <button class="btn" id="toggleWineries" style="width: 100%;">🍷 </button>
-    </div>
+    <!-- 原始的酒莊按鈕行已移除 -->
   </div>
 
 
@@ -515,18 +518,20 @@
       
       // 🍷 酒莊顯示功能實作
       btnWineries.onclick = () => {
+        // 初始狀態 wineriesVisible = true，visibility = 'visible'
         const currentVis = map.getLayoutProperty('wineries', 'visibility') === 'visible';
         const newVis = currentVis ? 'none' : 'visible';
         
         map.setLayoutProperty('wineries', 'visibility', newVis);
+        // 切換文字：如果是可見 (currentVis=true)，下一次點擊就是顯示 (要隱藏)，文字要變成「酒莊顯示」
         btnWineries.textContent = currentVis ? '🍷 酒莊顯示' : '🍷 酒莊隱藏';
         wineriesVisible = !currentVis;
       };
 
-      // 視角控制程式碼 (已還原)
+      // 視角控制程式碼 (為保持完整性保留)
       const pitchEl = document.getElementById('pitch');
       const pitchVal = document.getElementById('pitchVal');
-      pitchEl.oninput = () => {
+      if (pitchEl) pitchEl.oninput = () => {
         const v = Number(pitchEl.value)||0;
         map.setPitch(v);
         pitchVal.textContent = v + '°';
@@ -534,7 +539,7 @@
 
       const bearingEl = document.getElementById('bearing');
       const bearingVal = document.getElementById('bearingVal');
-      bearingEl.oninput = () => {
+      if (bearingEl) bearingEl.oninput = () => {
         const v = Number(bearingEl.value)||0;
         map.setBearing(v);
         bearingVal.textContent = v + '°';
@@ -542,7 +547,7 @@
 
       const exgEl = document.getElementById('exg');
       const exgVal = document.getElementById('exgVal');
-      exgEl.oninput = () => {
+      if (exgEl) exgEl.oninput = () => {
         const v = (Number(exgEl.value)||150) / 100; // 100% => 1.0
         exgVal.textContent = (v*100).toFixed(0) + '%';
         // 更新地形誇張度
@@ -552,20 +557,23 @@
         }
       };
 
-      document.getElementById('resetView').onclick = () => {
+      const resetBtn = document.getElementById('resetView');
+      if (resetBtn) resetBtn.onclick = () => {
         map.flyTo({ center:[START.lng, START.lat], zoom: START.zoom, pitch: START.pitch, bearing: START.bearing, duration: 700 });
-        pitchEl.value = START.pitch; pitchVal.textContent = START.pitch + '°';
-        bearingEl.value = START.bearing; bearingVal.textContent = START.bearing + '°';
-        exgEl.value = 150; exgVal.textContent = '150%';
-        const style = map.getStyle(); if (style && style.terrain) map.setTerrain({ source: 'terrain-dem', exaggeration: 1.5 });
+        if (pitchEl) pitchEl.value = START.pitch; if (pitchVal) pitchVal.textContent = START.pitch + '°';
+        if (bearingEl) bearingEl.value = START.bearing; if (bearingVal) bearingVal.textContent = START.bearing + '°';
+        if (exgEl) exgEl.value = 150; if (exgVal) exgVal.textContent = '150%';
+        const style = map.getStyle(); if (style && style.terrain) map.setTerrain({ source: 'terrain-dem', exaggeration: 3.0 });
       };
 
       // Hillshade / Sky 開關
-      document.getElementById('toggleShade').onclick = () => {
+      const toggleShadeBtn = document.getElementById('toggleShade');
+      if (toggleShadeBtn) toggleShadeBtn.onclick = () => {
         const vis = map.getLayoutProperty('hillshade', 'visibility') === 'visible' ? 'none' : 'visible';
         map.setLayoutProperty('hillshade', 'visibility', vis);
       };
-      document.getElementById('toggleSky').onclick = () => {
+      const toggleSkyBtn = document.getElementById('toggleSky');
+      if (toggleSkyBtn) toggleSkyBtn.onclick = () => {
         const vis = map.getLayoutProperty('sky', 'visibility') === 'visible' ? 'none' : 'visible';
         map.setLayoutProperty('sky', 'visibility', vis);
       };
