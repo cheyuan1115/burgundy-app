@@ -16,9 +16,10 @@
     }
     .row{ display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap; }
     .ui input[type="text"]{ flex:1; padding:8px 10px; border:1px solid #ddd; border-radius:8px; font:inherit; }
-    .btn{ padding:6px 10px; border:1px solid #ddd; border-radius:8px; background:#f8f8f8; cursor:pointer; font:12px; white-space:nowrap; }
-    .btn:hover{ background:#eee; }
-    label.small{ font-size:12px; color:#666; }
+    /* 調整按鈕樣式以適應只有圖標 */
+    .btn-icon{ padding:6px 10px; border:1px solid #ddd; border-radius:8px; background:#f8f8f8; cursor:pointer; font:16px; width: auto; line-height: 1; }
+    .btn-icon:hover{ background:#eee; }
+
     .legend{
       position:absolute; z-index:10; right:12px; bottom:12px; background:#fff; padding:10px;
       border-radius:10px; box-shadow:0 6px 20px rgba(0,0,0,.18); font:13px system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
@@ -35,15 +36,15 @@
   <div id="map"></div>
 
   <div class="ui">
-  <div class="row"><b>AOC 篩選</b></div>
-  <div class="row">
-    <input id="q" type="text" placeholder="例如：Meursault / La Romanee">
-    <button class="btn" id="clear">清除</button>
-    <button class="btn" id="showAll">全部</button>
-    <!-- 預設 wineriesVisible=true，所以初始按鈕文字設為「隱藏」 -->
-    <button class="btn" id="toggleWineries">🍷 酒莊隱藏</button>
+    <div class="row"><b>AOC 篩選</b></div>
+    <div class="row">
+      <input id="q" type="text" placeholder="例如：Meursault / La Romanee">
+      <button class="btn-icon" id="clear">清除</button>
+      <button class="btn-icon" id="showAll">全部</button>
+      <!-- 酒莊按鈕：只保留圖標 -->
+      <button class="btn-icon" id="toggleWineries" title="酒莊顯示/隱藏">🍷</button>
+    </div>
   </div>
-</div>
 
 
   <div class="legend">
@@ -54,10 +55,11 @@
   </div>
 
   <script>
-    // ====== 設定 ======
+    // ====== 設定（固定值）======
     const AOC_DATA_FILE = './burgundy.geojson';
     const WINERY_DATA_FILE = './wineries.geojson';
-    const START = { lng: 4.80, lat: 47.00, zoom: 8.8, pitch: 45, bearing: 0 };
+    // 鎖定視角和誇張度
+    const START = { lng: 4.80, lat: 47.00, zoom: 8.8, pitch: 45, bearing: 0, exaggeration: 3.0 };
 
 
     // ====== 名稱正規化 & 分級判定 ======
@@ -130,13 +132,28 @@
       // 2) Premier Cru
       const pcParts = parts.filter(p => /(premier|1er)\s*cru/i.test(p));
       if (pcParts.length){
-        let village = '';
-        for (const v of VILLAGES) {
-          if (raw.toLowerCase().includes(_norm(v))) { village = v; break; }
+        let titleAOC = 'Premier Cru';
+        
+        // 🚨 最終修復邏輯：從第一個找到的 PC 片段中，直接提取 'premier cru' 前面的所有文字作為村莊名
+        for(const p of pcParts) {
+            // 正則：從開頭匹配到 'premier cru'，並將其前面的部分作為 Village 名稱
+            const m = p.match(/^(.+?)\s+(premier|1er)\s*cru/i);
+            if (m && m[1]) {
+                const villagePartRaw = m[1].trim();
+                
+                // 檢查是否是無意義的名稱，例如 'bourgogne' 或只有一個字母
+                if (villagePartRaw.length > 2 && villagePartRaw.toLowerCase() !== 'bourgogne') {
+                   // 重新格式化成正確的標題
+                   titleAOC = villagePartRaw + ' Premier Cru'; 
+                   break;
+                }
+            }
         }
+        
+        // 提取地塊名稱
         const climats = pcParts.map(p => {
           let tail = '';
-          const m = p.match(/(?:premier|1er)\s*cru\s*(.*)$/i);
+          const m = p.match(/(?:premier|1er)\s*cru\s*([:\/–—\-]*\s*.*)$/i);
           if (m && m[1]) tail = m[1].trim();
           tail = tail.replace(/^[\s:\/–—\-]+/, '').replace(/^\((.*)\)$/, '$1').trim();
           if (!tail || /premier\s*cru/i.test(tail)) return '';
@@ -147,7 +164,7 @@
           .map(s => s.trim())
           .filter(Boolean);
 
-        const title = village ? `${village} Premier Cru` : 'Premier Cru';
+        const title = titleAOC;
         const subtitle = allClimats.length ? `地塊：${allClimats.join(', ')}` : '';
         return { level:'PC', title, subtitle };
       }
@@ -173,7 +190,6 @@
         version: 8,
           glyphs: 'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',
         sources: {
-          // 基礎底圖：OSM Raster（免金鑰）
           'osm': {
             type: 'raster',
             tiles: [
@@ -185,7 +201,6 @@
             maxzoom: 19,
             attribution: '© OpenStreetMap contributors'
           },
-          // DEM：Terrarium（免金鑰）
           'terrain-dem': {
             type: 'raster-dem',
             tiles: ['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],
@@ -197,8 +212,10 @@
         layers: [
           { id: 'osm', type: 'raster', source: 'osm' }
         ],
-        terrain: { source: 'terrain-dem', exaggeration: 3.0 }
+        // 鎖定地形誇張度
+        terrain: { source: 'terrain-dem', exaggeration: START.exaggeration }
       },
+      // 鎖定視角
       center: [START.lng, START.lat],
       zoom: START.zoom,
       pitch: START.pitch,
@@ -212,7 +229,8 @@
     // ====== 載入資料並建立圖層 ======
     let masterAOC = null;
     let currentFilterQ = '';
-    let wineriesVisible = true;
+    // 鎖定預設為隱藏
+    let wineriesVisible = false; 
 
     map.on('load', async () => {
 
@@ -225,10 +243,11 @@
         console.warn('meta.json 載入失敗：', e);
       }
 
-      // Sky + Hillshade
+      // Sky + Hillshade (預設開啟)
       map.addLayer({
         id: 'sky',
         type: 'sky',
+        layout: { 'visibility': 'visible' }, 
         paint: {
           'sky-type': 'atmosphere',
           'sky-atmosphere-sun': [0.0, 0.0],
@@ -240,7 +259,7 @@
         id: 'hillshade',
         type: 'hillshade',
         source: 'terrain-dem',
-        layout: { visibility: 'visible' },
+        layout: { 'visibility': 'visible' }, // 預設開啟
         paint: {
           'hillshade-exaggeration': 0.5,
           'hillshade-shadow-color': 'rgba(0,0,0,0.55)',
@@ -262,13 +281,6 @@
       });
 
       map.addSource('aoc', { type: 'geojson', data: enrich(masterAOC), promoteId: 'id', generateId: true });
-
-      // AOC Fill & Line & Hover Layers (未修改)
-      map.addLayer({ /* aoc-fill */ /* ... */ });
-      map.addLayer({ /* aoc-line */ /* ... */ });
-      map.addLayer({ /* aoc-line-hl */ /* ... */ });
-      
-      // 因為圖層設定很長，這裡省略以維持程式碼整潔，它們在您的程式碼中是完整的。
 
       // Fill 著色
       map.addLayer({
@@ -349,13 +361,18 @@
         const info = parseAOC(f.properties || {});
         const levelText = { GC:'Grand Cru', PC:'Premier Cru', VI:'Village', RE:'Régionale / 其他' }[info.level] || 'AOC';
         
-        // 修正 1: 讓 subtitle 獨立一行顯示，不再有括號
-        const subRow = info.subtitle ? `<div class="small" style="color:#666">${info.subtitle}</div>` : ''; 
+        let subText = '';
+        if (info.level === 'PC') {
+            subText = info.subtitle ? `地塊：${info.subtitle.replace('地塊：', '')}` : ''; 
+        } else if (info.level === 'GC') {
+            subText = info.subtitle ? `地點：${info.subtitle.replace('地點：', '')}` : ''; 
+        }
+        
+        const subRow = subText ? `<div class="small" style="color:#666;margin-top:2px">${subText}</div>` : ''; 
 
         const key = _norm(info.title || '');
         const meta = META[key] || null;
 
-        // 修正 2: 只有在有 meta 資料時才顯示 extra 區塊
         const extra = meta ? `
           <div style="margin-top:8px">
           <div class="small" style="margin-top:6px">
@@ -367,7 +384,7 @@
             <a href="${meta.link}" target="_blank" rel="noopener">🔗 Wine-Searcher</a>
           </div>` : ''}
           </div>
-        ` : ''; // 無 meta 資料時，extra 為空字串
+        ` : '';
 
         new maplibregl.Popup({ closeOnClick: true })
           .setLngLat(e.lngLat)
@@ -375,8 +392,8 @@
             `<div style="min-width:260px">
                <div style="font-weight:700">${info.title}</div>
                <div class="small" style="color:#666;margin-top:6px">等級：${levelText}</div>
-               ${subRow} <!-- 插入地塊/村莊名 -->
-               ${extra}   <!-- 插入 meta 資料 (如果存在) -->
+               ${subRow}
+               ${extra}
              </div>`
           )
           .addTo(map);
@@ -387,25 +404,44 @@
       const wFC = await wRes.json();
       map.addSource('wineries', { type: 'geojson', data: wFC });
       
-      // 修正 3: 將圖層改回 circle 確保顯示，並使用 Wine-color (紫色)
+      // 複合圖層 1/2: 用透明圓點作點擊範圍 (預設隱藏)
       map.addLayer({
-        id: 'wineries',
+        id: 'wineries-hit',
         type: 'circle',
         source: 'wineries',
-        layout: { 'visibility': 'visible' }, // 確保預設可見
+        layout: { 'visibility': 'none' }, // 預設隱藏
         paint: {
-          'circle-radius': 4.5,
-          'circle-color': '#7b1fa2', // 紫色
-          'circle-stroke-width': 1,
-          'circle-stroke-color': '#ffffff'
+          'circle-radius': 8,
+          'circle-color': '#7b1fa2',
+          'circle-opacity': 0 // 透明點
+        }
+      });
+
+      // 複合圖層 2/2: 用 symbol 顯示 🍷 符號 (預設隱藏)
+      map.addLayer({
+        id: 'wineries',
+        type: 'symbol',
+        source: 'wineries',
+        layout: { 
+            'visibility': 'none', // 預設隱藏
+            'text-field': '🍷', 
+            'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'], 
+            'text-size': 18,
+            'text-anchor': 'bottom',
+            'text-allow-overlap': true
+        },
+        paint: {
+            'text-color': '#7b1fa2', 
+            'text-halo-color': '#ffffff',
+            'text-halo-width': 1.5
         }
       });
       
-      // ===== 酒莊互動：滑入改游標、點擊顯示 popup（含 meta 合併） =====
-      map.on('mouseenter', 'wineries', () => { map.getCanvas().style.cursor = 'pointer'; });
-      map.on('mouseleave', 'wineries', () => { map.getCanvas().style.cursor = ''; });
+      // ===== 酒莊互動：滑入改游標、點擊顯示 popup（將點擊事件綁定到透明的 hit 層） =====
+      map.on('mouseenter', 'wineries-hit', () => { map.getCanvas().style.cursor = 'pointer'; });
+      map.on('mouseleave', 'wineries-hit', () => { map.getCanvas().style.cursor = ''; });
 
-      map.on('click', 'wineries', (e) => {
+      map.on('click', 'wineries-hit', (e) => { // 綁定到 hit 層
         const f = e.features && e.features[0];
         if (!f) return;
         const p = f.properties || {};
@@ -492,11 +528,15 @@
       
       // 🍷 酒莊顯示功能實作
       btnWineries.onclick = () => {
-        const currentVis = map.getLayoutProperty('wineries', 'visibility') === 'visible';
+        // 檢查 wineries-hit 層的狀態，因為它決定了點擊/互動
+        const currentVis = map.getLayoutProperty('wineries-hit', 'visibility') === 'visible';
         const newVis = currentVis ? 'none' : 'visible';
         
+        // 切換兩個圖層
+        map.setLayoutProperty('wineries-hit', 'visibility', newVis);
         map.setLayoutProperty('wineries', 'visibility', newVis);
-        btnWineries.textContent = currentVis ? '🍷 酒莊顯示' : '🍷 酒莊隱藏';
+        
+        // 更新狀態
         wineriesVisible = !currentVis;
       };
 
