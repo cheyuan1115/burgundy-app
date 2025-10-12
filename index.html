@@ -8,15 +8,13 @@
   <script src="https://unpkg.com/maplibre-gl@3.6.1/dist/maplibre-gl.js"></script>
   <style>
     html, body, #map { height: 100%; margin: 0; }
-    /* ************ 樣式修改開始 ************ */
     .ui{
       position: absolute; z-index: 10; top: 12px; left: 12px;
       background: #fff; padding: 10px; border-radius: 10px;
       box-shadow: 0 6px 20px rgba(0,0,0,.18);
-      width: min(88vw, 420px); /* 寬度從 560px 縮小到 420px */
+      width: min(88vw, 420px); /* UI 寬度調整為約 3/4 */
       font: 14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
     }
-    /* ************ 樣式修改結束 ************ */
     .row{ display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap; }
     .ui input[type="text"]{ flex:1; padding:8px 10px; border:1px solid #ddd; border-radius:8px; font:inherit; }
     .btn{ padding:6px 10px; border:1px solid #ddd; border-radius:8px; background:#f8f8f8; cursor:pointer; font:12px; white-space:nowrap; }
@@ -45,14 +43,11 @@
     <div class="row"><b>AOC 篩選</b></div>
     <div class="row">
       <input id="q" type="text" placeholder="例如：Meursault / La Romanee">
-      <button class="btn" id="clear">清除</button>
+      <!-- 移除 清除 按鈕 -->
       <button class="btn" id="showAll">全部</button>
-      <!-- ************ HTML 結構修改：將酒莊按鈕移到同一行 ************ -->
-      <button class="btn" id="toggleWineries">🍷 酒莊隱藏</button>
-      <!-- ************ HTML 結構修改結束 ************ -->
+      <!-- 酒莊按鈕：預設隱藏，圖示為 🚫🍷 -->
+      <button class="btn" id="toggleWineries" title="顯示酒莊">🚫🍷</button>
     </div>
-    
-    <!-- 原始的酒莊按鈕行已移除 -->
   </div>
 
 
@@ -209,6 +204,15 @@
             maxzoom: 19,
             attribution: '© OpenStreetMap contributors'
           },
+          // ************ 新增 OpenTopoMap 來源 (包含等高線) ************
+          'otm': {
+            type: 'raster',
+            tiles: ['https://tile.opentopomap.org/{z}/{x}/{y}.png'],
+            tileSize: 256,
+            maxzoom: 17,
+            attribution: '等高線來自: © OpenTopoMap (CC-BY-SA)'
+          },
+          // ****************************************
           'terrain-dem': {
             type: 'raster-dem',
             tiles: ['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],
@@ -218,7 +222,10 @@
           }
         },
         layers: [
-          { id: 'osm', type: 'raster', source: 'osm' }
+          { id: 'osm', type: 'raster', source: 'osm' },
+          // ************ 新增 OTM 渲染圖層 ************
+          { id: 'otm-layer', type: 'raster', source: 'otm', paint: { 'raster-opacity': 0.7 } } 
+          // ****************************************
         ],
         terrain: { source: 'terrain-dem', exaggeration: 3.0 }
       },
@@ -235,7 +242,7 @@
     // ====== 載入資料並建立圖層 ======
     let masterAOC = null;
     let currentFilterQ = '';
-    let wineriesVisible = true;
+    let wineriesVisible = false; // 預設為隱藏
 
     map.on('load', async () => {
 
@@ -418,7 +425,7 @@
         id: 'wineries',
         type: 'circle',
         source: 'wineries',
-        layout: { 'visibility': 'visible' }, 
+        layout: { 'visibility': 'none' }, // 預設為隱藏
         paint: {
           'circle-radius': 4.5,
           'circle-color': '#7b1fa2', // 紫色
@@ -494,41 +501,61 @@
 
         if (feats.length) {
           const b = new maplibregl.LngLatBounds();
+          
+          // 強化後的坐標提取邏輯
+          const addCoords = (coords) => {
+            if (Array.isArray(coords) && coords.length >= 2 && typeof coords[0] === 'number') {
+              b.extend(coords);
+            } else if (Array.isArray(coords)) {
+              coords.forEach(addCoords);
+            }
+          };
+
           feats.forEach(f => {
-            const add = (coords) => {
-              if (typeof coords[0] === 'number') b.extend([coords[0], coords[1]]);
-              else coords.forEach(add);
-            };
-            add(f.geometry.coordinates);
+            const geom = f.geometry;
+            if (geom && geom.coordinates) {
+               addCoords(geom.coordinates);
+            }
           });
-          map.fitBounds(b, { padding: 20, maxZoom: 14, duration: 600, pitch: map.getPitch(), bearing: map.getBearing() });
+          
+          if (b.isEmpty()) {
+              console.warn("計算出的邊界框為空，可能沒有有效的幾何圖形坐標。");
+              return;
+          }
+          
+          // 簡潔的 fitBounds 呼叫
+          map.fitBounds(b, { padding: 40, maxZoom: 14, duration: 600 });
         }
       }
 
       // 綁定 UI
       const q = document.getElementById('q');
-      const btnClear = document.getElementById('clear');
       const btnAll = document.getElementById('showAll');
       const btnWineries = document.getElementById('toggleWineries');
       
       let t = null;
       q.addEventListener('input', ()=>{ clearTimeout(t); t = setTimeout(()=> applySearch(q.value), 220); });
-      btnClear.onclick = ()=> { q.value=''; applySearch(''); };
       btnAll.onclick   = ()=> { q.value=''; applySearch(''); };
       
-      // 🍷 酒莊顯示功能實作
+      // 🍷 酒莊顯示功能實作 - 使用圖示切換
       btnWineries.onclick = () => {
-        // 初始狀態 wineriesVisible = true，visibility = 'visible'
         const currentVis = map.getLayoutProperty('wineries', 'visibility') === 'visible';
         const newVis = currentVis ? 'none' : 'visible';
         
         map.setLayoutProperty('wineries', 'visibility', newVis);
-        // 切換文字：如果是可見 (currentVis=true)，下一次點擊就是顯示 (要隱藏)，文字要變成「酒莊顯示」
-        btnWineries.textContent = currentVis ? '🍷 酒莊顯示' : '🍷 酒莊隱藏';
+        
+        // 根據新狀態切換按鈕圖示和 title
+        if (newVis === 'visible') {
+            btnWineries.textContent = '🍷';
+            btnWineries.title = '隱藏酒莊';
+        } else {
+            btnWineries.textContent = '🚫🍷'; // 🚫 表示禁止或隱藏
+            btnWineries.title = '顯示酒莊';
+        }
         wineriesVisible = !currentVis;
       };
 
-      // 視角控制程式碼 (為保持完整性保留)
+      // 視角控制程式碼 (已移除未使用的部分，保留與地圖相關的)
       const pitchEl = document.getElementById('pitch');
       const pitchVal = document.getElementById('pitchVal');
       if (pitchEl) pitchEl.oninput = () => {
@@ -550,7 +577,6 @@
       if (exgEl) exgEl.oninput = () => {
         const v = (Number(exgEl.value)||150) / 100; // 100% => 1.0
         exgVal.textContent = (v*100).toFixed(0) + '%';
-        // 更新地形誇張度
         const style = map.getStyle();
         if (style && style.terrain) {
           map.setTerrain({ source: 'terrain-dem', exaggeration: v });
