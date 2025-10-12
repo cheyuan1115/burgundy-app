@@ -37,8 +37,15 @@
     /* 新增的 UI 樣式 */
     .slider-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 13px; }
     .slider-row input[type="range"] { flex-grow: 1; }
-    /* 酒莊搜尋欄位樣式 */
-    .winery-search-box{ margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px; }
+    
+    /* ************ CSS 修改：預設隱藏酒莊搜尋欄 ************ */
+    .winery-search-box{ 
+      margin-top: 10px; 
+      border-top: 1px solid #eee; 
+      padding-top: 10px; 
+      display: none; /* 預設隱藏 */
+    }
+    /* **************************************** */
 
 
     .legend{
@@ -59,21 +66,20 @@
   <div class="ui">
     <div class="row"><b>AOC 篩選</b></div>
     <div class="row">
-      <!-- 為了讓 flex 設置生效，為其添加 ID -->
       <input id="q" type="text" placeholder="例如：Meursault / La Romanee">
       <button class="btn" id="showAll">全部</button>
       <button class="btn" id="toggleWineries" title="顯示酒莊">🚫🍷</button>
     </div>
     
-    <!-- ************ 新增酒莊搜尋欄位 ************ -->
-    <div class="winery-search-box">
+    <!-- ************ 新增 ID: winery-search-container ************ -->
+    <div class="winery-search-box" id="winery-search-container">
       <div class="row"><b>酒莊搜尋</b></div>
       <div class="row">
         <input id="winery-q" type="text" placeholder="例如：DRC / Romanée-Conti">
         <button class="btn" id="clear-winery">清除</button>
       </div>
     </div>
-    <!-- **************************************** -->
+    <!-- ******************************************************** -->
   </div>
 
 
@@ -541,7 +547,7 @@
         }
       }
       
-      // ************ 新增酒莊搜尋邏輯 ************
+      // ************ 酒莊搜尋邏輯：通過程式碼過濾然後更新 Source Data ************
       function applyWinerySearch(qRaw){
         const qNorm = _norm(qRaw || ''); 
         
@@ -549,46 +555,15 @@
 
         if (!qNorm) {
             // 清空搜尋：顯示所有酒莊
-            map.setFilter('wineries', null);
+            map.getSource('wineries').setData(masterWineries);
             return;
         }
-
-        // 搜尋邏輯：檢查 properties.name 是否包含或匹配搜尋字串
-        // 使用 MapLibre GL 的 Filter 語法: ['match', ['get', 'name'], '搜索字串', true, false]
-        // 為了實現「包含」和「忽略大小寫/重音」的邏輯，我們必須依賴 GeoJSON 數據中的屬性是否已經被「正規化」
-        // 由於原始數據沒有正規化名稱，我們將使用一個簡單的「包含」過濾器，它區分大小寫，但這是 GeoJSON 來源的限制
         
-        // *緊急修復：為了讓搜尋能忽略大小寫，我們改用 [case, ...] 來模擬，但這會讓過濾器更複雜*
-        
-        // 假設 GeoJSON 中的 'name' 屬性是純英文
-        // [
-        //   "any",
-        //   ["in", ["to-lowercase", qNorm], ["to-lowercase", ["get", "name"]]], // 包含
-        //   ["in", ["to-lowercase", qNorm], ["to-lowercase", ["get", "address"]]] // 包含地址 (如果有的話)
-        // ]
-        
-        // 由於 MapLibre GL 的 expression 中沒有 to-lowercase，我們只能用大小寫敏感的 includes/in 或 startsWith
-        // 為了避免複雜的表達式導致效能問題，我們採用 startsWith 敏感過濾：
-        
-        // MapLibre GL JS Filter: ["has", "name"] 並且 name starts with Q
-        const filter = [
-          'all',
-          ['has', 'name'],
-          ['match', ['get', 'name'], [`*${qRaw}*`], true, false] // 使用 MapLibre 的 glob-style 匹配 (如果 GeoJSON 來源支援)
-        ];
-        
-        // *** MapLibre GL JS 對 GeoJSON Source 的 Filter 限制：它不支持複雜的字符串操作。***
-        // *** 最簡單且可靠的 GeoJSON 過濾方法：檢查屬性是否存在且其值等於或以某個字符串開頭 (大小寫敏感)。***
-
-        // 採用最保守的 'in' 篩選器（它在 MapLibre GL 中對於 GeoJSON 有時是可用的，但通常是全等匹配）
-        // 為了讓它工作，我們必須在程式碼中過濾 masterWineries 並調用 setData，而不是 setFilter
-        
-        // 重新設計酒莊搜尋：通過程式碼過濾然後更新 Source Data
+        // 程式碼過濾 (忽略大小寫/重音)
         const filteredWineries = masterWineries.features.filter(f => {
-          if (!qNorm) return true;
           const name = _norm(f.properties?.name || '');
-          const addr = _norm(f.properties?.address || '');
-          const combined = `${name} ${addr}`;
+          // 可以在這裡加入更多屬性來搜尋，例如 address
+          const combined = `${name} ${_norm(f.properties?.address || '')}`; 
           return combined.includes(qNorm);
         });
         
@@ -611,8 +586,9 @@
       const btnAll = document.getElementById('showAll');
       const btnWineries = document.getElementById('toggleWineries');
       
-      const wineryQ = document.getElementById('winery-q'); // 新增酒莊輸入欄
-      const btnClearWinery = document.getElementById('clear-winery'); // 新增酒莊清除按鈕
+      const wineryQ = document.getElementById('winery-q'); 
+      const btnClearWinery = document.getElementById('clear-winery'); 
+      const wineryContainer = document.getElementById('winery-search-container'); // 取得容器元素
       
       
       let tAOC = null;
@@ -627,31 +603,38 @@
         map.setLayoutProperty('wineries', 'visibility', newVis);
         
         if (newVis === 'visible') {
+            // 顯示酒莊圖層時
             btnWineries.textContent = '🍷';
             btnWineries.title = '隱藏酒莊';
+            // 顯示搜尋欄
+            wineryContainer.style.display = 'block'; 
         } else {
-            btnWineries.textContent = '🚫🍷'; // 🚫 表示禁止或隱藏
+            // 隱藏酒莊圖層時
+            btnWineries.textContent = '🚫🍷'; 
             btnWineries.title = '顯示酒莊';
+            // 隱藏搜尋欄並清空篩選
+            wineryContainer.style.display = 'none'; 
+            wineryQ.value = ''; // 清空搜尋欄位
+            applyWinerySearch(''); // 清空篩選結果，顯示所有原始酒莊 (但圖層本身是隱藏的)
         }
         wineriesVisible = !currentVis;
       };
 
-      // ************ 綁定酒莊搜尋 UI ************
+      // 綁定酒莊搜尋 UI
       let tWinery = null;
       wineryQ.addEventListener('input', ()=>{ clearTimeout(tWinery); tWinery = setTimeout(()=> applyWinerySearch(wineryQ.value), 220); });
       
       btnClearWinery.onclick = ()=> { 
         wineryQ.value = ''; 
         applyWinerySearch('');
-        // 確保酒莊圖層在清除搜尋後是可見的
+        // 確保酒莊圖層在清除搜尋後是可見的 (如果它被打開了的話)
         if (map.getLayoutProperty('wineries', 'visibility') !== 'visible') {
             map.setLayoutProperty('wineries', 'visibility', 'visible');
             btnWineries.textContent = '🍷';
             btnWineries.title = '隱藏酒莊';
         }
       };
-      // ****************************************
-
+      
       // 視角控制程式碼 (為保持完整性保留)
       const pitchEl = document.getElementById('pitch');
       const pitchVal = document.getElementById('pitchVal');
