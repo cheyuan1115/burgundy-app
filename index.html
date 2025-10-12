@@ -291,7 +291,7 @@
         layers: [
           { id: 'osm', type: 'raster', source: 'osm' }
         ],
-        terrain: { source: 'terrain-dem', exaggeration: 3.0 }
+        terrain: { source: 'terrain-dem', exaggeration: 2.0 }
       },
       center: [START.lng, START.lat],
       zoom: START.zoom,
@@ -337,7 +337,7 @@
         source: 'terrain-dem',
         layout: { visibility: 'visible' },
         paint: {
-          'hillshade-exaggeration': 1.0, // 增強陰影視覺效果
+          'hillshade-exaggeration': 1.5, // 增強陰影視覺效果
           'hillshade-shadow-color': 'rgba(0,0,0,0.55)',
           'hillshade-illumination-direction': 315
         }
