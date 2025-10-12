@@ -1,11 +1,17 @@
 {
-  "romaneeconti": {
+    "romaneeconti": {
     "zh": "羅曼尼-康帝",
     "level": "特級園 (Grand Cru)",
     "village": "Vosne-Romanée",
-    "notes": "DRC 獨佔園。被譽為『天堂的味道』，是優雅、複雜度與陳年潛力的完美結合。帶有細緻的紅色水果、紫羅蘭、異國香料與濕潤泥土的氣息，口感如絲綢般滑順，尾韻悠長。",
+    "area_ha": 1.63,
+    "soil": "極薄的表土，主要為石灰岩和富含鐵質的泥灰岩，排水性極佳。底層為堅硬的巴通期石灰岩。",
+    "aspect": "正東略偏南",
+    "elevation": "海拔 255-270 公尺",
+    "style_note": "極致優雅、結構精巧、複雜度超群。香氣細緻，以紅色水果、紫羅蘭、紅茶和異國香料為主。單寧絲滑，具有無與倫比的陳年潛力。",
+    "notes": "DRC 獨佔園 (Monopole)。被譽為『天堂的味道』或『勃根地之魂』。面積雖小，但地位無可撼動。",
     "link": "https://www.wine-searcher.com/find/dom+de+la+romanee+conti+romanee+conti+grand+cru+cote+de+nuits+france"
   },
+
   "latache": {
     "zh": "拉塔希",
     "level": "特級園 (Grand Cru)",
@@ -61,5 +67,13 @@
     "village": "Flagey-Echézeaux",
     "notes": "雖然名字裡有『大』，但面積遠小於 Echézeaux，且品質普遍更高。風格更為嚴謹、集中、深邃，結構感更強，香氣以黑色水果和泥土氣息為主，需要更長的陳年時間。",
     "link": "https://www.wine-searcher.com/find/grands+echezeaux+grand+cru+cote+de+nuits+france"
+  },
+  
+  "lesamoureuseschambollemusigny": {
+    "zh": "愛侶園",
+    "level": "一級園 (Premier Cru)",
+    "village": "Chambolle-Musigny",
+    "notes": "位於特級園 Musigny 正下方，被公認為是 Chambolle-Musigny 最優雅、最細緻的 PC，常被譽為『勃根地最貴的 PC』。香氣極為芳香，以玫瑰花、紫羅蘭和甜美的紅色水果為主。",
+    "link": "https://www.wine-searcher.com/find/les+amoureuses+1er+cru+chambolle+musigny+cote+de+nuits+france"
   }
 }
