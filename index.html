@@ -38,15 +38,6 @@
     .slider-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 13px; }
     .slider-row input[type="range"] { flex-grow: 1; }
     
-    /* ************ 解決 Pop-up 寬度被限制和長文本換行問題 ************ */
-    .maplibregl-popup {
-      max-width: 360px !important; /* 確保 Pop-up 容器可以有 360px 寬 */
-    }
-    .maplibregl-popup-content * {
-      word-wrap: break-word;
-      word-break: break-word;
-    }
-    /* **************************************** */
     .winery-search-box{ 
       margin-top: 10px; 
       border-top: 1px solid #eee; 
@@ -54,7 +45,49 @@
       display: none; /* 預設隱藏 */
     }
 
-
+    /* ************ 手機資訊面板 CSS ************ */
+    #info-panel {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      max-height: 80vh; /* 最大高度限制 */
+      background: #fff;
+      z-index: 100;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+      transform: translateY(100%); /* 初始時完全隱藏在底部 */
+      transition: transform 0.3s ease-out;
+      padding: 16px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    #info-panel.visible {
+      transform: translateY(0); /* 顯示時滑入 */
+    }
+    .mobile-panel .content {
+      padding-bottom: 20px; /* 底部空間 */
+    }
+    .close-btn {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      font-size: 18px;
+      font-weight: bold;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #999;
+      z-index: 101; /* 確保按鈕在內容之上 */
+    }
+    /* 確保 panel 內部的元素換行 */
+    #panel-content * {
+      word-wrap: break-word;
+      word-break: break-word;
+    }
+    /* **************************************** */
+    
     .legend{
       position:absolute; z-index:10; right:12px; bottom:12px; background:#fff; padding:10px;
       border-radius:10px; box-shadow:0 6px 20px rgba(0,0,0,.18); font:13px system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
@@ -94,6 +127,13 @@
     <div class="item"><span class="swatch vi"></span> Village</div>
     <div class="item"><span class="swatch re"></span> Régionale / 其他</div>
   </div>
+
+  <!-- ************ 新增底部資訊面板 HTML ************ -->
+  <div id="info-panel">
+    <button id="close-panel" class="close-btn">X</button>
+    <div id="panel-content" class="content"></div>
+  </div>
+  <!-- **************************************** -->
 
   <script>
     // ====== 設定 ======
@@ -388,8 +428,18 @@
         if (hoveredId !== null) map.setFeatureState({ source: 'aoc', id: hoveredId }, { hover: false });
         hoveredId = null;
       });
+      
+      // ************ 獲取面板元素並綁定關閉事件 ************
+      const infoPanel = document.getElementById('info-panel');
+      const panelContent = document.getElementById('panel-content');
+      const closePanelBtn = document.getElementById('close-panel');
 
-      // --- 點擊 AOC 顯示彈窗 ---
+      closePanelBtn.onclick = () => {
+        infoPanel.classList.remove('visible');
+      };
+      // ************************************************
+
+      // --- 點擊 AOC 顯示底部面板 ---
       map.on('click', 'aoc-fill', (e) => {
         const f = e.features && e.features[0];
         if (!f) return;
@@ -458,18 +508,17 @@
           </div>
         ` : '';
 
-        // 最終輸出：標題 -> 等級 -> 地塊/地點 -> Meta資料
-        new maplibregl.Popup({ closeOnClick: true })
-          .setLngLat(e.lngLat)
-          .setHTML(
-            `<div> 
-               <div style="font-weight:700">${info.title}</div>
-               <div class="small" style="color:#666;margin-top:6px">等級：${levelText}</div>
-               ${subRow}   <!-- 插入地塊/地點名 -->
-               ${extra}    <!-- 插入 meta 資料 (如果存在) -->
-             </div>`
-          )
-          .addTo(map);
+        // ************ 填充內容並顯示底部面板 ************
+        const finalHTML = `
+           <div style="font-weight:700">${info.title}</div>
+           <div class="small" style="color:#666;margin-top:6px">等級：${levelText}</div>
+           ${subRow}   <!-- 插入地塊/地點名 -->
+           ${extra}    <!-- 插入 meta 資料 (如果存在) -->
+        `;
+        
+        panelContent.innerHTML = finalHTML;
+        infoPanel.classList.add('visible');
+        // ************************************************
       });
 
       // 酒莊圖層設定
@@ -496,6 +545,7 @@
       map.on('mouseleave', 'wineries', () => { map.getCanvas().style.cursor = ''; });
 
       map.on('click', 'wineries', (e) => {
+        // ************ 這裡仍保留 Pop-up 給酒莊，因為資訊較簡短 ************
         const f = e.features && e.features[0];
         if (!f) return;
         const p = f.properties || {};
@@ -529,6 +579,7 @@
           .setLngLat(e.lngLat)
           .setHTML(html)
           .addTo(map);
+        // *******************************************************************
       });
 
 
