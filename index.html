@@ -9,11 +9,16 @@
   <style>
     html, body, #map { height: 100%; margin: 0; }
     /* ************ 樣式修改開始 ************ */
-    .ui{
-      position: absolute; z-index: 10; top: 12px; left: 12px;
+.ui{
+      position: absolute; z-index: 10; 
+      /* ************ CSS 修改開始 ************ */
+      top: 8px; /* 距離頂部更近一點 */
+      left: 8px; /* 距離左邊更近一點 */
+      max-height: 90vh; /* 限制高度，避免內容過多時撐滿螢幕 */
+      /* ************ CSS 修改結束 ************ */
       background: #fff; padding: 10px; border-radius: 10px;
       box-shadow: 0 6px 20px rgba(0,0,0,.18);
-      width: min(88vw, 420px); /* 寬度從 560px 縮小到 420px */
+      width: min(88vw, 420px); 
       font: 14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
     }
     /* ************ 樣式修改結束 ************ */
