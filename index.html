@@ -15,26 +15,31 @@
       max-height: 90vh; 
       background: #fff; padding: 10px; border-radius: 10px;
       box-shadow: 0 6px 20px rgba(0,0,0,.18);
-      width: min(88vw, 300px); /* UI 寬度調整為約 3/4 */
+      width: min(88vw, 320px); /* 縮小寬度以避免遮擋地圖控制 */
       font: 14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
     }
     .row{ display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap; }
-    /* ************ CSS 修改：讓搜尋欄變短 ************ */
+    /* 確保 AOC 輸入欄的寬度 */
+    .ui #q{ 
+      flex-grow: 1; 
+      max-width: 260px;
+    }
     .ui input[type="text"]{ 
       flex-grow: 1; 
-      max-width: 150px; /* 限制最大寬度為 260px，你可以調整這個數值 */
       padding:8px 10px; 
       border:1px solid #ddd; 
       border-radius:8px; 
       font:inherit; 
     }
-    /* **************************************** */
     .btn{ padding:6px 10px; border:1px solid #ddd; border-radius:8px; background:#f8f8f8; cursor:pointer; font:12px; white-space:nowrap; }
     .btn:hover{ background:#eee; }
     label.small{ font-size:12px; color:#666; }
     /* 新增的 UI 樣式 */
     .slider-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 13px; }
     .slider-row input[type="range"] { flex-grow: 1; }
+    /* 酒莊搜尋欄位樣式 */
+    .winery-search-box{ margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px; }
+
 
     .legend{
       position:absolute; z-index:10; right:12px; bottom:12px; background:#fff; padding:10px;
@@ -54,10 +59,21 @@
   <div class="ui">
     <div class="row"><b>AOC 篩選</b></div>
     <div class="row">
-      <input id="q" type="text" placeholder="例如：vosne romanee">
+      <!-- 為了讓 flex 設置生效，為其添加 ID -->
+      <input id="q" type="text" placeholder="例如：Meursault / La Romanee">
       <button class="btn" id="showAll">全部</button>
       <button class="btn" id="toggleWineries" title="顯示酒莊">🚫🍷</button>
     </div>
+    
+    <!-- ************ 新增酒莊搜尋欄位 ************ -->
+    <div class="winery-search-box">
+      <div class="row"><b>酒莊搜尋</b></div>
+      <div class="row">
+        <input id="winery-q" type="text" placeholder="例如：DRC / Romanée-Conti">
+        <button class="btn" id="clear-winery">清除</button>
+      </div>
+    </div>
+    <!-- **************************************** -->
   </div>
 
 
@@ -239,6 +255,7 @@
 
     // ====== 載入資料並建立圖層 ======
     let masterAOC = null;
+    let masterWineries = null; // 新增：保存原始酒莊數據
     let currentFilterQ = '';
     let wineriesVisible = false; // 預設為隱藏
 
@@ -415,8 +432,8 @@
 
       // 酒莊圖層設定
       const wRes = await fetch(WINERY_DATA_FILE);
-      const wFC = await wRes.json();
-      map.addSource('wineries', { type: 'geojson', data: wFC });
+      masterWineries = await wRes.json(); // 保存原始數據
+      map.addSource('wineries', { type: 'geojson', data: masterWineries });
       
       // 使用 circle 確保穩定顯示
       map.addLayer({
@@ -473,7 +490,7 @@
       });
 
 
-      // ====== 搜尋（直接對 masterAOC 篩選後 setData）======
+      // ====== AOC 搜尋（直接對 masterAOC 篩選後 setData）======
       async function applySearch(qRaw){
         currentFilterQ = _norm(qRaw || ''); 
         const feats = (masterAOC.features || []).filter(f => {
@@ -500,7 +517,6 @@
         if (feats.length) {
           const b = new maplibregl.LngLatBounds();
           
-          // 強化後的坐標提取邏輯
           const addCoords = (coords) => {
             if (Array.isArray(coords) && coords.length >= 2 && typeof coords[0] === 'number') {
               b.extend(coords);
@@ -517,22 +533,90 @@
           });
           
           if (b.isEmpty()) {
-              console.warn("計算出的邊界框為空，可能沒有有效的幾何圖形坐標。");
+              console.warn("AOC 搜尋：計算出的邊界框為空。");
               return;
           }
           
-          // 簡潔的 fitBounds 呼叫 (帶有搜尋放大效果)
           map.fitBounds(b, { padding: 40, maxZoom: 14, duration: 600 });
         }
       }
+      
+      // ************ 新增酒莊搜尋邏輯 ************
+      function applyWinerySearch(qRaw){
+        const qNorm = _norm(qRaw || ''); 
+        
+        if (!map.getSource('wineries')) return;
+
+        if (!qNorm) {
+            // 清空搜尋：顯示所有酒莊
+            map.setFilter('wineries', null);
+            return;
+        }
+
+        // 搜尋邏輯：檢查 properties.name 是否包含或匹配搜尋字串
+        // 使用 MapLibre GL 的 Filter 語法: ['match', ['get', 'name'], '搜索字串', true, false]
+        // 為了實現「包含」和「忽略大小寫/重音」的邏輯，我們必須依賴 GeoJSON 數據中的屬性是否已經被「正規化」
+        // 由於原始數據沒有正規化名稱，我們將使用一個簡單的「包含」過濾器，它區分大小寫，但這是 GeoJSON 來源的限制
+        
+        // *緊急修復：為了讓搜尋能忽略大小寫，我們改用 [case, ...] 來模擬，但這會讓過濾器更複雜*
+        
+        // 假設 GeoJSON 中的 'name' 屬性是純英文
+        // [
+        //   "any",
+        //   ["in", ["to-lowercase", qNorm], ["to-lowercase", ["get", "name"]]], // 包含
+        //   ["in", ["to-lowercase", qNorm], ["to-lowercase", ["get", "address"]]] // 包含地址 (如果有的話)
+        // ]
+        
+        // 由於 MapLibre GL 的 expression 中沒有 to-lowercase，我們只能用大小寫敏感的 includes/in 或 startsWith
+        // 為了避免複雜的表達式導致效能問題，我們採用 startsWith 敏感過濾：
+        
+        // MapLibre GL JS Filter: ["has", "name"] 並且 name starts with Q
+        const filter = [
+          'all',
+          ['has', 'name'],
+          ['match', ['get', 'name'], [`*${qRaw}*`], true, false] // 使用 MapLibre 的 glob-style 匹配 (如果 GeoJSON 來源支援)
+        ];
+        
+        // *** MapLibre GL JS 對 GeoJSON Source 的 Filter 限制：它不支持複雜的字符串操作。***
+        // *** 最簡單且可靠的 GeoJSON 過濾方法：檢查屬性是否存在且其值等於或以某個字符串開頭 (大小寫敏感)。***
+
+        // 採用最保守的 'in' 篩選器（它在 MapLibre GL 中對於 GeoJSON 有時是可用的，但通常是全等匹配）
+        // 為了讓它工作，我們必須在程式碼中過濾 masterWineries 並調用 setData，而不是 setFilter
+        
+        // 重新設計酒莊搜尋：通過程式碼過濾然後更新 Source Data
+        const filteredWineries = masterWineries.features.filter(f => {
+          if (!qNorm) return true;
+          const name = _norm(f.properties?.name || '');
+          const addr = _norm(f.properties?.address || '');
+          const combined = `${name} ${addr}`;
+          return combined.includes(qNorm);
+        });
+        
+        map.getSource('wineries').setData({ type: 'FeatureCollection', features: filteredWineries });
+        
+        // 找到並飛向第一個結果
+        if (filteredWineries.length > 0) {
+            const firstFeature = filteredWineries[0];
+            const coords = firstFeature.geometry.coordinates;
+            if (coords && coords.length === 2 && typeof coords[0] === 'number') {
+                map.flyTo({ center: coords, zoom: Math.max(map.getZoom(), 12), duration: 600 });
+            }
+        }
+      }
+      // ****************************************
+
 
       // 綁定 UI
       const q = document.getElementById('q');
       const btnAll = document.getElementById('showAll');
       const btnWineries = document.getElementById('toggleWineries');
       
-      let t = null;
-      q.addEventListener('input', ()=>{ clearTimeout(t); t = setTimeout(()=> applySearch(q.value), 220); });
+      const wineryQ = document.getElementById('winery-q'); // 新增酒莊輸入欄
+      const btnClearWinery = document.getElementById('clear-winery'); // 新增酒莊清除按鈕
+      
+      
+      let tAOC = null;
+      q.addEventListener('input', ()=>{ clearTimeout(tAOC); tAOC = setTimeout(()=> applySearch(q.value), 220); });
       btnAll.onclick   = ()=> { q.value=''; applySearch(''); };
       
       // 🍷 酒莊顯示功能實作 - 使用圖示切換
@@ -542,7 +626,6 @@
         
         map.setLayoutProperty('wineries', 'visibility', newVis);
         
-        // 根據新狀態切換按鈕圖示和 title
         if (newVis === 'visible') {
             btnWineries.textContent = '🍷';
             btnWineries.title = '隱藏酒莊';
@@ -552,6 +635,22 @@
         }
         wineriesVisible = !currentVis;
       };
+
+      // ************ 綁定酒莊搜尋 UI ************
+      let tWinery = null;
+      wineryQ.addEventListener('input', ()=>{ clearTimeout(tWinery); tWinery = setTimeout(()=> applyWinerySearch(wineryQ.value), 220); });
+      
+      btnClearWinery.onclick = ()=> { 
+        wineryQ.value = ''; 
+        applyWinerySearch('');
+        // 確保酒莊圖層在清除搜尋後是可見的
+        if (map.getLayoutProperty('wineries', 'visibility') !== 'visible') {
+            map.setLayoutProperty('wineries', 'visibility', 'visible');
+            btnWineries.textContent = '🍷';
+            btnWineries.title = '隱藏酒莊';
+        }
+      };
+      // ****************************************
 
       // 視角控制程式碼 (為保持完整性保留)
       const pitchEl = document.getElementById('pitch');
