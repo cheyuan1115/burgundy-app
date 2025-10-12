@@ -8,22 +8,27 @@
   <script src="https://unpkg.com/maplibre-gl@3.6.1/dist/maplibre-gl.js"></script>
   <style>
     html, body, #map { height: 100%; margin: 0; }
-    /* ************ 樣式修改開始 ************ */
-.ui{
+    .ui{
       position: absolute; z-index: 10; 
-      /* ************ CSS 修改開始 ************ */
-      top: 8px; /* 距離頂部更近一點 */
-      left: 8px; /* 距離左邊更近一點 */
-      max-height: 90vh; /* 限制高度，避免內容過多時撐滿螢幕 */
-      /* ************ CSS 修改結束 ************ */
+      top: 8px; 
+      left: 8px; 
+      max-height: 90vh; 
       background: #fff; padding: 10px; border-radius: 10px;
       box-shadow: 0 6px 20px rgba(0,0,0,.18);
-      width: min(88vw, 420px); 
+      width: min(88vw, 420px); /* UI 寬度調整為約 3/4 */
       font: 14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
     }
-    /* ************ 樣式修改結束 ************ */
     .row{ display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap; }
-    .ui input[type="text"]{ flex:1; padding:8px 10px; border:1px solid #ddd; border-radius:8px; font:inherit; }
+    /* ************ CSS 修改：讓搜尋欄變短 ************ */
+    .ui input[type="text"]{ 
+      flex-grow: 1; 
+      max-width: 260px; /* 限制最大寬度為 260px，你可以調整這個數值 */
+      padding:8px 10px; 
+      border:1px solid #ddd; 
+      border-radius:8px; 
+      font:inherit; 
+    }
+    /* **************************************** */
     .btn{ padding:6px 10px; border:1px solid #ddd; border-radius:8px; background:#f8f8f8; cursor:pointer; font:12px; white-space:nowrap; }
     .btn:hover{ background:#eee; }
     label.small{ font-size:12px; color:#666; }
@@ -50,9 +55,7 @@
     <div class="row"><b>AOC 篩選</b></div>
     <div class="row">
       <input id="q" type="text" placeholder="例如：Meursault / La Romanee">
-      <!-- 移除 #clear 按鈕 -->
       <button class="btn" id="showAll">全部</button>
-      <!-- 修改 #toggleWineries 按鈕：只用圖示，並預設為隱藏狀態的圖示 -->
       <button class="btn" id="toggleWineries" title="顯示酒莊">🚫🍷</button>
     </div>
   </div>
@@ -267,7 +270,7 @@
         source: 'terrain-dem',
         layout: { visibility: 'visible' },
         paint: {
-          'hillshade-exaggeration': 1.0,
+          'hillshade-exaggeration': 1.0, // 增強陰影視覺效果
           'hillshade-shadow-color': 'rgba(0,0,0,0.55)',
           'hillshade-illumination-direction': 315
         }
@@ -345,9 +348,6 @@
         }
       });
       
-
-
-
 
       let hoveredId = null;
       map.on('mousemove', 'aoc-fill', (e) => {
@@ -521,23 +521,21 @@
               return;
           }
           
-          // 保持簡潔的 fitBounds 呼叫，padding 設為 40 以確保可視範圍
+          // 簡潔的 fitBounds 呼叫 (帶有搜尋放大效果)
           map.fitBounds(b, { padding: 40, maxZoom: 14, duration: 600 });
         }
       }
 
       // 綁定 UI
       const q = document.getElementById('q');
-      // const btnClear = document.getElementById('clear'); // 移除
       const btnAll = document.getElementById('showAll');
       const btnWineries = document.getElementById('toggleWineries');
       
       let t = null;
       q.addEventListener('input', ()=>{ clearTimeout(t); t = setTimeout(()=> applySearch(q.value), 220); });
-      // 移除 btnClear 的處理
       btnAll.onclick   = ()=> { q.value=''; applySearch(''); };
       
-      // 🍷 酒莊顯示功能實作 - 使用圖示
+      // 🍷 酒莊顯示功能實作 - 使用圖示切換
       btnWineries.onclick = () => {
         const currentVis = map.getLayoutProperty('wineries', 'visibility') === 'visible';
         const newVis = currentVis ? 'none' : 'visible';
@@ -577,7 +575,6 @@
       if (exgEl) exgEl.oninput = () => {
         const v = (Number(exgEl.value)||150) / 100; // 100% => 1.0
         exgVal.textContent = (v*100).toFixed(0) + '%';
-        // 更新地形誇張度
         const style = map.getStyle();
         if (style && style.terrain) {
           map.setTerrain({ source: 'terrain-dem', exaggeration: v });
