@@ -1,5 +1,6 @@
 {
-    "romaneeconti": {
+
+  "romaneeconti": {
     "zh": "羅曼尼-康帝",
     "level": "特級園 (Grand Cru)",
     "village": "Vosne-Romanée",
@@ -11,69 +12,116 @@
     "notes": "DRC 獨佔園 (Monopole)。被譽為『天堂的味道』或『勃根地之魂』。面積雖小，但地位無可撼動。",
     "link": "https://www.wine-searcher.com/find/dom+de+la+romanee+conti+romanee+conti+grand+cru+cote+de+nuits+france"
   },
-
   "latache": {
     "zh": "拉塔希",
     "level": "特級園 (Grand Cru)",
     "village": "Vosne-Romanée",
-    "notes": "DRC 獨佔園。風格比羅曼尼-康帝更為外放、熱情與華麗。香氣濃郁，充滿黑櫻桃、李子、玫瑰花瓣與一絲野性的氣息。口感豐滿，結構宏大，是力量與性感的代名詞。",
+    "area_ha": 6.06,
+    "soil": "表土比 Romanée-Conti 稍深，富含黏土和石灰岩碎石，有助於鎖住水分。",
+    "aspect": "正東",
+    "elevation": "海拔 250-300 公尺",
+    "style_note": "風格比 Romanée-Conti 更為外放、熱情與華麗。充滿黑櫻桃、李子、玫瑰花瓣與一絲野性的氣息。口感豐滿，結構宏大，是力量與性感的代名詞。",
+    "notes": "DRC 獨佔園 (Monopole)。位於 Romanée-Conti 南側，是勃根地最容易辨識的風格之一。",
     "link": "https://www.wine-searcher.com/find/dom+de+la+romanee+conti+la+tache+grand+cru+monopole+cote+de+nuits+france"
   },
   "richebourg": {
     "zh": "李其堡",
     "level": "特級園 (Grand Cru)",
     "village": "Vosne-Romanée",
-    "notes": "風格雄壯、豐腴且深邃，被認為是力量最強勁的特級園之一。充滿濃郁的黑色水果、松露、皮革與煙燻風味，酒體飽滿，單寧強勁，需要長時間陳年才能展現其全部潛力。",
+    "area_ha": 8.03,
+    "soil": "深厚的石灰質棕色泥土，石灰岩含量高，排水性強。",
+    "aspect": "正東",
+    "elevation": "海拔 250-310 公尺",
+    "style_note": "風格雄壯、豐腴且深邃，被認為是力量最強勁的特級園之一。充滿濃郁的黑色水果、松露、皮革與煙燻風味，酒體飽滿，單寧強勁，陳年潛力極佳。",
+    "notes": "由多位頂級酒莊共同擁有。地塊南北向延伸，上坡和下坡的風格略有差異。",
     "link": "https://www.wine-searcher.com/find/richebourg+grand+cru+cote+de+nuits+france"
   },
   "romaneesaintvivant": {
     "zh": "羅曼尼-聖-維馮",
     "level": "特級園 (Grand Cru)",
     "village": "Vosne-Romanée",
-    "notes": "以其極致的優雅、精緻與芬芳而聞名。香氣細膩，以紅色莓果、紫羅蘭、紅茶和香料為主。口感絲滑，結構精巧，被認為是 Vosne-Romanée 中最女性化、最細膩的特級園。",
+    "area_ha": 9.44,
+    "soil": "表土較深，以細膩的黏土和石灰岩組成，底層為堅硬岩石。",
+    "aspect": "正東",
+    "elevation": "海拔 240-280 公尺",
+    "style_note": "以其極致的優雅、精緻與芬芳而聞名。香氣細膩，以紅色莓果、紫羅蘭、紅茶和香料為主。口感絲滑，結構精巧，是 Vosne-Romanée 中最女性化、最細膩的特級園。",
+    "notes": "位於 Romanée-Conti 和 Richebourg 下方，是 DRC 擁有最大份額的特級園之一。",
     "link": "https://www.wine-searcher.com/find/romanee+st+vivant+grand+cru+cote+de+nuits+france"
   },
-  "chambertin": {
+  "grandsechezeaux": {
+    "zh": "大-艾雪索",
+    "level": "特級園 (Grand Cru)",
+    "village": "Flagey-Echézeaux",
+    "area_ha": 9.14,
+    "soil": "多石灰岩碎石，表土較薄且多孔，排水性極佳。",
+    "aspect": "東南",
+    "elevation": "海拔 250-300 公尺",
+    "style_note": "風格更為嚴謹、集中、深邃，結構感強。香氣以黑色水果和泥土氣息為主，陳年時間比 Echézeaux 更長。",
+    "notes": "品質普遍優於 Echézeaux，因為其風土更為一致。大部分由 DRC 和 Clos de Vougeot 的繼承者擁有。",
+    "link": "https://www.wine-searcher.com/find/grands+echezeaux+grand+cru+cote+de+nuits+france"
+  },
+  "echezeaux": {
+    "zh": "艾雪索",
+    "level": "特級園 (Grand Cru)",
+    "village": "Flagey-Echézeaux",
+    "area_ha": 37.69,
+    "soil": "地塊異質性高，土壤從黏土到石灰岩碎石不一，導致風格多變。",
+    "aspect": "東至東南",
+    "elevation": "海拔 240-330 公尺",
+    "style_note": "風格多變，通常比 Grands-Échezeaux 輕盈、奔放，帶有紅色水果、香料與花香，口感較柔和，更早進入適飲期。",
+    "notes": "由多達 80 個擁有者分享，涵蓋 11 個不同的小地塊（Lieux-dits）。勃根地面積最大的特級園之一。",
+    "link": "https://www.wine-searcher.com/find/echezeaux+grand+cru+cote+de+nuits+france"
+  },
+
+"chambertin":{
     "zh": "香貝丹",
     "level": "特級園 (Grand Cru)",
     "village": "Gevrey-Chambertin",
-    "notes": "被譽為『王者之酒』，拿破崙的最愛。風格強勁、結構宏大、充滿力量感。香氣以深色莓果、甘草、泥土和野味為主，單寧堅實，陳年潛力極佳，展現出無與倫比的深度與複雜性。",
+    "area_ha": 13.14,
+    "soil": "坡上為堅硬的石灰岩，坡下為深厚的黏土和泥灰岩。多石塊，排水良好。",
+    "aspect": "正東",
+    "elevation": "海拔 275-300 公尺",
+    "style_note": "被譽為『王者之酒』，風格強勁、結構宏大、充滿力量感。香氣以深色莓果、甘草、泥土和野味為主，陳年潛力極佳。",
+    "notes": "拿破崙最愛的葡萄酒。是 Gevrey-Chambertin 所有特級園的基準和核心。",
     "link": "https://www.wine-searcher.com/find/chambertin+grand+cru+cote+de+nuits+france"
   },
   "chambertinclosdebeze": {
     "zh": "香貝丹-貝日園",
     "level": "特級園 (Grand Cru)",
     "village": "Gevrey-Chambertin",
-    "notes": "歷史比香貝丹更悠久，法律上它也可以標示為香貝丹。風格與香貝丹同樣強勁，但常被認為多了一份優雅與精緻的紅色水果香氣，結構同樣宏大，尾韻極長。",
+    "area_ha": 15.40,
+    "soil": "與 Chambertin 土壤相似，但表土較薄，含有更多石灰岩碎石。",
+    "aspect": "正東",
+    "elevation": "海拔 260-290 公尺",
+    "style_note": "風格與 Chambertin 同樣強勁，但常被認為多了一份優雅與精緻的紅色水果香氣，結構宏大，尾韻極長。",
+    "notes": "歷史比 Chambertin 更悠久，是勃根地最早的葡萄園之一。法律上，該園的酒可以標示為 Chambertin。",
     "link": "https://www.wine-searcher.com/find/chambertin+clos+de+beze+grand+cru+cote+de+nuits+france"
   },
+
   "musigny": {
     "zh": "蜜思妮",
     "level": "特級園 (Grand Cru)",
     "village": "Chambolle-Musigny",
-    "notes": "被譽為『皇后之酒』，是優雅與力量的完美結合。香氣空靈，充滿覆盆子、紫羅蘭、牡丹與礦石的氣息。口感如絲綢般細膩，結構卻如鋼鐵般堅實，尾韻層次豐富，彷彿孔雀開屏。",
+    "area_ha": 10.86,
+    "soil": "表土非常薄，底層為堅硬的石灰岩。石塊多，黏土少，土壤呈淡色。",
+    "aspect": "東南",
+    "elevation": "海拔 270-300 公尺",
+    "style_note": "被譽為『皇后之酒』，是優雅與力量的完美結合。香氣空靈，充滿覆盆子、紫羅蘭、牡丹與礦石的氣息。口感細膩，尾韻層次豐富。",
+    "notes": "是 Côte de Nuits 唯一一個可以生產少量白葡萄酒（約 0.61 ha）的特級園。",
     "link": "https://www.wine-searcher.com/find/musigny+grand+cru+cote+de+nuits+france"
   },
-  "echezeaux": {
-    "zh": "艾雪索",
-    "level": "特級園 (Grand Cru)",
-    "village": "Flagey-Echézeaux",
-    "notes": "面積較大，橫跨多個不同的小地塊 (Lieux-dits)，因此風格多變。通常被認為比鄰近的 Grands-Échezeaux 更為輕盈、奔放，帶有紅色水果、香料與花香，口感較為柔和，更早進入適飲期。",
-    "link": "https://www.wine-searcher.com/find/echezeaux+grand+cru+cote+de+nuits+france"
-  },
-  "grandsechezeaux": {
-    "zh": "大-艾雪索",
-    "level": "特級園 (Grand Cru)",
-    "village": "Flagey-Echézeaux",
-    "notes": "雖然名字裡有『大』，但面積遠小於 Echézeaux，且品質普遍更高。風格更為嚴謹、集中、深邃，結構感更強，香氣以黑色水果和泥土氣息為主，需要更長的陳年時間。",
-    "link": "https://www.wine-searcher.com/find/grands+echezeaux+grand+cru+cote+de+nuits+france"
-  },
+
   
   "lesamoureuseschambollemusigny": {
     "zh": "愛侶園",
     "level": "一級園 (Premier Cru)",
     "village": "Chambolle-Musigny",
-    "notes": "位於特級園 Musigny 正下方，被公認為是 Chambolle-Musigny 最優雅、最細緻的 PC，常被譽為『勃根地最貴的 PC』。香氣極為芳香，以玫瑰花、紫羅蘭和甜美的紅色水果為主。",
+    "area_ha": 5.40,
+    "soil": "與 Musigny 共享相似的優質風土，表土薄，多石灰岩碎石和少量紅色黏土，排水性極佳。",
+    "aspect": "東南",
+    "elevation": "海拔 250-300 公尺",
+    "style_note": "極致芳香、細膩柔美。以玫瑰花、紫羅蘭和甜美覆盆子香氣為主。口感如絲綢，結構細巧而優雅。被譽為『勃根地最貴的 PC』。",
+    "notes": "位於特級園 Musigny 正下方，因其超高的品質和極度女性化的風格而聞名。",
     "link": "https://www.wine-searcher.com/find/les+amoureuses+1er+cru+chambolle+musigny+cote+de+nuits+france"
   }
 }
