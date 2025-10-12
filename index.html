@@ -16,9 +16,12 @@
     }
     .row{ display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap; }
     .ui input[type="text"]{ flex:1; padding:8px 10px; border:1px solid #ddd; border-radius:8px; font:inherit; }
-    /* 調整按鈕樣式以適應只有圖標 */
-    .btn-icon{ padding:6px 10px; border:1px solid #ddd; border-radius:8px; background:#f8f8f8; cursor:pointer; font:16px; width: auto; line-height: 1; }
-    .btn-icon:hover{ background:#eee; }
+    .btn{ padding:6px 10px; border:1px solid #ddd; border-radius:8px; background:#f8f8f8; cursor:pointer; font:12px; white-space:nowrap; }
+    .btn:hover{ background:#eee; }
+    label.small{ font-size:12px; color:#666; }
+    /* 新增的 UI 樣式 */
+    .slider-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 13px; }
+    .slider-row input[type="range"] { flex-grow: 1; }
 
     .legend{
       position:absolute; z-index:10; right:12px; bottom:12px; background:#fff; padding:10px;
@@ -39,10 +42,13 @@
     <div class="row"><b>AOC 篩選</b></div>
     <div class="row">
       <input id="q" type="text" placeholder="例如：Meursault / La Romanee">
-      <button class="btn-icon" id="clear">清除</button>
-      <button class="btn-icon" id="showAll">全部</button>
-      <!-- 酒莊按鈕：只保留圖標 -->
-      <button class="btn-icon" id="toggleWineries" title="酒莊顯示/隱藏">🍷</button>
+      <button class="btn" id="clear">清除</button>
+      <button class="btn" id="showAll">全部</button>
+    </div>
+    
+    <!-- 酒莊顯示按鈕 -->
+    <div class="row" style="margin-top: -8px;">
+        <button class="btn" id="toggleWineries" style="width: 100%;">🍷 </button>
     </div>
   </div>
 
@@ -55,11 +61,10 @@
   </div>
 
   <script>
-    // ====== 設定（固定值）======
+    // ====== 設定 ======
     const AOC_DATA_FILE = './burgundy.geojson';
     const WINERY_DATA_FILE = './wineries.geojson';
-    // 鎖定視角和誇張度
-    const START = { lng: 4.80, lat: 47.00, zoom: 8.8, pitch: 45, bearing: 0, exaggeration: 3.0 };
+    const START = { lng: 4.80, lat: 47.00, zoom: 8.8, pitch: 45, bearing: 0 };
 
 
     // ====== 名稱正規化 & 分級判定 ======
@@ -212,10 +217,8 @@
         layers: [
           { id: 'osm', type: 'raster', source: 'osm' }
         ],
-        // 鎖定地形誇張度
-        terrain: { source: 'terrain-dem', exaggeration: START.exaggeration }
+        terrain: { source: 'terrain-dem', exaggeration: 3.0 }
       },
-      // 鎖定視角
       center: [START.lng, START.lat],
       zoom: START.zoom,
       pitch: START.pitch,
@@ -229,8 +232,7 @@
     // ====== 載入資料並建立圖層 ======
     let masterAOC = null;
     let currentFilterQ = '';
-    // 鎖定預設為隱藏
-    let wineriesVisible = false; 
+    let wineriesVisible = true;
 
     map.on('load', async () => {
 
@@ -243,11 +245,10 @@
         console.warn('meta.json 載入失敗：', e);
       }
 
-      // Sky + Hillshade (預設開啟)
+      // Sky + Hillshade
       map.addLayer({
         id: 'sky',
         type: 'sky',
-        layout: { 'visibility': 'visible' }, 
         paint: {
           'sky-type': 'atmosphere',
           'sky-atmosphere-sun': [0.0, 0.0],
@@ -259,7 +260,7 @@
         id: 'hillshade',
         type: 'hillshade',
         source: 'terrain-dem',
-        layout: { 'visibility': 'visible' }, // 預設開啟
+        layout: { visibility: 'visible' },
         paint: {
           'hillshade-exaggeration': 0.5,
           'hillshade-shadow-color': 'rgba(0,0,0,0.55)',
@@ -361,10 +362,13 @@
         const info = parseAOC(f.properties || {});
         const levelText = { GC:'Grand Cru', PC:'Premier Cru', VI:'Village', RE:'Régionale / 其他' }[info.level] || 'AOC';
         
+        // 確保地塊/地點的標籤正確且不重複
         let subText = '';
         if (info.level === 'PC') {
+            // Premier Cru: 顯示地塊
             subText = info.subtitle ? `地塊：${info.subtitle.replace('地塊：', '')}` : ''; 
         } else if (info.level === 'GC') {
+            // Grand Cru: 顯示地點
             subText = info.subtitle ? `地點：${info.subtitle.replace('地點：', '')}` : ''; 
         }
         
@@ -373,6 +377,7 @@
         const key = _norm(info.title || '');
         const meta = META[key] || null;
 
+        // 只有在有 meta 資料時才顯示 extra 區塊
         const extra = meta ? `
           <div style="margin-top:8px">
           <div class="small" style="margin-top:6px">
@@ -386,14 +391,15 @@
           </div>
         ` : '';
 
+        // 最終輸出：標題 -> 等級 -> 地塊/地點 -> Meta資料
         new maplibregl.Popup({ closeOnClick: true })
           .setLngLat(e.lngLat)
           .setHTML(
             `<div style="min-width:260px">
                <div style="font-weight:700">${info.title}</div>
                <div class="small" style="color:#666;margin-top:6px">等級：${levelText}</div>
-               ${subRow}
-               ${extra}
+               ${subRow}   <!-- 插入地塊/地點名 -->
+               ${extra}    <!-- 插入 meta 資料 (如果存在) -->
              </div>`
           )
           .addTo(map);
@@ -404,44 +410,25 @@
       const wFC = await wRes.json();
       map.addSource('wineries', { type: 'geojson', data: wFC });
       
-      // 複合圖層 1/2: 用透明圓點作點擊範圍 (預設隱藏)
-      map.addLayer({
-        id: 'wineries-hit',
-        type: 'circle',
-        source: 'wineries',
-        layout: { 'visibility': 'none' }, // 預設隱藏
-        paint: {
-          'circle-radius': 8,
-          'circle-color': '#7b1fa2',
-          'circle-opacity': 0 // 透明點
-        }
-      });
-
-      // 複合圖層 2/2: 用 symbol 顯示 🍷 符號 (預設隱藏)
+      // 使用 circle 確保穩定顯示
       map.addLayer({
         id: 'wineries',
-        type: 'symbol',
+        type: 'circle',
         source: 'wineries',
-        layout: { 
-            'visibility': 'none', // 預設隱藏
-            'text-field': '🍷', 
-            'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'], 
-            'text-size': 18,
-            'text-anchor': 'bottom',
-            'text-allow-overlap': true
-        },
+        layout: { 'visibility': 'visible' }, 
         paint: {
-            'text-color': '#7b1fa2', 
-            'text-halo-color': '#ffffff',
-            'text-halo-width': 1.5
+          'circle-radius': 4.5,
+          'circle-color': '#7b1fa2', // 紫色
+          'circle-stroke-width': 1,
+          'circle-stroke-color': '#ffffff'
         }
       });
       
-      // ===== 酒莊互動：滑入改游標、點擊顯示 popup（將點擊事件綁定到透明的 hit 層） =====
-      map.on('mouseenter', 'wineries-hit', () => { map.getCanvas().style.cursor = 'pointer'; });
-      map.on('mouseleave', 'wineries-hit', () => { map.getCanvas().style.cursor = ''; });
+      // ===== 酒莊互動：滑入改游標、點擊顯示 popup（含 meta 合併） =====
+      map.on('mouseenter', 'wineries', () => { map.getCanvas().style.cursor = 'pointer'; });
+      map.on('mouseleave', 'wineries', () => { map.getCanvas().style.cursor = ''; });
 
-      map.on('click', 'wineries-hit', (e) => { // 綁定到 hit 層
+      map.on('click', 'wineries', (e) => {
         const f = e.features && e.features[0];
         if (!f) return;
         const p = f.properties || {};
@@ -528,16 +515,59 @@
       
       // 🍷 酒莊顯示功能實作
       btnWineries.onclick = () => {
-        // 檢查 wineries-hit 層的狀態，因為它決定了點擊/互動
-        const currentVis = map.getLayoutProperty('wineries-hit', 'visibility') === 'visible';
+        const currentVis = map.getLayoutProperty('wineries', 'visibility') === 'visible';
         const newVis = currentVis ? 'none' : 'visible';
         
-        // 切換兩個圖層
-        map.setLayoutProperty('wineries-hit', 'visibility', newVis);
         map.setLayoutProperty('wineries', 'visibility', newVis);
-        
-        // 更新狀態
+        btnWineries.textContent = currentVis ? '🍷 酒莊顯示' : '🍷 酒莊隱藏';
         wineriesVisible = !currentVis;
+      };
+
+      // 視角控制程式碼 (已還原)
+      const pitchEl = document.getElementById('pitch');
+      const pitchVal = document.getElementById('pitchVal');
+      pitchEl.oninput = () => {
+        const v = Number(pitchEl.value)||0;
+        map.setPitch(v);
+        pitchVal.textContent = v + '°';
+      };
+
+      const bearingEl = document.getElementById('bearing');
+      const bearingVal = document.getElementById('bearingVal');
+      bearingEl.oninput = () => {
+        const v = Number(bearingEl.value)||0;
+        map.setBearing(v);
+        bearingVal.textContent = v + '°';
+      };
+
+      const exgEl = document.getElementById('exg');
+      const exgVal = document.getElementById('exgVal');
+      exgEl.oninput = () => {
+        const v = (Number(exgEl.value)||150) / 100; // 100% => 1.0
+        exgVal.textContent = (v*100).toFixed(0) + '%';
+        // 更新地形誇張度
+        const style = map.getStyle();
+        if (style && style.terrain) {
+          map.setTerrain({ source: 'terrain-dem', exaggeration: v });
+        }
+      };
+
+      document.getElementById('resetView').onclick = () => {
+        map.flyTo({ center:[START.lng, START.lat], zoom: START.zoom, pitch: START.pitch, bearing: START.bearing, duration: 700 });
+        pitchEl.value = START.pitch; pitchVal.textContent = START.pitch + '°';
+        bearingEl.value = START.bearing; bearingVal.textContent = START.bearing + '°';
+        exgEl.value = 150; exgVal.textContent = '150%';
+        const style = map.getStyle(); if (style && style.terrain) map.setTerrain({ source: 'terrain-dem', exaggeration: 1.5 });
+      };
+
+      // Hillshade / Sky 開關
+      document.getElementById('toggleShade').onclick = () => {
+        const vis = map.getLayoutProperty('hillshade', 'visibility') === 'visible' ? 'none' : 'visible';
+        map.setLayoutProperty('hillshade', 'visibility', vis);
+      };
+      document.getElementById('toggleSky').onclick = () => {
+        const vis = map.getLayoutProperty('sky', 'visibility') === 'visible' ? 'none' : 'visible';
+        map.setLayoutProperty('sky', 'visibility', vis);
       };
 
       // 初始顯示
