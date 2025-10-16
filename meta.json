@@ -1,127 +1,1856 @@
 {
-
-  "romaneeconti": {
-    "zh": "羅曼尼-康帝",
+  "chambertin": {
+    "zh": "香貝丹",
     "level": "特級園 (Grand Cru)",
-    "village": "Vosne-Romanée",
-    "area_ha": 1.63,
-    "soil": "極薄的表土，主要為石灰岩和富含鐵質的泥灰岩，排水性極佳。底層為堅硬的巴通期石灰岩。",
-    "aspect": "正東略偏南",
-    "elevation": "海拔 255-270 公尺",
-    "style_note": "極致優雅、結構精巧、複雜度超群。香氣細緻，以紅色水果、紫羅蘭、紅茶和異國香料為主。單寧絲滑，具有無與倫比的陳年潛力。",
-    "notes": "DRC 獨佔園 (Monopole)。被譽為『天堂的味道』或『勃根地之魂』。面積雖小，但地位無可撼動。",
-    "link": "https://www.wine-searcher.com/find/dom+de+la+romanee+conti+romanee+conti+grand+cru+cote+de+nuits+france"
-  },
-  "latache": {
-    "zh": "拉塔希",
-    "level": "特級園 (Grand Cru)",
-    "village": "Vosne-Romanée",
-    "area_ha": 6.06,
-    "soil": "表土比 Romanée-Conti 稍深，富含黏土和石灰岩碎石，有助於鎖住水分。",
-    "aspect": "正東",
-    "elevation": "海拔 250-300 公尺",
-    "style_note": "風格比 Romanée-Conti 更為外放、熱情與華麗。充滿黑櫻桃、李子、玫瑰花瓣與一絲野性的氣息。口感豐滿，結構宏大，是力量與性感的代名詞。",
-    "notes": "DRC 獨佔園 (Monopole)。位於 Romanée-Conti 南側，是勃根地最容易辨識的風格之一。",
-    "link": "https://www.wine-searcher.com/find/dom+de+la+romanee+conti+la+tache+grand+cru+monopole+cote+de+nuits+france"
-  },
-  "richebourg": {
-    "zh": "李其堡",
-    "level": "特級園 (Grand Cru)",
-    "village": "Vosne-Romanée",
-    "area_ha": 8.03,
-    "soil": "深厚的石灰質棕色泥土，石灰岩含量高，排水性強。",
-    "aspect": "正東",
-    "elevation": "海拔 250-310 公尺",
-    "style_note": "風格雄壯、豐腴且深邃，被認為是力量最強勁的特級園之一。充滿濃郁的黑色水果、松露、皮革與煙燻風味，酒體飽滿，單寧強勁，陳年潛力極佳。",
-    "notes": "由多位頂級酒莊共同擁有。地塊南北向延伸，上坡和下坡的風格略有差異。",
-    "link": "https://www.wine-searcher.com/find/richebourg+grand+cru+cote+de+nuits+france"
-  },
-  "romaneesaintvivant": {
-    "zh": "羅曼尼-聖-維馮",
-    "level": "特級園 (Grand Cru)",
-    "village": "Vosne-Romanée",
-    "area_ha": 9.44,
-    "soil": "表土較深，以細膩的黏土和石灰岩組成，底層為堅硬岩石。",
-    "aspect": "正東",
-    "elevation": "海拔 240-280 公尺",
-    "style_note": "以其極致的優雅、精緻與芬芳而聞名。香氣細膩，以紅色莓果、紫羅蘭、紅茶和香料為主。口感絲滑，結構精巧，是 Vosne-Romanée 中最女性化、最細膩的特級園。",
-    "notes": "位於 Romanée-Conti 和 Richebourg 下方，是 DRC 擁有最大份額的特級園之一。",
-    "link": "https://www.wine-searcher.com/find/romanee+st+vivant+grand+cru+cote+de+nuits+france"
-  },
-  "grandsechezeaux": {
-    "zh": "大-艾雪索",
-    "level": "特級園 (Grand Cru)",
-    "village": "Flagey-Echézeaux",
-    "area_ha": 9.14,
-    "soil": "多石灰岩碎石，表土較薄且多孔，排水性極佳。",
+    "village": "Gevrey-Chambertin",
+    "area_ha": 12.9,
+    "soil": "坡上為堅硬石灰岩，坡下為黏土與泥灰岩混合，排水良好。",
     "aspect": "東南",
-    "elevation": "海拔 250-300 公尺",
-    "style_note": "風格更為嚴謹、集中、深邃，結構感強。香氣以黑色水果和泥土氣息為主，陳年時間比 Echézeaux 更長。",
-    "notes": "品質普遍優於 Echézeaux，因為其風土更為一致。大部分由 DRC 和 Clos de Vougeot 的繼承者擁有。",
-    "link": "https://www.wine-searcher.com/find/grands+echezeaux+grand+cru+cote+de+nuits+france"
+    "elevation": "260-300 公尺",
+    "style_note": "「王者之酒」風格雄渾、結構宏大、陳年潛力極佳。",
+    "notes": "拿破崙最愛的酒。為所有 Gevrey 特級園的標準。",
+    "link": "https://www.wine-searcher.com/find/chambertin"
+  },
+  "chambertinclosdebeze": {
+    "zh": "香貝丹-貝日園",
+    "level": "特級園 (Grand Cru)",
+    "village": "Gevrey-Chambertin",
+    "area_ha": 15.4,
+    "soil": "與 Chambertin 土壤相似，但表土較薄，含有更多石灰岩碎石。",
+    "aspect": "正東",
+    "elevation": "260-290 公尺",
+    "style_note": "風格強勁而帶有優雅的紅色水果香氣，結構宏大、尾韻極長。",
+    "notes": "歷史比 Chambertin 更悠久，為勃根地最早的葡萄園之一。",
+    "link": "https://www.wine-searcher.com/find/chambertin+clos+debeze"
+  },
+  "mazischambertin": {
+    "zh": "馬吉-香貝丹",
+    "level": "特級園 (Grand Cru)",
+    "village": "Gevrey-Chambertin",
+    "area_ha": 8.3,
+    "soil": "表土深厚且富含鐵質的黏土與石灰岩碎石，排水良好。",
+    "aspect": "東南",
+    "elevation": "260-300 公尺",
+    "style_note": "風格強勁厚實，帶黑莓、皮革與松露香氣。",
+    "notes": "為最接近 Chambertin 的風格，被視為「Chambertin 的兄弟」。",
+    "link": "https://www.wine-searcher.com/find/mazis+chambertin"
+  },
+  "ruchotteschambertin": {
+    "zh": "魯紹特-香貝丹",
+    "level": "特級園 (Grand Cru)",
+    "village": "Gevrey-Chambertin",
+    "area_ha": 3.3,
+    "soil": "土壤貧瘠，多石灰岩與小石塊。",
+    "aspect": "東南",
+    "elevation": "260-300 公尺",
+    "style_note": "風格優雅、礦物感強、香氣細緻。",
+    "notes": "最小的 Gevrey 特級園之一。",
+    "link": "https://www.wine-searcher.com/find/ruchottes+chambertin"
+  },
+  "closdelaroche": {
+    "zh": "拉羅許園",
+    "level": "特級園 (Grand Cru)",
+    "village": "Morey-Saint-Denis",
+    "area_ha": 16.9,
+    "soil": "表土深厚，黏土與石灰岩混合，礦物質豐富。",
+    "aspect": "東南",
+    "elevation": "250-300 公尺",
+    "style_note": "風格強勁、結構嚴謹，具有黑色水果、皮革與香料風味。",
+    "notes": "Morey-Saint-Denis 最大的特級園，名氣僅次於 Chambertin。",
+    "link": "https://www.wine-searcher.com/find/clos+de+la+roche"
+  },
+  "clossaintdenis": {
+    "zh": "聖丹尼園",
+    "level": "特級園 (Grand Cru)",
+    "village": "Morey-Saint-Denis",
+    "area_ha": 6.6,
+    "soil": "石灰岩比例高，表土淺薄，富含礦物質。",
+    "aspect": "東南",
+    "elevation": "260-290 公尺",
+    "style_note": "風格柔和細膩，果香與花香兼具，帶玫瑰與紅莓氣息。",
+    "notes": "Morey-Saint-Denis 最具女性化與優雅的特級園。",
+    "link": "https://www.wine-searcher.com/find/clos+saint+denis"
+  },
+  "closdeslambrays": {
+    "link": "https://www.wine-searcher.com/find/clos%2Bdes%2Blambrays"
+  },
+  "closdetart": {
+    "zh": "塔爾園",
+    "level": "特級園 (Grand Cru)",
+    "village": "Morey-Saint-Denis",
+    "area_ha": 7.53,
+    "soil": "坡地石灰岩底層，表土含黏土與碎石。",
+    "aspect": "東南",
+    "elevation": "260-300 公尺",
+    "style_note": "酒體濃郁、層次豐富，帶黑莓、紫羅蘭與香料氣息。",
+    "notes": "歷史悠久，1130 年建成，Domaine Clos de Tart 為 Monopole。",
+    "link": "https://www.wine-searcher.com/find/clos+de+tart"
+  },
+  "bonnesmares": {
+    "zh": "邦馬園",
+    "level": "特級園 (Grand Cru)",
+    "village": "Morey-Saint-Denis / Chambolle-Musigny",
+    "area_ha": 15.06,
+    "soil": "土壤異質性高，上坡多石灰岩，下坡富黏土。",
+    "aspect": "東南",
+    "elevation": "250-300 公尺",
+    "style_note": "風格介於力量與優雅之間，兼具深度與香氣。",
+    "notes": "地塊橫跨兩村，是兩村共享的特級園之一。",
+    "link": "https://www.wine-searcher.com/find/bonnes+mares"
+  },
+  "musigny": {
+    "zh": "蜜思妮",
+    "level": "特級園 (Grand Cru)",
+    "village": "Chambolle-Musigny",
+    "area_ha": 10.86,
+    "soil": "表土極薄，多石灰岩碎石與白色泥灰岩。",
+    "aspect": "東南",
+    "elevation": "270-300 公尺",
+    "style_note": "被譽為「皇后之酒」，優雅細膩、結構完美，果香與花香並重。",
+    "notes": "唯一能生產白酒的 Côte de Nuits 特級園（約 0.6 ha）。",
+    "link": "https://www.wine-searcher.com/find/musigny"
+  },
+  "closdevougeot": {
+    "zh": "伏舊園",
+    "level": "特級園 (Grand Cru)",
+    "village": "Vougeot",
+    "area_ha": 50.96,
+    "soil": "上坡：石灰岩；中坡：黏土與石灰混合；下坡：深黏土。",
+    "aspect": "東南",
+    "elevation": "240-275 公尺",
+    "style_note": "風格多變，從濃郁厚重到柔和優雅皆有。",
+    "notes": "勃根地最大單一圍牆特級園，由約 80 家酒莊分持。",
+    "link": "https://www.wine-searcher.com/find/clos+de+vougeot"
   },
   "echezeaux": {
     "zh": "艾雪索",
     "level": "特級園 (Grand Cru)",
     "village": "Flagey-Echézeaux",
     "area_ha": 37.69,
-    "soil": "地塊異質性高，土壤從黏土到石灰岩碎石不一，導致風格多變。",
+    "soil": "土壤異質性高，從黏土到石灰岩碎石皆有。",
     "aspect": "東至東南",
-    "elevation": "海拔 240-330 公尺",
-    "style_note": "風格多變，通常比 Grands-Échezeaux 輕盈、奔放，帶有紅色水果、香料與花香，口感較柔和，更早進入適飲期。",
-    "notes": "由多達 80 個擁有者分享，涵蓋 11 個不同的小地塊（Lieux-dits）。勃根地面積最大的特級園之一。",
-    "link": "https://www.wine-searcher.com/find/echezeaux+grand+cru+cote+de+nuits+france"
+    "elevation": "240-330 公尺",
+    "style_note": "風格多樣，通常比 Grands-Échezeaux 輕盈、奔放，帶紅色水果與花香。",
+    "notes": "擁有者超過 80 家，是面積最大的特級園之一。",
+    "link": "https://www.wine-searcher.com/find/echezeaux"
   },
-
-"chambertin":{
-    "zh": "香貝丹",
+  "grandsechezeaux": {
+    "zh": "大艾雪索",
     "level": "特級園 (Grand Cru)",
-    "village": "Gevrey-Chambertin",
-    "area_ha": 13.14,
-    "soil": "坡上為堅硬的石灰岩，坡下為深厚的黏土和泥灰岩。多石塊，排水良好。",
-    "aspect": "正東",
-    "elevation": "海拔 275-300 公尺",
-    "style_note": "被譽為『王者之酒』，風格強勁、結構宏大、充滿力量感。香氣以深色莓果、甘草、泥土和野味為主，陳年潛力極佳。",
-    "notes": "拿破崙最愛的葡萄酒。是 Gevrey-Chambertin 所有特級園的基準和核心。",
-    "link": "https://www.wine-searcher.com/find/chambertin+grand+cru+cote+de+nuits+france"
-  },
-  "chambertinclosdebeze": {
-    "zh": "香貝丹-貝日園",
-    "level": "特級園 (Grand Cru)",
-    "village": "Gevrey-Chambertin",
-    "area_ha": 15.40,
-    "soil": "與 Chambertin 土壤相似，但表土較薄，含有更多石灰岩碎石。",
-    "aspect": "正東",
-    "elevation": "海拔 260-290 公尺",
-    "style_note": "風格與 Chambertin 同樣強勁，但常被認為多了一份優雅與精緻的紅色水果香氣，結構宏大，尾韻極長。",
-    "notes": "歷史比 Chambertin 更悠久，是勃根地最早的葡萄園之一。法律上，該園的酒可以標示為 Chambertin。",
-    "link": "https://www.wine-searcher.com/find/chambertin+clos+de+beze+grand+cru+cote+de+nuits+france"
-  },
-
-  "musigny": {
-    "zh": "蜜思妮",
-    "level": "特級園 (Grand Cru)",
-    "village": "Chambolle-Musigny",
-    "area_ha": 10.86,
-    "soil": "表土非常薄，底層為堅硬的石灰岩。石塊多，黏土少，土壤呈淡色。",
+    "village": "Flagey-Echézeaux",
+    "area_ha": 9.14,
+    "soil": "多石灰岩碎石，表土薄且排水性佳。",
     "aspect": "東南",
-    "elevation": "海拔 270-300 公尺",
-    "style_note": "被譽為『皇后之酒』，是優雅與力量的完美結合。香氣空靈，充滿覆盆子、紫羅蘭、牡丹與礦石的氣息。口感細膩，尾韻層次豐富。",
-    "notes": "是 Côte de Nuits 唯一一個可以生產少量白葡萄酒（約 0.61 ha）的特級園。",
-    "link": "https://www.wine-searcher.com/find/musigny+grand+cru+cote+de+nuits+france"
+    "elevation": "250-300 公尺",
+    "style_note": "風格集中、深邃、陳年潛力強。",
+    "notes": "品質穩定一致，被認為優於 Échezeaux。",
+    "link": "https://www.wine-searcher.com/find/grands+echezeaux"
   },
-
-  
-  "lesamoureuseschambollemusigny": {
+  "richebourg": {
+    "zh": "李其堡",
+    "level": "特級園 (Grand Cru)",
+    "village": "Vosne-Romanée",
+    "area_ha": 8.03,
+    "soil": "深厚的石灰質棕色泥土，排水良好。",
+    "aspect": "正東",
+    "elevation": "250-310 公尺",
+    "style_note": "風格雄壯飽滿，黑色水果、松露、皮革香氣明顯。",
+    "notes": "結構強勁，陳年潛力極佳。",
+    "link": "https://www.wine-searcher.com/find/richebourg"
+  },
+  "romaneesaintvivant": {
+    "zh": "羅曼尼-聖-維馮",
+    "level": "特級園 (Grand Cru)",
+    "village": "Vosne-Romanée",
+    "area_ha": 9.44,
+    "soil": "表土較深，以細黏土與石灰岩為主。",
+    "aspect": "正東",
+    "elevation": "240-280 公尺",
+    "style_note": "以優雅與芬芳聞名，紅莓、紫羅蘭、紅茶香氣。",
+    "notes": "最具女性化的 Vosne-Romanée 風格。名稱源於中世紀的聖維馮修道院（Abbaye de Saint-Vivant de Vergy），意為「屬於聖維馮的羅曼尼」",
+    "link": "https://www.wine-searcher.com/find/romanee+saint+vivant"
+  },
+  "laromanee": {
+    "zh": "拉羅曼尼",
+    "level": "特級園 (Grand Cru)",
+    "village": "Vosne-Romanée",
+    "area_ha": 0.85,
+    "soil": "淺層石灰岩與紅黏土混合，坡度大。",
+    "aspect": "東南",
+    "elevation": "260-280 公尺",
+    "style_note": "極度集中與細膩，紫羅蘭、香料與礦物香。",
+    "notes": "全世界最小的 AOC，Monopole：Domaine du Comte Liger-Belair。",
+    "link": "https://www.wine-searcher.com/find/la+romanee"
+  },
+  "romaneeconti": {
+    "zh": "羅曼尼-康帝",
+    "level": "特級園 (Grand Cru)",
+    "village": "Vosne-Romanée",
+    "area_ha": 1.63,
+    "soil": "極薄表土，主要為石灰岩與富鐵泥灰岩。",
+    "aspect": "正東略偏南",
+    "elevation": "255-270 公尺",
+    "style_note": "極致優雅、結構精巧、香氣細緻。",
+    "notes": "DRC 獨佔園（Monopole），被譽為「天堂的味道」。",
+    "link": "https://www.wine-searcher.com/find/romanee+conti"
+  },
+  "latache": {
+    "zh": "拉塔希",
+    "level": "特級園 (Grand Cru)",
+    "village": "Vosne-Romanée",
+    "area_ha": 6.06,
+    "soil": "表土略厚於 Romanée-Conti，含黏土與石灰岩碎石。",
+    "aspect": "正東",
+    "elevation": "250-300 公尺",
+    "style_note": "風格外放華麗，充滿黑櫻桃與玫瑰香。",
+    "notes": "DRC 獨佔園，力量與性感兼具。",
+    "link": "https://www.wine-searcher.com/find/la+tache"
+  },
+  "mazoyereschambertin": {
+    "zh": "瑪索耶爾-香貝丹",
+    "level": "特級園 (Grand Cru)",
+    "village": "Gevrey-Chambertin",
+    "area_ha": 18.58,
+    "soil": "表土深厚，黏土比例高，礦物感強。",
+    "aspect": "東南",
+    "elevation": "260-290 公尺",
+    "style_note": "風格厚重、結構紮實，黑莓與甘草香氣。",
+    "notes": "可用「Charmes-Chambertin」名稱銷售，實際面積更大。",
+    "link": "https://www.wine-searcher.com/find/mazoyeres+chambertin"
+  },
+  "charmeschambertin": {
+    "zh": "夏姆-香貝丹",
+    "level": "特級園 (Grand Cru)",
+    "village": "Gevrey-Chambertin",
+    "area_ha": 12.24,
+    "soil": "表土較厚，黏土比例高，排水性良好。",
+    "aspect": "東南",
+    "elevation": "250-280 公尺",
+    "style_note": "風格圓潤柔和，香氣甜美，紅果與花香為主。",
+    "notes": "風格親和，被稱為「王者的柔情」。",
+    "link": "https://www.wine-searcher.com/find/charmes+chambertin"
+  },
+  "griottechambertin": {
+    "zh": "格里奧特-香貝丹",
+    "level": "特級園 (Grand Cru)",
+    "village": "Gevrey-Chambertin",
+    "area_ha": 2.73,
+    "soil": "土壤為細黏土與石灰岩混合，深層排水佳。",
+    "aspect": "東南",
+    "elevation": "260-280 公尺",
+    "style_note": "風格精緻細膩，櫻桃、玫瑰與香料香。",
+    "notes": "最小且最迷人的特級園之一。",
+    "link": "https://www.wine-searcher.com/find/griotte+chambertin"
+  },
+  "latriciereschambertin": {
+    "zh": "拉特里謝爾-香貝丹",
+    "level": "特級園 (Grand Cru)",
+    "village": "Gevrey-Chambertin",
+    "area_ha": 7.35,
+    "soil": "表層薄而多石，石灰岩碎石豐富，排水佳。",
+    "aspect": "東南",
+    "elevation": "260-290 公尺",
+    "style_note": "風格冷峻緊緻，黑莓與礦石風味明顯。",
+    "notes": "比 Chambertin 更具礦物感與嚴謹結構。",
+    "link": "https://www.wine-searcher.com/find/latricieres+chambertin"
+  },
+  "lagranderue": {
+    "zh": "拉格宏德路園",
+    "level": "特級園 (Grand Cru)",
+    "village": "Vosne-Romanée",
+    "area_ha": 1.65,
+    "soil": "細黏土與石灰岩混合，坡度緩、排水佳。",
+    "aspect": "正東",
+    "elevation": "260-280 公尺",
+    "style_note": "風格介於 La Tâche 與 Romanée-Conti 之間，兼具優雅與深度。",
+    "notes": "Monopole：Domaine Lamarche，1992 年升格為特級園。",
+    "link": "https://www.wine-searcher.com/find/la+grande+rue"
+  },
+  "corton": {
+    "zh": "科通",
+    "level": "特級園 (Grand Cru)",
+    "village": "Aloxe-Corton / Ladoix-Serrigny / Pernand-Vergelesses",
+    "area_ha": 94,
+    "soil": "上坡石灰岩、下坡富黏土與鐵質，適合紅白皆產。",
+    "aspect": "東南至東",
+    "elevation": "250-330 公尺",
+    "style_note": "紅酒：結構強勁、單寧厚實；白酒：圓潤飽滿、礦物感強。",
+    "notes": "伯恩丘唯一同時產紅白兩色的特級園。",
+    "link": "https://www.wine-searcher.com/find/corton"
+  },
+  "cortoncharlemagne": {
+    "zh": "科通-夏里曼",
+    "level": "特級園 (Grand Cru)",
+    "village": "Aloxe-Corton / Pernand-Vergelesses",
+    "area_ha": 52.4,
+    "soil": "石灰岩與白色泥灰岩，坡度大、排水佳。",
+    "aspect": "南至西南",
+    "elevation": "280-330 公尺",
+    "style_note": "白酒：礦物感強烈、酸度高、層次深厚。",
+    "notes": "據傳為查理曼大帝最愛的白酒。",
+    "link": "https://www.wine-searcher.com/find/corton+charlemagne"
+  },
+  "charlemagne": {
+    "zh": "夏里曼",
+    "level": "特級園 (Grand Cru)",
+    "village": "Aloxe-Corton",
+    "area_ha": 0.28,
+    "soil": "與 Corton-Charlemagne 相似但表層更薄，多石灰岩。",
+    "aspect": "南至西南",
+    "elevation": "280-320 公尺",
+    "style_note": "白酒：細膩、花香與蜂蜜香氣，酸度柔和。",
+    "notes": "實際產量稀少，常併入 Corton-Charlemagne 銷售。",
+    "link": "https://www.wine-searcher.com/find/charlemagne"
+  },
+  "montrachet": {
+    "zh": "蒙哈榭",
+    "level": "特級園 (Grand Cru)",
+    "village": "Puligny-Montrachet / Chassagne-Montrachet",
+    "area_ha": 7.99,
+    "soil": "薄石灰岩與細黏土混合，極佳排水。",
+    "aspect": "東南",
+    "elevation": "260-300 公尺",
+    "style_note": "白酒：優雅均衡、香氣複雜、尾韻極長。",
+    "notes": "被譽為「白酒之王」。",
+    "link": "https://www.wine-searcher.com/find/montrachet"
+  },
+  "chevaliermontrachet": {
+    "zh": "騎士-蒙哈榭",
+    "level": "特級園 (Grand Cru)",
+    "village": "Puligny-Montrachet",
+    "area_ha": 7.47,
+    "soil": "白色石灰岩與薄黏土層，坡度陡峭。",
+    "aspect": "東南",
+    "elevation": "280-300 公尺",
+    "style_note": "白酒：礦物感強、結構緊緻、陳年力極佳。",
+    "notes": "位於 Montrachet 上方。",
+    "link": "https://www.wine-searcher.com/find/chevalier+montrachet"
+  },
+  "batardmontrachet": {
+    "zh": "巴塔-蒙哈榭",
+    "level": "特級園 (Grand Cru)",
+    "village": "Puligny-Montrachet / Chassagne-Montrachet",
+    "area_ha": 11.73,
+    "soil": "富含黏土與石灰岩，土層較厚。",
+    "aspect": "東南",
+    "elevation": "240-270 公尺",
+    "style_note": "白酒：濃郁飽滿、酒體厚重、尾韻悠長。",
+    "notes": "Montrachet 家族中產量最高的一園。",
+    "link": "https://www.wine-searcher.com/find/batard+montrachet"
+  },
+  "bienvenuesbatardmontrachet": {
+    "zh": "歡迎-巴塔-蒙哈榭",
+    "level": "特級園 (Grand Cru)",
+    "village": "Puligny-Montrachet",
+    "area_ha": 3.53,
+    "soil": "細黏土與石灰岩混合，土壤均勻。",
+    "aspect": "東南",
+    "elevation": "250-270 公尺",
+    "style_note": "白酒：優雅細膩、花香與蜂蜜香氣。",
+    "notes": "名字意為「歡迎來到 Bâtard-Montrachet」。",
+    "link": "https://www.wine-searcher.com/find/bienvenues+batard+montrachet"
+  },
+  "criotbatardmontrachet": {
+    "zh": "克里奧-巴塔-蒙哈榭",
+    "level": "特級園 (Grand Cru)",
+    "village": "Chassagne-Montrachet",
+    "area_ha": 1.57,
+    "soil": "薄石灰岩上覆紅黏土，礦物感強。",
+    "aspect": "東南",
+    "elevation": "240-260 公尺",
+    "style_note": "白酒：香氣濃郁、層次複雜、圓潤優雅。",
+    "notes": "Montrachet 家族中最小的特級園。",
+    "link": "https://www.wine-searcher.com/find/criot+batard+montrachet"
+  },
+  "lesclos": {
+    "zh": "雷克洛",
+    "level": "特級園 (Grand Cru)",
+    "village": "Chablis",
+    "area_ha": 25.9,
+    "soil": "基質為 Kimmeridgian 石灰岩與貝殼化石，表土薄。",
+    "aspect": "南至西南",
+    "elevation": "130-170 公尺",
+    "style_note": "結構強勁、深邃集中，是 Chablis 最具代表性的特級園。",
+    "notes": "被譽為「Chablis 之王」，陳年潛力極佳。",
+    "link": "https://www.wine-searcher.com/find/chablis+les+clos"
+  },
+  "vaudesir": {
+    "zh": "沃德希",
+    "level": "特級園 (Grand Cru)",
+    "village": "Chablis",
+    "area_ha": 14.7,
+    "soil": "坡度陡峭，石灰岩與白色泥灰岩混合。",
+    "aspect": "東南與西南兩坡",
+    "elevation": "150-180 公尺",
+    "style_note": "香氣細膩，口感圓潤，果香與花香並重。",
+    "notes": "地形呈馬蹄形，日照充足，風格柔美。",
+    "link": "https://www.wine-searcher.com/find/chablis+vaudesir"
+  },
+  "valmur": {
+    "zh": "瓦穆爾",
+    "level": "特級園 (Grand Cru)",
+    "village": "Chablis",
+    "area_ha": 13.2,
+    "soil": "白色泥灰岩與細黏土組成，富含貝殼化石。",
+    "aspect": "南至西南",
+    "elevation": "150-180 公尺",
+    "style_note": "酒體飽滿、結構緊緻，香氣花果兼具。",
+    "notes": "與 Les Clos 接壤，常被視為最平衡的特級園。",
+    "link": "https://www.wine-searcher.com/find/chablis+valmur"
+  },
+  "blanchot": {
+    "zh": "布朗肖",
+    "level": "特級園 (Grand Cru)",
+    "village": "Chablis",
+    "area_ha": 12.7,
+    "soil": "白色泥灰岩與石灰岩為主，排水佳。",
+    "aspect": "東南",
+    "elevation": "150-180 公尺",
+    "style_note": "香氣細緻柔和，帶白花、蜂蜜與礦物香。",
+    "notes": "最具女性化特質的 Chablis Grand Cru。",
+    "link": "https://www.wine-searcher.com/find/chablis+blanchot"
+  },
+  "bougros": {
+    "zh": "布格羅",
+    "level": "特級園 (Grand Cru)",
+    "village": "Chablis",
+    "area_ha": 15.9,
+    "soil": "富含白色泥灰岩與黏土，坡度陡。",
+    "aspect": "西北",
+    "elevation": "130-170 公尺",
+    "style_note": "酒體厚實、圓潤飽滿，礦物味強。",
+    "notes": "位於最西北側，風格最豐滿。",
+    "link": "https://www.wine-searcher.com/find/chablis+bougros"
+  },
+  "preuses": {
+    "zh": "普勒茲",
+    "level": "特級園 (Grand Cru)",
+    "village": "Chablis",
+    "area_ha": 11.4,
+    "soil": "石灰岩與白色泥灰岩交錯，富貝殼化石。",
+    "aspect": "西南",
+    "elevation": "150-180 公尺",
+    "style_note": "最優雅柔和的 Chablis Grand Cru，帶白花與礦物香。",
+    "notes": "風格輕盈細膩、酸度平衡。",
+    "link": "https://www.wine-searcher.com/find/chablis+les+preuses"
+  },
+  "grenouilles": {
+    "zh": "格努伊",
+    "level": "特級園 (Grand Cru)",
+    "village": "Chablis",
+    "area_ha": 9.4,
+    "style_note": "酒體圓潤柔美、香氣開放，帶蜂蜜與熟蘋果香。",
+    "notes": "Monopole：La Chablisienne。",
+    "link": "https://www.wine-searcher.com/find/chablis+grenouilles"
+  },
+  "lesamoureuses": {
     "zh": "愛侶園",
     "level": "一級園 (Premier Cru)",
     "village": "Chambolle-Musigny",
-    "area_ha": 5.40,
-    "soil": "與 Musigny 共享相似的優質風土，表土薄，多石灰岩碎石和少量紅色黏土，排水性極佳。",
+    "area_ha": 5.4,
+    "soil": "表土薄、富石灰岩碎石與少量紅色黏土，排水極佳。",
     "aspect": "東南",
-    "elevation": "海拔 250-300 公尺",
-    "style_note": "極致芳香、細膩柔美。以玫瑰花、紫羅蘭和甜美覆盆子香氣為主。口感如絲綢，結構細巧而優雅。被譽為『勃根地最貴的 PC』。",
-    "notes": "位於特級園 Musigny 正下方，因其超高的品質和極度女性化的風格而聞名。",
-    "link": "https://www.wine-searcher.com/find/les+amoureuses+1er+cru+chambolle+musigny+cote+de+nuits+france"
+    "elevation": "250-300 公尺",
+    "style_note": "極致芳香、細膩柔美。以玫瑰花、紫羅蘭與甜美覆盆子香氣為主，口感如絲綢。",
+    "notes": "位於特級園 Musigny 正下方，品質極高，被譽為「勃根地最貴的一級園」。",
+    "link": "https://www.wine-searcher.com/find/les+amoureuses+chambolle+musigny"
+  },
+  "closnapoleon": {
+    "zh": "拿破崙園",
+    "level": "一級園 (Premier Cru)",
+    "village": "Fixin",
+    "area_ha": 3.8,
+    "soil": "表層石灰岩與紅黏土混合，礦物質豐富。",
+    "aspect": "東南",
+    "elevation": "300 公尺",
+    "style_note": "結構緊緻、酒體厚實、帶紅莓與煙草氣息。",
+    "notes": "以拿破崙禁衛軍上尉 Claude Noisot 命名，他退役後回鄉釀酒，為紀念拿破崙而改名 Clos Napoléon，並在園旁建立「Parc Noisot」紀念公園，內有拿破崙雕像。",
+    "link": "https://www.wine-searcher.com/find/clos+napoleon+fixin"
+  },
+  "closduchapitre": {
+    "zh": "夏普特園",
+    "level": "一級園 (Premier Cru)",
+    "village": "Fixin",
+    "area_ha": 4.5,
+    "soil": "富含黏土與石灰岩，結構平衡。",
+    "aspect": "東南",
+    "elevation": "280 公尺",
+    "style_note": "風格優雅、香氣細膩，果味與酸度平衡佳。",
+    "notes": "名稱意指「主教會議院的園地」。",
+    "link": "https://www.wine-searcher.com/find/clos+du+chapitre+fixin"
+  },
+  "leshervelets": {
+    "zh": "艾赫弗雷",
+    "level": "一級園 (Premier Cru)",
+    "village": "Fixin",
+    "area_ha": 5,
+    "soil": "紅色黏土與石灰岩混合，坡度較大。",
+    "aspect": "東南",
+    "elevation": "280-320 公尺",
+    "style_note": "酒體飽滿、單寧堅實，帶黑櫻桃與香料氣息。",
+    "notes": "位於村北坡，與 Gevrey 接壤。",
+    "link": "https://www.wine-searcher.com/find/les+hervelets+fixin"
+  },
+  "lesarvelets": {
+    "zh": "阿爾弗雷園",
+    "level": "一級園 (Premier Cru)",
+    "village": "Fixin",
+    "area_ha": 2,
+    "soil": "表層薄黏土，底層石灰岩。",
+    "aspect": "東南",
+    "elevation": "290-310 公尺",
+    "style_note": "風格柔和，果香為主，酸度清爽。",
+    "notes": "小而精緻的園地，常與 Les Hervelets 混釀。",
+    "link": "https://www.wine-searcher.com/find/les+arvelets+fixin"
+  },
+  "lesmeixbas": {
+    "zh": "梅巴園",
+    "level": "一級園 (Premier Cru)",
+    "village": "Fixin",
+    "area_ha": 2.8,
+    "soil": "黏土含量高，土壤較深，適合產結構厚重的酒。",
+    "aspect": "東南",
+    "elevation": "270 公尺",
+    "style_note": "香氣濃郁、口感飽滿、尾韻略帶煙燻。",
+    "notes": "位於村莊南側，與 Marsannay 接近。",
+    "link": "https://www.wine-searcher.com/find/les+meix+bas+fixin"
+  },
+  "closdelaperriere": {
+    "zh": "佩里耶園",
+    "level": "一級園 (Premier Cru)",
+    "village": "Fixin",
+    "area_ha": 5.3,
+    "soil": "石灰岩碎石多，排水極佳。",
+    "aspect": "東南",
+    "elevation": "280-320 公尺",
+    "style_note": "結構嚴謹、香氣優雅、帶礦物感。",
+    "notes": "由修道士創建的歷史園地，被視為 Fixin 最潛力的一級園。",
+    "link": "https://www.wine-searcher.com/find/clos+de+la+perriere+fixin"
+  },
+  "clossaintjacques": {
+    "zh": "聖雅克園",
+    "level": "一級園 (Premier Cru)",
+    "village": "Gevrey-Chambertin",
+    "area_ha": 6.7,
+    "soil": "細黏土與石灰岩碎石混合，坡度均勻。",
+    "aspect": "東南",
+    "elevation": "280-300 公尺",
+    "style_note": "結構精緻、香氣深邃、礦物感強，常被視為「第 35 特級園」。",
+    "notes": "名稱來自聖雅各朝聖之路，為夜丘最受尊崇的一級園之一。",
+    "link": "https://www.wine-searcher.com/find/clos+saint+jacques+gevrey+chambertin"
+  },
+  "lescazetiers": {
+    "zh": "卡澤提耶園",
+    "level": "一級園 (Premier Cru)",
+    "village": "Gevrey-Chambertin",
+    "area_ha": 8.84,
+    "soil": "淺層石灰岩與紅黏土，礦物感明顯。",
+    "aspect": "東南",
+    "elevation": "280-310 公尺",
+    "style_note": "風格強勁厚實、結構宏大，帶黑櫻桃與松露香。",
+    "notes": "地勢高、緊鄰 Clos Saint-Jacques，被視為特級園等級之一。",
+    "link": "https://www.wine-searcher.com/find/les+cazetiers+gevrey+chambertin"
+  },
+  "lavauxsaintjacques": {
+    "zh": "拉沃聖雅克園",
+    "level": "一級園 (Premier Cru)",
+    "village": "Gevrey-Chambertin",
+    "area_ha": 9.53,
+    "soil": "表土深厚，含黏土與石灰岩。",
+    "aspect": "東南",
+    "elevation": "260-300 公尺",
+    "style_note": "酒體厚實，黑莓、甘草與礦物風味濃郁。",
+    "notes": "與 Clos Saint-Jacques 相連，名稱意為「聖雅克山谷」。",
+    "link": "https://www.wine-searcher.com/find/lavaux+saint+jacques+gevrey+chambertin"
+  },
+  "leschampeaux": {
+    "zh": "尚波園",
+    "level": "一級園 (Premier Cru)",
+    "village": "Gevrey-Chambertin",
+    "area_ha": 5.39,
+    "soil": "富含石灰岩碎石與紅黏土，坡度較高。",
+    "aspect": "東南",
+    "elevation": "300 公尺",
+    "style_note": "結構緊緻、香氣深沉，黑櫻桃與森林氣息明顯。",
+    "notes": "位於北坡高地，氣候涼爽，酒風優雅細膩。",
+    "link": "https://www.wine-searcher.com/find/les+champeaux+gevrey+chambertin"
+  },
+  "petitcazetiers": {
+    "zh": "小卡澤提耶園",
+    "level": "一級園 (Premier Cru)",
+    "village": "Gevrey-Chambertin",
+    "area_ha": 3.3,
+    "soil": "石灰岩碎石多、表土淺，排水良好。",
+    "aspect": "東南",
+    "elevation": "270-300 公尺",
+    "style_note": "風格類似 Cazetiers，但更纖細、果香明亮。",
+    "notes": "地勢較低、與 Les Cazetiers 接壤，被視為其延伸園。",
+    "link": "https://www.wine-searcher.com/find/petit+cazetiers+gevrey+chambertin"
+  },
+  "lescorbeaux": {
+    "zh": "科博園",
+    "level": "一級園 (Premier Cru)",
+    "village": "Gevrey-Chambertin",
+    "area_ha": 4.09,
+    "soil": "表土中等厚度，含石灰岩碎石與紅黏土。",
+    "aspect": "東南",
+    "elevation": "260-280 公尺",
+    "style_note": "風格濃郁、結構扎實、帶黑櫻桃與香料香。",
+    "notes": "名稱意為「烏鴉」，可能源自昔日棲息於此地的黑鳥群。",
+    "link": "https://www.wine-searcher.com/find/les+corbeaux+gevrey+chambertin"
+  },
+  "lesgoulots": {
+    "zh": "古洛園",
+    "level": "一級園 (Premier Cru)",
+    "village": "Gevrey-Chambertin",
+    "area_ha": 2.54,
+    "soil": "坡度大、石灰岩碎石多，排水良好。",
+    "aspect": "東南",
+    "elevation": "280-320 公尺",
+    "style_note": "風格緊緻、酸度明亮，礦物與紅果香氣。",
+    "notes": "名稱意指「狹窄的谷口」，反映地形形狀。",
+    "link": "https://www.wine-searcher.com/find/les+goulots+gevrey+chambertin"
+  },
+  "leschamponnets": {
+    "zh": "尚波內園",
+    "level": "一級園 (Premier Cru)",
+    "village": "Gevrey-Chambertin",
+    "area_ha": 5.4,
+    "soil": "黏土與石灰岩均衡，礦物感適中。",
+    "aspect": "東南",
+    "elevation": "260-280 公尺",
+    "style_note": "風格圓潤柔和、香氣花果兼具。",
+    "notes": "地名可能源於古語「champ」（田野），意指開闊平緩地。",
+    "link": "https://www.wine-searcher.com/find/les+champonnets+gevrey+chambertin"
+  },
+  "combeauxmoines": {
+    "zh": "僧侶谷園",
+    "level": "一級園 (Premier Cru)",
+    "village": "Gevrey-Chambertin",
+    "area_ha": 5.23,
+    "soil": "石灰岩碎石多，土壤淺、排水極佳。",
+    "aspect": "東南",
+    "elevation": "280-320 公尺",
+    "style_note": "風格緊實深邃、帶森林與香料氣息。",
+    "notes": "名稱意為「修道士之谷」，中世紀曾為修士耕種的園地。",
+    "link": "https://www.wine-searcher.com/find/combe+aux+moines+gevrey+chambertin"
+  },
+  "craipillot": {
+    "zh": "克雷皮洛園",
+    "level": "一級園 (Premier Cru)",
+    "village": "Gevrey-Chambertin",
+    "area_ha": 2.7,
+    "soil": "石灰岩礫石與黏土混合，表層薄。",
+    "aspect": "東南",
+    "elevation": "260 公尺",
+    "style_note": "風格細膩柔和，紅果香明顯。",
+    "notes": "名稱來自古法語「crepillo」，意指滿布小石的坡地。",
+    "link": "https://www.wine-searcher.com/find/craipillot+gevrey+chambertin"
+  },
+  "lescombottes": {
+    "zh": "孔博特園",
+    "level": "一級園 (Premier Cru)",
+    "village": "Gevrey-Chambertin",
+    "area_ha": 4.55,
+    "soil": "細黏土與石灰岩碎石混合，排水佳。",
+    "aspect": "東南",
+    "elevation": "270-300 公尺",
+    "style_note": "平衡優雅、結構柔順、帶紅莓果與礦物香氣。",
+    "notes": "位於三村交界處，地理位置獨特，被稱為「三村園」。",
+    "link": "https://www.wine-searcher.com/find/les+combottes+gevrey+chambertin"
+  },
+  "lesclosprieur": {
+    "zh": "修士園",
+    "level": "一級園 (Premier Cru)",
+    "village": "Gevrey-Chambertin",
+    "area_ha": 5.5,
+    "soil": "石灰岩與黏土交錯，排水良好。",
+    "aspect": "東南",
+    "elevation": "260-280 公尺",
+    "style_note": "平衡細緻、結構穩定、帶淡淡礦物香。",
+    "notes": "「Clos Prieur」意為「修士的園地」，曾屬修道院所有。",
+    "link": "https://www.wine-searcher.com/find/les+clos+prieur+gevrey+chambertin"
+  },
+  "lesevocelles": {
+    "zh": "艾沃塞勒園",
+    "level": "一級園 (Premier Cru)",
+    "village": "Gevrey-Chambertin",
+    "area_ha": 7,
+    "soil": "土壤薄、富含碎石與石灰岩。",
+    "aspect": "東南",
+    "elevation": "290-320 公尺",
+    "style_note": "香氣優雅、結構緊緻、酸度明亮。",
+    "notes": "名稱來自古法語「voisselle」，意為小山坡。",
+    "link": "https://www.wine-searcher.com/find/les+evocelles+gevrey+chambertin"
+  },
+  "lesjeunesrois": {
+    "zh": "青年王園",
+    "level": "一級園 (Premier Cru)",
+    "village": "Gevrey-Chambertin",
+    "area_ha": 3.2,
+    "soil": "紅黏土與細碎石灰岩組成，坡度緩。",
+    "aspect": "東南",
+    "elevation": "260 公尺",
+    "style_note": "口感圓潤、果味豐富、結構柔順。",
+    "notes": "「Jeunes Rois」意指「年輕的國王」，可能源於昔日地主家族名稱。",
+    "link": "https://www.wine-searcher.com/find/les+jeunes+rois+gevrey+chambertin"
+  },
+  "lesvaroilles": {
+    "zh": "瓦侯園",
+    "level": "一級園 (Premier Cru)",
+    "village": "Gevrey-Chambertin",
+    "area_ha": 9,
+    "soil": "中層石灰岩與紅黏土混合，肥力適中。",
+    "aspect": "東南",
+    "elevation": "260-290 公尺",
+    "style_note": "風格濃郁飽滿、香氣深沉、尾韻悠長。",
+    "notes": "名稱意為「小谷」，氣候溫和、地勢平緩。",
+    "link": "https://www.wine-searcher.com/find/les+varoilles+gevrey+chambertin"
+  },
+  "petitchapelle": {
+    "zh": "小教堂園",
+    "level": "一級園 (Premier Cru)",
+    "village": "Gevrey-Chambertin",
+    "area_ha": 5.4,
+    "soil": "黏土與石灰岩比例均衡，礦物感適中。",
+    "aspect": "東南",
+    "elevation": "260-280 公尺",
+    "style_note": "柔美細膩、果香優雅、口感圓潤。",
+    "notes": "名稱意為「小禮拜堂」，昔日附近曾有一座村中教堂。",
+    "link": "https://www.wine-searcher.com/find/petite+chapelle+gevrey+chambertin"
+  },
+  "climat_owners": {
+    "chambertin": [
+      {
+        "name": "Domaine Armand Rousseau Père et Fils",
+        "ha": 2.56,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Armand+Rousseau+chambertin"
+      },
+      {
+        "name": "Domaine Rossignol-Trapet",
+        "ha": 1.6,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Rossignol+Trapet+chambertin"
+      },
+      {
+        "name": "Domaine Jean-Louis Trapet",
+        "ha": 1.9,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Jean+Louis+Trapet+chambertin"
+      },
+      {
+        "name": "Maison Louis Latour",
+        "ha": 0.81,
+        "search_link": "https://www.wine-searcher.com/find/Louis+Latour+chambertin"
+      },
+      {
+        "name": "Domaine Leroy",
+        "ha": 0.5,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Leroy+chambertin"
+      },
+      {
+        "name": "Domaine Faiveley",
+        "ha": 0.5,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Faiveley+chambertin"
+      },
+      {
+        "name": "Olivier Bernstein",
+        "ha": 0.4,
+        "search_link": "https://www.wine-searcher.com/find/Olivier+Bernstein+chambertin"
+      },
+      {
+        "name": "Domaine Denis Mortet",
+        "ha": 0.3,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Denis+Mortet+chambertin"
+      }
+    ],
+    "chambertinclosdebeze": [
+      {
+        "name": "Domaine Drouhin-Laroze",
+        "ha": 1.5,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Drouhin+Laroze+chambertin+clos+debeze"
+      },
+      {
+        "name": "Domaine Armand Rousseau",
+        "ha": 1.42,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Armand+Rousseau+chambertin+clos+debeze"
+      },
+      {
+        "name": "Domaine Pierre Damoy",
+        "ha": 5.36,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Pierre+Damoy+chambertin+clos+debeze"
+      },
+      {
+        "name": "Domaine Faiveley",
+        "ha": 1.29,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Faiveley+chambertin+clos+debeze"
+      },
+      {
+        "name": "Domaine Bart",
+        "ha": 0.3,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Bart+chambertin+clos+debeze"
+      },
+      {
+        "name": "Olivier Bernstein",
+        "ha": 0.37,
+        "search_link": "https://www.wine-searcher.com/find/Olivier+Bernstein+chambertin+clos+debeze"
+      },
+      {
+        "name": "Domaine Bruno Clair",
+        "ha": 0.33,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Bruno+Clair+chambertin+clos+debeze"
+      },
+      {
+        "name": "Domaine Louis Jadot",
+        "ha": 0.41,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Louis+Jadot+chambertin+clos+debeze"
+      }
+    ],
+    "mazischambertin": [
+      {
+        "name": "Domaine Faiveley",
+        "ha": 1.56,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Faiveley+mazis+chambertin"
+      },
+      {
+        "name": "Domaine Harmand-Geoffroy",
+        "ha": 0.65,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Harmand+Geoffroy+mazis+chambertin"
+      },
+      {
+        "name": "Domaine Dugat-Py",
+        "ha": 0.3,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Dugat+Py+mazis+chambertin"
+      },
+      {
+        "name": "Domaine Rousseau",
+        "ha": 0.53,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Armand+Rousseau+mazis+chambertin"
+      },
+      {
+        "name": "Domaine Tawse",
+        "ha": 0.25,
+        "search_link": "https://www.wine-searcher.com/find/Tawse+mazis+chambertin"
+      },
+      {
+        "name": "Domaine Chantal Remy",
+        "ha": 0.2,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Chantal+Remy+mazis+chambertin"
+      },
+      {
+        "name": "Domaine Henri Rebourseau",
+        "ha": 0.5,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Henri+Rebourseau+mazis+chambertin"
+      }
+    ],
+    "ruchotteschambertin": [
+      {
+        "name": "Domaine Armand Rousseau",
+        "ha": 1.06,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Armand+Rousseau+ruchottes+chambertin"
+      },
+      {
+        "name": "Domaine Roumier",
+        "ha": 0.46,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Roumier+ruchottes+chambertin"
+      },
+      {
+        "name": "Domaine Georges Mugneret-Gibourg",
+        "ha": 0.39,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Georges+Mugneret+Gibourg+ruchottes+chambertin"
+      },
+      {
+        "name": "Domaine Humbert Frères",
+        "ha": 0.32,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Humbert+Freres+ruchottes+chambertin"
+      },
+      {
+        "name": "Domaine Fourrier",
+        "ha": 0.25,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Fourrier+ruchottes+chambertin"
+      }
+    ],
+    "closdelaroche": [
+      {
+        "name": "Domaine Dujac",
+        "ha": 1.95,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Dujac+clos+de+la+roche"
+      },
+      {
+        "name": "Domaine Ponsot",
+        "ha": 3.3,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Ponsot+clos+de+la+roche"
+      },
+      {
+        "name": "Domaine Lignier-Michelot",
+        "ha": 0.7,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Lignier+Michelot+clos+de+la+roche"
+      },
+      {
+        "name": "Domaine Arlaud",
+        "ha": 0.45,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Arlaud+clos+de+la+roche"
+      },
+      {
+        "name": "Domaine Hubert Lignier",
+        "ha": 0.45,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Hubert+Lignier+clos+de+la+roche"
+      },
+      {
+        "name": "Domaine Drouhin-Laroze",
+        "ha": 0.4,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Drouhin+Laroze+clos+de+la+roche"
+      },
+      {
+        "name": "Domaine Castagnier",
+        "ha": 0.3,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Castagnier+clos+de+la+roche"
+      }
+    ],
+    "clossaintdenis": [
+      {
+        "name": "Domaine Dujac",
+        "ha": 0.76,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Dujac+clos+saint+denis"
+      },
+      {
+        "name": "Domaine Georges Lignier",
+        "ha": 1.5,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Georges+Lignier+clos+saint+denis"
+      },
+      {
+        "name": "Domaine Ponsot",
+        "ha": 1.5,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Ponsot+clos+saint+denis"
+      },
+      {
+        "name": "Domaine Arlaud",
+        "ha": 0.3,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Arlaud+clos+saint+denis"
+      },
+      {
+        "name": "Domaine Castagnier",
+        "ha": 0.2,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Castagnier+clos+saint+denis"
+      },
+      {
+        "name": "Domaine Bertagna",
+        "ha": 0.3,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Bertagna+clos+saint+denis"
+      },
+      {
+        "name": "Domaine Drouhin-Laroze",
+        "ha": 0.25,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Drouhin+Laroze+clos+saint+denis"
+      }
+    ],
+    "closdeslambrays": [
+      {
+        "name": "Domaine des Lambrays",
+        "ha": 8.84,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+des+Lambrays+clos+des+lambrays"
+      },
+      {
+        "name": "Domaine Taupenot-Merme",
+        "ha": 0.1,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Taupenot+Merme+clos+des+lambrays"
+      }
+    ],
+    "closdetart": [
+      {
+        "name": "Domaine Clos de Tart",
+        "ha": 7.53,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Clos+de+Tart+clos+de+tart",
+        "is_monopole": true
+      }
+    ],
+    "bonnesmares": [
+      {
+        "name": "Domaine Georges Roumier",
+        "ha": 1.45,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Georges+Roumier+bonnes+mares"
+      },
+      {
+        "name": "Domaine de Vogüé",
+        "ha": 2.7,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Comte+Georges+de+Vogue+bonnes+mares"
+      },
+      {
+        "name": "Domaine Bart",
+        "ha": 0.8,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Bart+bonnes+mares"
+      },
+      {
+        "name": "Domaine Fougeray de Beauclair",
+        "ha": 1,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Fougeray+de+Beauclair+bonnes+mares"
+      },
+      {
+        "name": "Domaine Drouhin-Laroze",
+        "ha": 0.4,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Drouhin+Laroze+bonnes+mares"
+      },
+      {
+        "name": "Domaine Bruno Clair",
+        "ha": 0.3,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Bruno+Clair+bonnes+mares"
+      }
+    ],
+    "musigny": [
+      {
+        "name": "Domaine Comte Georges de Vogüé",
+        "ha": 7.12,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Comte+Georges+de+Vogue+musigny"
+      },
+      {
+        "name": "Domaine Leroy",
+        "ha": 0.27,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Leroy+musigny"
+      },
+      {
+        "name": "Domaine Jacques-Frédéric Mugnier",
+        "ha": 1.13,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Jacques+Frederic+Mugnier+musigny"
+      },
+      {
+        "name": "Domaine Roumier",
+        "ha": 0.1,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Georges+Roumier+musigny"
+      },
+      {
+        "name": "Domaine Faiveley",
+        "ha": 0.3,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Faiveley+musigny"
+      },
+      {
+        "name": "Domaine de la Vougeraie",
+        "ha": 0.2,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+de+la+Vougeraie+musigny"
+      }
+    ],
+    "closdevougeot": [
+      {
+        "name": "Domaine Méo-Camuzet",
+        "ha": 1.3,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Meo+Camuzet+clos+de+vougeot"
+      },
+      {
+        "name": "Domaine de la Vougeraie",
+        "ha": 1.8,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+de+la+Vougeraie+clos+de+vougeot"
+      },
+      {
+        "name": "Château de La Tour",
+        "ha": 5.48,
+        "search_link": "https://www.wine-searcher.com/find/Chateau+de+la+Tour+clos+de+vougeot"
+      },
+      {
+        "name": "Domaine Hudelot-Noëllat",
+        "ha": 0.7,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Hudelot+Noellat+clos+de+vougeot"
+      },
+      {
+        "name": "Domaine Anne Gros",
+        "ha": 0.93,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Anne+Gros+clos+de+vougeot"
+      },
+      {
+        "name": "Domaine Gros Frère et Soeur",
+        "ha": 1.5,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Gros+Frere+et+Soeur+clos+de+vougeot"
+      },
+      {
+        "name": "Domaine Joseph Drouhin",
+        "ha": 0.5,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Joseph+Drouhin+clos+de+vougeot"
+      }
+    ],
+    "echezeaux": [
+      {
+        "name": "Domaine de la Romanée-Conti",
+        "ha": 4.67,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+de+la+Romanee+Conti+echezeaux"
+      },
+      {
+        "name": "Domaine Mongeard-Mugneret",
+        "ha": 0.6,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Mongeard+Mugneret+echezeaux"
+      },
+      {
+        "name": "Domaine Gros Frère et Soeur",
+        "ha": 0.7,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Gros+Frere+et+Soeur+echezeaux"
+      },
+      {
+        "name": "Domaine Meo-Camuzet",
+        "ha": 0.3,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Meo+Camuzet+echezeaux"
+      },
+      {
+        "name": "Domaine Jean Grivot",
+        "ha": 0.4,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Jean+Grivot+echezeaux"
+      },
+      {
+        "name": "Domaine Emmanuel Rouget",
+        "ha": 0.55,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Emmanuel+Rouget+echezeaux"
+      },
+      {
+        "name": "Domaine Lamarche",
+        "ha": 0.32,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Lamarche+echezeaux"
+      },
+      {
+        "name": "Domaine Coquard-Loison-Fleurot",
+        "ha": 0.5,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Coquard+Loison+Fleurot+echezeaux"
+      }
+    ],
+    "grandsechezeaux": [
+      {
+        "name": "Domaine de la Romanée-Conti",
+        "ha": 3.53,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+de+la+Romanee+Conti+grands+echezeaux"
+      },
+      {
+        "name": "Domaine Mongeard-Mugneret",
+        "ha": 1.44,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Mongeard+Mugneret+grands+echezeaux"
+      },
+      {
+        "name": "Domaine Gros Frère et Soeur",
+        "ha": 0.36,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Gros+Frere+et+Soeur+grands+echezeaux"
+      },
+      {
+        "name": "Domaine Drouhin-Laroze",
+        "ha": 0.3,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Drouhin+Laroze+grands+echezeaux"
+      },
+      {
+        "name": "Domaine Lamarche",
+        "ha": 0.35,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Lamarche+grands+echezeaux"
+      },
+      {
+        "name": "Domaine Meo-Camuzet",
+        "ha": 0.16,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Meo+Camuzet+grands+echezeaux"
+      }
+    ],
+    "richebourg": [
+      {
+        "name": "Domaine de la Romanée-Conti",
+        "ha": 3.51,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+de+la+Romanee+Conti+richebourg"
+      },
+      {
+        "name": "Domaine Leroy",
+        "ha": 0.73,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Leroy+richebourg"
+      },
+      {
+        "name": "Domaine Anne Gros",
+        "ha": 0.6,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Anne+Gros+richebourg"
+      },
+      {
+        "name": "Domaine Gros Frère et Soeur",
+        "ha": 0.52,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Gros+Frere+et+Soeur+richebourg"
+      },
+      {
+        "name": "Domaine Jean Grivot",
+        "ha": 0.44,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Jean+Grivot+richebourg"
+      },
+      {
+        "name": "Domaine Meo-Camuzet",
+        "ha": 0.35,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Meo+Camuzet+richebourg"
+      },
+      {
+        "name": "Domaine Thibault Liger-Belair",
+        "ha": 0.17,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Thibault+Liger+Belair+richebourg"
+      },
+      {
+        "name": "Domaine Mongeard-Mugneret",
+        "ha": 0.13,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Mongeard+Mugneret+richebourg"
+      },
+      {
+        "name": "Domaine A.F. Gros",
+        "ha": 0.1,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+A.F.+Gros+richebourg"
+      },
+      {
+        "name": "Domaine Louis Latour",
+        "ha": 0.08,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Louis+Latour+richebourg"
+      }
+    ],
+    "romaneesaintvivant": [
+      {
+        "name": "Domaine de la Romanée-Conti",
+        "ha": 5.29,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+de+la+Romanee+Conti+romanee+saint+vivant"
+      },
+      {
+        "name": "Domaine Leroy",
+        "ha": 0.99,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Leroy+romanee+saint+vivant"
+      },
+      {
+        "name": "Domaine Arnoux-Lachaux",
+        "ha": 0.35,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Arnoux+Lachaux+romanee+saint+vivant"
+      },
+      {
+        "name": "Domaine Hudelot-Noëllat",
+        "ha": 0.32,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Hudelot+Noellat+romanee+saint+vivant"
+      },
+      {
+        "name": "Domaine Jean Grivot",
+        "ha": 0.4,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Jean+Grivot+romanee+saint+vivant"
+      },
+      {
+        "name": "Domaine Sylvain Cathiard",
+        "ha": 0.3,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Sylvain+Cathiard+romanee+saint+vivant"
+      },
+      {
+        "name": "Domaine Confuron-Cotetidot",
+        "ha": 0.2,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Confuron+Cotetidot+romanee+saint+vivant"
+      }
+    ],
+    "laromanee": [
+      {
+        "name": "Domaine du Comte Liger-Belair",
+        "ha": 0.85,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+du+Comte+Liger+Belair+la+romanee",
+        "is_monopole": true
+      }
+    ],
+    "romaneeconti": [
+      {
+        "name": "Domaine de la Romanée-Conti (DRC)",
+        "ha": 1.63,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+de+la+Romanee+Conti+romanee+conti",
+        "is_monopole": true
+      }
+    ],
+    "latache": [
+      {
+        "name": "Domaine de la Romanée-Conti (DRC)",
+        "ha": 6.06,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+de+la+Romanee+Conti+la+tache",
+        "is_monopole": true
+      }
+    ],
+    "mazoyereschambertin": [
+      {
+        "name": "Domaine Taupenot-Merme",
+        "ha": 0.8,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Taupenot+Merme+mazoyeres+chambertin"
+      },
+      {
+        "name": "Domaine Dugat-Py",
+        "ha": 0.5,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Dugat+Py+mazoyeres+chambertin"
+      },
+      {
+        "name": "Domaine Faiveley",
+        "ha": 0.5,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Faiveley+mazoyeres+chambertin"
+      },
+      {
+        "name": "Domaine Perrot-Minot",
+        "ha": 0.3,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Perrot+Minot+mazoyeres+chambertin"
+      },
+      {
+        "name": "Domaine Harmand-Geoffroy",
+        "ha": 0.4,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Harmand+Geoffroy+mazoyeres+chambertin"
+      },
+      {
+        "name": "Domaine Arlaud",
+        "ha": 0.25,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Arlaud+mazoyeres+chambertin"
+      },
+      {
+        "name": "Domaine Leroy",
+        "ha": 0.2,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Leroy+mazoyeres+chambertin"
+      }
+    ],
+    "charmeschambertin": [
+      {
+        "name": "Domaine Armand Rousseau",
+        "ha": 1.37,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Armand+Rousseau+charmes+chambertin"
+      },
+      {
+        "name": "Domaine Joseph Roty",
+        "ha": 0.67,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Joseph+Roty+charmes+chambertin"
+      },
+      {
+        "name": "Domaine Bachelet",
+        "ha": 0.29,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Bachelet+charmes+chambertin"
+      },
+      {
+        "name": "Domaine Claude Dugat",
+        "ha": 0.27,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Claude+Dugat+charmes+chambertin"
+      },
+      {
+        "name": "Domaine Drouhin-Laroze",
+        "ha": 0.36,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Drouhin+Laroze+charmes+chambertin"
+      },
+      {
+        "name": "Domaine Perrot-Minot",
+        "ha": 0.34,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Perrot+Minot+charmes+chambertin"
+      },
+      {
+        "name": "Domaine Humbert Frères",
+        "ha": 0.26,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Humbert+Freres+charmes+chambertin"
+      },
+      {
+        "name": "Domaine Camus",
+        "ha": 0.3,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Camus+charmes+chambertin"
+      }
+    ],
+    "griottechambertin": [
+      {
+        "name": "Domaine Joseph Drouhin",
+        "ha": 0.9,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Joseph+Drouhin+griotte+chambertin"
+      },
+      {
+        "name": "Domaine Fourrier",
+        "ha": 0.27,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Fourrier+griotte+chambertin"
+      },
+      {
+        "name": "Domaine Ponsot",
+        "ha": 0.8,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Ponsot+griotte+chambertin"
+      },
+      {
+        "name": "Domaine Claude Dugat",
+        "ha": 0.3,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Claude+Dugat+griotte+chambertin"
+      },
+      {
+        "name": "Domaine Harmand-Geoffroy",
+        "ha": 0.2,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Harmand+Geoffroy+griotte+chambertin"
+      },
+      {
+        "name": "Domaine Faiveley",
+        "ha": 0.3,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Faiveley+griotte+chambertin"
+      }
+    ],
+    "latriciereschambertin": [
+      {
+        "name": "Domaine Faiveley",
+        "ha": 1.2,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Faiveley+latricieres+chambertin"
+      },
+      {
+        "name": "Domaine Trapet Père et Fils",
+        "ha": 1,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Trapet+latricieres+chambertin"
+      },
+      {
+        "name": "Domaine Rossignol-Trapet",
+        "ha": 0.7,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Rossignol+Trapet+latricieres+chambertin"
+      },
+      {
+        "name": "Domaine Duroché",
+        "ha": 0.55,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Duroche+latricieres+chambertin"
+      },
+      {
+        "name": "Domaine Leroy",
+        "ha": 0.25,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Leroy+latricieres+chambertin"
+      },
+      {
+        "name": "Domaine Camus",
+        "ha": 0.4,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Camus+latricieres+chambertin"
+      },
+      {
+        "name": "Domaine Henri Magnien",
+        "ha": 0.35,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Henri+Magnien+latricieres+chambertin"
+      }
+    ],
+    "lagranderue": [
+      {
+        "name": "Domaine Lamarche",
+        "ha": 1.65,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Lamarche+la+grande+rue",
+        "is_monopole": true
+      }
+    ],
+    "corton": [
+      {
+        "name": "Domaine Faiveley",
+        "ha": 3.6,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Faiveley+corton"
+      },
+      {
+        "name": "Domaine Tollot-Beaut",
+        "ha": 1.8,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Tollot+Beaut+corton"
+      },
+      {
+        "name": "Domaine Chandon de Briailles",
+        "ha": 1.3,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Chandon+de+Briailles+corton"
+      },
+      {
+        "name": "Domaine Louis Latour",
+        "ha": 3.5,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Louis+Latour+corton"
+      },
+      {
+        "name": "Domaine Bouchard Père et Fils",
+        "ha": 2.9,
+        "search_link": "https://www.wine-searcher.com/find/Bouchard+Pere+Fils+corton"
+      },
+      {
+        "name": "Domaine Michel Gaunoux",
+        "ha": 1,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Michel+Gaunoux+corton"
+      }
+    ],
+    "cortoncharlemagne": [
+      {
+        "name": "Domaine Bonneau du Martray",
+        "ha": 11,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Bonneau+du+Martray+corton+charlemagne"
+      },
+      {
+        "name": "Domaine Coche-Dury",
+        "ha": 0.34,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Coche+Dury+corton+charlemagne"
+      },
+      {
+        "name": "Domaine Rapet Père et Fils",
+        "ha": 1,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Rapet+Pere+Fils+corton+charlemagne"
+      },
+      {
+        "name": "Domaine Louis Latour",
+        "ha": 10,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Louis+Latour+corton+charlemagne"
+      },
+      {
+        "name": "Domaine Bouchard Père et Fils",
+        "ha": 3.6,
+        "search_link": "https://www.wine-searcher.com/find/Bouchard+Pere+Fils+corton+charlemagne"
+      },
+      {
+        "name": "Domaine Faiveley",
+        "ha": 1,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Faiveley+corton+charlemagne"
+      }
+    ],
+    "charlemagne": [
+      {
+        "name": "Domaine Bonneau du Martray",
+        "ha": 0.28,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Bonneau+du+Martray+charlemagne",
+        "is_monopole": true
+      }
+    ],
+    "montrachet": [
+      {
+        "name": "Domaine Leflaive",
+        "ha": 2.06,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Leflaive+montrachet"
+      },
+      {
+        "name": "Domaine de la Romanée-Conti",
+        "ha": 0.67,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+de+la+Romanee+Conti+montrachet"
+      },
+      {
+        "name": "Domaine Ramonet",
+        "ha": 0.26,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Ramonet+montrachet"
+      },
+      {
+        "name": "Domaine Jacques Prieur",
+        "ha": 0.59,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Jacques+Prieur+montrachet"
+      },
+      {
+        "name": "Domaine Blain-Gagnard",
+        "ha": 0.08,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Blain+Gagnard+montrachet"
+      },
+      {
+        "name": "Domaine Guy Amiot et Fils",
+        "ha": 0.27,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Guy+Amiot+montrachet"
+      },
+      {
+        "name": "Domaine Fontaine-Gagnard",
+        "ha": 0.33,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Fontaine+Gagnard+montrachet"
+      }
+    ],
+    "chevaliermontrachet": [
+      {
+        "name": "Domaine Leflaive",
+        "ha": 2,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Leflaive+chevalier+montrachet"
+      },
+      {
+        "name": "Domaine Bouchard Père et Fils",
+        "ha": 2.33,
+        "search_link": "https://www.wine-searcher.com/find/Bouchard+Pere+Fils+chevalier+montrachet"
+      },
+      {
+        "name": "Domaine Louis Jadot",
+        "ha": 1.5,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Louis+Jadot+chevalier+montrachet"
+      },
+      {
+        "name": "Domaine Niellon",
+        "ha": 0.6,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Niellon+chevalier+montrachet"
+      },
+      {
+        "name": "Domaine Michel Niellon",
+        "ha": 0.5,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Michel+Niellon+chevalier+montrachet"
+      }
+    ],
+    "batardmontrachet": [
+      {
+        "name": "Domaine Leflaive",
+        "ha": 2.65,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Leflaive+batard+montrachet"
+      },
+      {
+        "name": "Domaine Ramonet",
+        "ha": 0.6,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Ramonet+batard+montrachet"
+      },
+      {
+        "name": "Domaine Fontaine-Gagnard",
+        "ha": 0.33,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Fontaine+Gagnard+batard+montrachet"
+      },
+      {
+        "name": "Domaine Blain-Gagnard",
+        "ha": 0.21,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Blain+Gagnard+batard+montrachet"
+      },
+      {
+        "name": "Domaine Guy Amiot et Fils",
+        "ha": 0.5,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Guy+Amiot+batard+montrachet"
+      },
+      {
+        "name": "Domaine Niellon",
+        "ha": 0.4,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Niellon+batard+montrachet"
+      }
+    ],
+    "bienvenuesbatardmontrachet": [
+      {
+        "name": "Domaine Leflaive",
+        "ha": 2.3,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Leflaive+bienvenues+batard+montrachet"
+      },
+      {
+        "name": "Domaine Ramonet",
+        "ha": 0.35,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Ramonet+bienvenues+batard+montrachet"
+      },
+      {
+        "name": "Domaine Paul Pernot",
+        "ha": 0.6,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Paul+Pernot+bienvenues+batard+montrachet"
+      },
+      {
+        "name": "Domaine Carillon",
+        "ha": 0.2,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Carillon+bienvenues+batard+montrachet"
+      },
+      {
+        "name": "Domaine Guy Amiot et Fils",
+        "ha": 0.08,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Guy+Amiot+bienvenues+batard+montrachet"
+      }
+    ],
+    "criotbatardmontrachet": [
+      {
+        "name": "Domaine Blain-Gagnard",
+        "ha": 0.2,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Blain+Gagnard+criot+batard+montrachet"
+      },
+      {
+        "name": "Domaine Fontaine-Gagnard",
+        "ha": 0.33,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Fontaine+Gagnard+criot+batard+montrachet"
+      },
+      {
+        "name": "Domaine Niellon",
+        "ha": 0.24,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Niellon+criot+batard+montrachet"
+      },
+      {
+        "name": "Domaine Roger Belland",
+        "ha": 0.3,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Roger+Belland+criot+batard+montrachet"
+      },
+      {
+        "name": "Domaine Faiveley",
+        "ha": 0.18,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Faiveley+criot+batard+montrachet"
+      }
+    ],
+    "lesclos": [
+      {
+        "name": "Domaine William Fèvre",
+        "ha": 4.11,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+William+Fevre+chablis+les+clos"
+      },
+      {
+        "name": "Domaine François Raveneau",
+        "ha": 0.54,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Francois+Raveneau+chablis+les+clos"
+      },
+      {
+        "name": "Domaine Vincent Dauvissat",
+        "ha": 1.11,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Vincent+Dauvissat+chablis+les+clos"
+      },
+      {
+        "name": "La Chablisienne",
+        "ha": 2.4,
+        "search_link": "https://www.wine-searcher.com/find/La+Chablisienne+chablis+les+clos"
+      },
+      {
+        "name": "Domaine Louis Moreau",
+        "ha": 1,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Louis+Moreau+chablis+les+clos"
+      }
+    ],
+    "vaudesir": [
+      {
+        "name": "Domaine William Fèvre",
+        "ha": 1.2,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+William+Fevre+chablis+vaudesir"
+      },
+      {
+        "name": "Domaine François Raveneau",
+        "ha": 0.5,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Francois+Raveneau+chablis+vaudesir"
+      },
+      {
+        "name": "Domaine Louis Michel",
+        "ha": 1,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Louis+Michel+chablis+vaudesir"
+      },
+      {
+        "name": "Domaine Long-Depaquit",
+        "ha": 0.7,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Long+Depaquit+chablis+vaudesir"
+      },
+      {
+        "name": "Domaine Billaud-Simon",
+        "ha": 0.5,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Billaud+Simon+chablis+vaudesir"
+      }
+    ],
+    "valmur": [
+      {
+        "name": "Domaine François Raveneau",
+        "ha": 0.75,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Francois+Raveneau+chablis+valmur"
+      },
+      {
+        "name": "Domaine Christian Moreau Père et Fils",
+        "ha": 0.5,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Christian+Moreau+chablis+valmur"
+      },
+      {
+        "name": "Domaine Billaud-Simon",
+        "ha": 0.5,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Billaud+Simon+chablis+valmur"
+      },
+      {
+        "name": "Domaine William Fèvre",
+        "ha": 1.1,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+William+Fevre+chablis+valmur"
+      },
+      {
+        "name": "La Chablisienne",
+        "ha": 1.2,
+        "search_link": "https://www.wine-searcher.com/find/La+Chablisienne+chablis+valmur"
+      }
+    ],
+    "blanchot": [
+      {
+        "name": "Domaine François Raveneau",
+        "ha": 0.6,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Francois+Raveneau+chablis+blanchot"
+      },
+      {
+        "name": "Domaine William Fèvre",
+        "ha": 1.2,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+William+Fevre+chablis+blanchot"
+      },
+      {
+        "name": "Domaine Laroche",
+        "ha": 1.5,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Laroche+chablis+blanchot"
+      },
+      {
+        "name": "La Chablisienne",
+        "ha": 0.9,
+        "search_link": "https://www.wine-searcher.com/find/La+Chablisienne+chablis+blanchot"
+      },
+      {
+        "name": "Domaine Billaud-Simon",
+        "ha": 0.4,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Billaud+Simon+chablis+blanchot"
+      }
+    ],
+    "bougros": [
+      {
+        "name": "Domaine William Fèvre",
+        "ha": 2.11,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+William+Fevre+chablis+bougros"
+      },
+      {
+        "name": "Domaine Long-Depaquit",
+        "ha": 1,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Long+Depaquit+chablis+bougros"
+      },
+      {
+        "name": "La Chablisienne",
+        "ha": 1.5,
+        "search_link": "https://www.wine-searcher.com/find/La+Chablisienne+chablis+bougros"
+      },
+      {
+        "name": "Domaine Louis Michel",
+        "ha": 0.8,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Louis+Michel+chablis+bougros"
+      },
+      {
+        "name": "Domaine Billaud-Simon",
+        "ha": 0.5,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Billaud+Simon+chablis+bougros"
+      }
+    ],
+    "preuses": [
+      {
+        "name": "Domaine William Fèvre",
+        "ha": 1,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+William+Fevre+chablis+les+preuses"
+      },
+      {
+        "name": "Domaine François Raveneau",
+        "ha": 0.5,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Francois+Raveneau+chablis+les+preuses"
+      },
+      {
+        "name": "Domaine La Chablisienne",
+        "ha": 1,
+        "search_link": "https://www.wine-searcher.com/find/La+Chablisienne+chablis+les+preuses"
+      },
+      {
+        "name": "Domaine Jean-Paul & Benoît Droin",
+        "ha": 0.4,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Jean+Paul+Droin+chablis+les+preuses"
+      }
+    ],
+    "grenouilles": [
+      {
+        "name": "石灰岩與細黏土混合，土層較厚。",
+        "search_link": "140-160 公尺"
+      }
+    ],
+    "lesamoureuses": [
+      {
+        "name": "Domaine Comte Georges de Vogüé",
+        "ha": 0.56,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Comte+Georges+de+Vogue+les+amoureuses"
+      },
+      {
+        "name": "Domaine Roumier",
+        "ha": 0.4,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Georges+Roumier+les+amoureuses"
+      },
+      {
+        "name": "Domaine J.-F. Mugnier",
+        "ha": 0.37,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Jacques+Frederic+Mugnier+les+amoureuses"
+      },
+      {
+        "name": "Domaine Robert Groffier",
+        "ha": 0.38,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Robert+Groffier+les+amoureuses"
+      },
+      {
+        "name": "Domaine Amiot-Servelle",
+        "ha": 0.45,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Amiot+Servelle+les+amoureuses"
+      },
+      {
+        "name": "Domaine Drouhin-Laroze",
+        "ha": 0.3,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Drouhin+Laroze+les+amoureuses"
+      },
+      {
+        "name": "Domaine Bertheau",
+        "ha": 0.32,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Bertheau+les+amoureuses"
+      },
+      {
+        "name": "Domaine Hudelot-Noëllat",
+        "ha": 0.25,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Hudelot+Noellat+les+amoureuses"
+      },
+      {
+        "name": "Domaine Groffier Père et Fils",
+        "ha": 0.4,
+        "search_link": "https://www.wine-searcher.com/find/Domaine+Groffier+Pere+et+Fils+les+amoureuses"
+      }
+    ]
+  },
+  "wineries": {
+    "drc": {
+      "display_name": "Domaine de la Romanée-Conti",
+      "address": "1 place de l'Église, 21700 Vosne-Romanée, France",
+      "website": "https://www.romanee-conti.com/",
+      "notes": "勃根地最知名的酒莊，獨佔羅曼尼-康帝和拉塔希特級園。"
+    },
+    "mugnier": {
+      "display_name": "Domaine Jacques-Frédéric Mugnier",
+      "address": "10, Grande Rue, 21640 Chambolle-Musigny, France",
+      "website": "http://www.mugnier.fr/",
+      "notes": "以其極致優雅的 Chambolle-Musigny 葡萄酒而聞名。"
+    }
   }
 }
