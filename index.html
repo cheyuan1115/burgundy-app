@@ -150,7 +150,7 @@
         .normalize('NFD').replace(/[\u0300-\u036f]/g,'')   // 去重音
         .replace(/['’`´\.·]/g,'')                         // 去標點
         .replace(/st[\.\s]/g,'saint ')                    // St→Saint
-        .replace(/[\-–—]/g,' ')                           // 各式連字號轉空白
+        .replace(/[\-–—]/g,'')                           // 各式連字號轉空白
         .replace(/[\s\u00A0\u2000-\u200D]+/g,'')          // 消所有空白
         .trim();
     }
@@ -189,38 +189,55 @@
     ];
     const VILL_NORM = VILLAGES.map(_norm);
 
-    /* ---------- 單一版解析器（判斷等級並傳回顯示名稱） ---------- */
-    function parseAOC(props){
-      const raw = String(props?.denom || '');
-      const parts = raw.split(',').map(s=>s.trim()).filter(Boolean);
-      const partsNorm = parts.map(_norm);
+    /* ---------- 單一版解析器（判斷等級並傳回顯示名稱）- 此處保留不變，因為修改點擊事件查找邏輯更安全 ---------- */
+    /* ---------- 單一版解析器（判斷等級並傳回顯示名稱）- 修復版 ---------- */
+function parseAOC(props){
+    const raw = String(props?.denom || '');
+    const parts = raw.split(',').map(s=>s.trim()).filter(Boolean);
+    const partsNorm = parts.map(_norm);
 
-      // 1) Grand Cru
-      for (let i=0;i<parts.length;i++){
+    // 1) Grand Cru
+    for (let i=0;i<parts.length;i++){
         const pn = partsNorm[i];
         let gcCanon = GC_ALIASES.get(pn) ?? null;
         if (!gcCanon){
-          const idx = GC_NORM.indexOf(pn);
-          if (idx !== -1) gcCanon = GC_LIST[idx];
+            const idx = GC_NORM.indexOf(pn);
+            if (idx !== -1) gcCanon = GC_LIST[idx];
         }
-        if (gcCanon){
-          const home = GC_HOME[gcCanon] || [];
-          return { level:'GC', title: gcCanon, subtitle: home.length ? `地點：${home.join(' / ')}` : '', climats: [gcCanon] }; // GC 視為一個 climat
-        }
-      }
-
-      // 2) Premier Cru
-      const pcParts = parts.filter(p => /(premier|1er)\s*cru/i.test(p));
-      if (pcParts.length){
-        let titleAOC = 'Premier Cru';
-        let villagePartRaw = ''; // 新增：儲存原始村莊名
         
-        // 🚨 最終修復邏輯：從第一個找到的 PC 片段中，直接提取 'premier cru' 前面的所有文字作為村莊名
+        if (gcCanon){
+            const home = GC_HOME[gcCanon] || [];
+            let climats = [gcCanon];
+            
+            // *** 【修復 Chablis Grand Cru 關鍵】***
+            if (gcCanon === 'Chablis Grand Cru') {
+                // 從原始 parts 中，尋找 "Chablis Grand Cru" 後面還有文字的部分
+                const climatPartRaw = parts.find(p => p.startsWith('Chablis Grand Cru') && p.length > 'Chablis Grand Cru'.length + 1);
+                if (climatPartRaw) {
+                    // 例如從 "Chablis Grand Cru Les Clos" 中提取 "Les Clos"
+                    const specificClimat = climatPartRaw.replace('Chablis Grand Cru', '').trim();
+                    if (specificClimat) {
+                        climats = [specificClimat]; // 讓 climats 只包含地塊名 (如 Les Clos)
+                        return { level:'GC', title: gcCanon, subtitle: `地點：Chablis / ${specificClimat}`, climats };
+                    }
+                }
+            }
+            
+            return { level:'GC', title: gcCanon, subtitle: home.length ? `地點：${home.join(' / ')}` : '', climats };
+        }
+    }
+
+    // 2) Premier Cru
+    const pcParts = parts.filter(p => /(premier|1er)\s*cru/i.test(p));
+    if (pcParts.length){
+        let titleAOC = 'Premier Cru';
+        let villagePartRaw = ''; 
+        
+        // 提取村莊名
         for(const p of pcParts) {
             const m = p.match(/^(.+?)\s+(premier|1er)\s*cru/i);
             if (m && m[1]) {
-                villagePartRaw = m[1].trim(); // 儲存村莊名
-                
+                villagePartRaw = m[1].trim(); 
                 if (villagePartRaw.length > 2 && villagePartRaw.toLowerCase() !== 'bourgogne') {
                    titleAOC = villagePartRaw + ' Premier Cru'; 
                    break;
@@ -228,40 +245,45 @@
             }
         }
         
-        // 提取地塊名稱
-        const climatsRaw = pcParts.map(p => {
-          let tail = '';
-          const m = p.match(/(?:premier|1er)\s*cru\s*([:\/–—\-]*\s*.*)$/i);
-          if (m && m[1]) tail = m[1].trim();
-          tail = tail.replace(/^[\s:\/–—\-]+/, '').replace(/^\((.*)\)$/, '$1').trim();
-          if (!tail || /premier\s*cru/i.test(tail)) return '';
-          return tail;
-        }).filter(Boolean);
-        const allClimats = climatsRaw
-          .flatMap(c => c.split(/\s*,\s*/))
-          .map(s => s.trim())
-          .filter(Boolean);
+// 提取地塊名稱
+        const allClimats = pcParts
+          .flatMap(p => {
+              // 從 e.g., "Meursault 1er cru Les Perrières (Domaine XYZ)" 中提取地塊名
+              let tail = p.replace(/^(.+?)\s+(premier|1er)\s*cru/i, '').trim();
+              
+              // 刪除前綴標點符號和括號 (保持這個清理邏輯)
+              tail = tail.replace(/^[\s:\/–—\-]+/, '').replace(/^\((.*)\)$/, '$1').trim();
+              
+              if (!tail || /premier\s*cru/i.test(tail)) return [];
+              
+              // *** 【關鍵修復】: 不再用空格分隔，讓整個地塊名 (如 "Les Amoureuses") 成為一個單一元素 ***
+              return [tail]; 
+          })
+          .filter(c => c.length > 2) // 排除掉過短的殘餘字串
+          .filter((value, index, self) => self.indexOf(value) === index); // 去重
 
         const title = titleAOC;
-        const subtitle = allClimats.length ? `地塊：${allClimats.join(', ')}` : '';
-        // 傳回所有地塊名稱（已正規化）和村莊原始名稱
+        const subtitle = allClimats.length ? `地塊：${allClimats.join(', ')}` : ''; 
+        // 備註：此處 join() 仍使用 ', '，但因為 allClimats 只有一個元素，所以不會有逗號
+        
         return { level:'PC', title, subtitle, village: villagePartRaw, climats: allClimats };
-      }
-
-      // 3) Village
-      for (let i=0;i<parts.length;i++){
-        const idx = VILL_NORM.indexOf(partsNorm[i]);
-        if (idx !== -1){
-          return { level:'VI', title: VILLAGES[idx], subtitle:'Village', climats: [] };
-        }
-      }
-
-      // 4) Régionale / 其他
-      return { level:'RE', title: parts[0] || 'AOC', subtitle: 'Régionale / 其他', climats: [] };
     }
 
-    const getLevel = (props) => parseAOC(props).level;
+    // 3) Village
+    for (let i=0;i<parts.length;i++){
+        const idx = VILL_NORM.indexOf(partsNorm[i]);
+        if (idx !== -1){
+            return { level:'VI', title: VILLAGES[idx], subtitle:'Village', climats: [] };
+        }
+    }
 
+    // 4) Régionale / 其他
+    return { level:'RE', title: parts[0] || 'AOC', subtitle: 'Régionale / 其他', climats: [] };
+}
+
+const getLevel = (props) => parseAOC(props).level;
+    // ... (Map 初始化部分不變) ...
+    
     // ====== Map 初始化（MapLibre GL）======
     const map = new maplibregl.Map({
       container: 'map',
@@ -291,7 +313,7 @@
         layers: [
           { id: 'osm', type: 'raster', source: 'osm' }
         ],
-        terrain: { source: 'terrain-dem', exaggeration: 2.0 }
+        terrain: { source: 'terrain-dem', exaggeration: 3.0 }
       },
       center: [START.lng, START.lat],
       zoom: START.zoom,
@@ -312,14 +334,15 @@
     map.on('load', async () => {
 
       // 1) 載入 meta.json
-      let META = { wineries: {} };
+      let META = { wineries: {}, climat_owners: {} }; // 確保 climat_owners 存在
       try {
         const mRes = await fetch('./meta.json');
         META = await mRes.json();
       } catch (e) {
         console.warn('meta.json 載入失敗：', e);
       }
-
+        
+      // ... (Sky, Hillshade, AOC 圖層初始化代碼不變) ...
       // Sky + Hillshade
       map.addLayer({
         id: 'sky',
@@ -441,58 +464,105 @@
 
       // --- 點擊 AOC 顯示底部面板 ---
       map.on('click', 'aoc-fill', (e) => {
-        const f = e.features && e.features[0];
-        if (!f) return;
+    const f = e.features && e.features[0];
+    if (!f) return;
 
-        const info = parseAOC(f.properties || {});
-        const levelText = { GC:'Grand Cru', PC:'Premier Cru', VI:'Village', RE:'Régionale / 其他' }[info.level] || 'AOC';
-        
-        
-        // ************ 強化 META 資料查找邏輯 ************
-        let meta = null;
-        let foundKey = '';
+    const info = parseAOC(f.properties || {});
+    const levelText = { GC:'Grand Cru', PC:'Premier Cru', VI:'Village', RE:'Régionale / 其他' }[info.level] || 'AOC';
+    
+    
+    // ************ 強化 META 資料查找邏輯 (最終修復版本 V3: 移除 break) ************
+    let meta = null;
+    let foundKey = '';
+    const props = f.properties || {};
 
-        if (info.level === 'PC' && info.climats.length > 0 && info.village) {
-            const villNorm = _norm(info.village);
-            // 1. 嘗試用地塊名 + 村莊名查找 (例如：lesperrieresmeursault)
-            for (const climat of info.climats) {
-                const climatNorm = _norm(climat);
-                foundKey = climatNorm + villNorm;
+    // --- 1. Premier Cru / Grand Cru Climat 專屬查找（最優先，依賴 parseAOC 提取的完整地塊名） ---
+    if ((info.level === 'PC' || info.level === 'GC') && info.climats.length > 0) {
+        const villNorm = _norm(info.village || ''); 
+        
+        // 此時 info.climats 裡只有一個完整的地塊名，例如 "Les Amoureuses"
+        const fullClimatRaw = info.climats[0];
+        const fullClimatNorm = _norm(fullClimatRaw); // "lesamoureuses"
+        
+        // 排除通用 AOC 名稱
+        if (!fullClimatNorm.includes(_norm(info.title))) {
+
+            // 嘗試 1A: 地塊名 + 村莊名 (如 lesamoureuseschambollemusigny)
+            if (villNorm && villNorm.length > 2 && villNorm !== 'bourgogne') {
+                foundKey = fullClimatNorm + villNorm;
                 if (META[foundKey]) {
                     meta = META[foundKey];
-                    break;
+                }
+            }
+            
+            // 嘗試 1B: 只有地塊名 (如 lesamoureuses，這是您 meta.json 中的鍵)
+            if (!meta) {
+                foundKey = fullClimatNorm; 
+                if (META[foundKey]) {
+                    meta = META[foundKey];
                 }
             }
         }
-        
-        // 2. 如果地塊名查找失敗，使用通用 AOC 名稱查找（GC、PC-通用、Village、Régionale）
-        if (!meta) {
-            foundKey = _norm(info.title || '');
-            meta = META[foundKey] || null;
-        }
+    } 
+
+
+    // --- 2. 通用 AOC 名稱查找（如果 1 失敗） ---
+    if (!meta) {
+        foundKey = _norm(info.title || '');
+        meta = META[foundKey] || null;
+    }
         
         // **********************************************
-
 
         // 確保地塊/地點的標籤正確且不重複
         let subText = '';
         if (info.level === 'PC') {
-            // Premier Cru: 顯示地塊
-            subText = info.subtitle ? `地塊：${info.subtitle.replace('地塊：', '')}` : ''; 
+            // Premier Cru: 顯示地塊，並移除地塊名中間的逗號
+            const rawSub = info.subtitle.replace('地塊：', '');
+            const cleanSub = rawSub.replace(/,\s*/g, ' '); // 將逗號替換為空格
+            subText = rawSub ? `地塊：${cleanSub}` : '';
         } else if (info.level === 'GC') {
             // Grand Cru: 顯示地點
             subText = info.subtitle ? `地點：${info.subtitle.replace('地點：', '')}` : ''; 
         }
         
-        const subRow = subText ? `<div class="small" style="color:#666;margin-top:2px">${subText}</div>` : ''; 
+        const subRow = subText ? `<div class="small" style="color:#666;margin-top:2px">${subText}</div>` : '';
 
         
+        // ************ 新增：查詢地塊擁有者列表 ************
+        const ownerKey = foundKey; // 使用與 meta 相同的 key 進行查詢
+        const owners = META.climat_owners && META.climat_owners[ownerKey] || null;
+        let ownersHTML = '';
+
+        if (owners && owners.length > 0) {
+            let listItems = owners.map(owner => {
+                const monopole = owner.is_monopole ? ' (獨佔園)' : '';
+                const area = owner.ha ? ` (${owner.ha} ha)` : '';
+                
+                // 檢查是否有連結，並生成超連結
+                const ownerName = owner.search_link ? 
+                                    `<a href="${owner.search_link}" target="_blank" rel="noopener">${owner.name}</a>` : 
+                                    owner.name;
+
+                return `<li>${ownerName}<b>${monopole}</b>${area}</li>`;
+            }).join('');
+            
+            ownersHTML = `
+                <div style="margin-top:10px; font-weight: bold;">🥂 擁有酒莊：</div>
+                <ul style="margin: 4px 0 0 16px; padding: 0; list-style-type: none; font-size: 13px;">
+                    ${listItems}
+                </ul>
+            `;
+        }
+        // ************************************************
+
+
         // 只有在有 meta 資料時才顯示 extra 區塊
         const extra = meta ? `
           <div style="margin-top:8px">
           <div class="small" style="margin-top:6px">
             <b>${meta.zh || (foundKey.includes('premiercru') ? info.village + ' ' + (info.climats[0]||'PC') : info.title)}</b>｜${meta.level || levelText}<br>
-            村莊：${meta.village || '未知'}
+            村莊：${meta.village || info.subtitle.replace('地點：', '').replace('地塊：', '') || '未知'}
           </div>
           <div style="margin-top:8px">
             ${meta.area_ha ? `<div class="small">面積: <b>${meta.area_ha} ha</b></div>` : ''}
@@ -502,6 +572,7 @@
           </div>
           ${meta.style_note ? `<div class="small" style="color:#2c7d2c;margin-top:6px">風格: ${meta.style_note}</div>` : ''}
           <div class="small" style="color:#555;margin-top:6px">${meta.notes || ''}</div>
+          ${ownersHTML} <!-- 插入酒莊列表 -->
           ${meta.link ? `<div class="small" style="margin-top:4px">
             <a href="${meta.link}" target="_blank" rel="noopener">🔗 Wine-Searcher</a>
           </div>` : ''}
@@ -521,6 +592,7 @@
         // ************************************************
       });
 
+      // ... (酒莊圖層及搜尋代碼不變) ...
       // 酒莊圖層設定
       const wRes = await fetch(WINERY_DATA_FILE);
       masterWineries = await wRes.json(); // 保存原始數據
