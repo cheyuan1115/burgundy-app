@@ -1,28 +1,36 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
+  <meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+/>
+
   <meta charset="utf-8" />
   <title>Burgundy AOC — 3D 可傾斜版（MapLibre GL）</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <link href="https://unpkg.com/maplibre-gl@3.6.1/dist/maplibre-gl.css" rel="stylesheet"/>
-  <script src="https://unpkg.com/maplibre-gl@3.6.1/dist/maplibre-gl.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">  <link href="https://cdn.jsdelivr.net/npm/maplibre-gl@3.6.1/dist/maplibre-gl.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/maplibre-gl@3.6.1/dist/maplibre-gl.js"></script>
   <style>
     html, body, #map { height: 100%; margin: 0; }
-    .ui{
+  .ui .row { flex-wrap: nowrap; }              /* 全局不換行 */
+.winery-search-box .row { flex-wrap: wrap; } /* 酒莊搜尋區仍可換行 */
+
+/* 縮小輸入框寬度與高度 */
+.ui{
       position: absolute; z-index: 10; 
       top: 8px; 
       left: 8px; 
       max-height: 90vh; 
       background: #fff; padding: 10px; border-radius: 10px;
       box-shadow: 0 6px 20px rgba(0,0,0,.18);
-      width: min(88vw, 320px); /* 縮小寬度以避免遮擋地圖控制 */
+      width: min(88vw, 305px); /* 縮小寬度以避免遮擋地圖控制 */
       font: 14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
     }
     .row{ display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap; }
     /* 確保 AOC 輸入欄的寬度 */
     .ui #q{ 
       flex-grow: 1; 
-      max-width: 260px;
+      max-width: 240px;
     }
     .ui input[type="text"]{ 
       flex-grow: 1; 
@@ -62,6 +70,7 @@
       overflow-y: auto;
       font-size: 14px;
       line-height: 1.6;
+      touch-action: pan-y;
     }
     #info-panel.visible {
       transform: translateY(0); /* 顯示時滑入 */
@@ -98,7 +107,40 @@
     .pc{ border-color:#ff7f0e; background:#ff7f0e33 }
     .vi{ border-color:#1f77b4; background:#1f77b433 }
     .re{ border-color:#2ca02c; background:#2ca02c33 }
+#info-panel {
+      touch-action: pan-y; /* 只允許上下滑動，防止放大 */
+    }
+/* 【新增】地窖標記樣式 */
+.cellar-marker {
+    width: 32px;
+    height: 32px;
+    border-radius: 16px;
+    background-color: #800000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    border: 2px solid white;
+}
+.cellar-marker.consumed {
+    background-color: #007bff; /* 已飲用狀態的顏色 */
+}
+.cellar-marker span {
+    font-size: 18px; /* 確保數字或符號清晰 */
+}
   </style>
+  <script>
+    // 阻止 iOS 的全頁 pinch-zoom（不影響地圖手勢）
+    (function () {
+      function block(e){ e.preventDefault(); }
+      document.addEventListener('gesturestart',  block, { passive:false });
+      document.addEventListener('gesturechange', block, { passive:false });
+      document.addEventListener('gestureend',    block, { passive:false });
+    })();
+  </script>
 </head>
 <body>
   <div id="map"></div>
@@ -106,9 +148,17 @@
   <div class="ui">
     <div class="row"><b>AOC 篩選</b></div>
     <div class="row">
-      <input id="q" type="text" placeholder="例如：Meursault / La Romanee">
+      <input id="q" type="text" placeholder="例如：La Romanee">
       <button class="btn" id="showAll">全部</button>
       <button class="btn" id="toggleWineries" title="顯示酒莊">🚫🍷</button>
+      <!-- ************ 新增：掃描按鈕 ************ -->
+    <!-- **************************************** -->
+     <!-- ************ 新增：主選單按鈕 ************ -->
+<button class="btn" id="goHomeBtn">主選單</button>
+<!-- **************************************** -->
+  </div>
+  
+  <div class="winery-search-box" id="winery-search-container">
     </div>
     
     <div class="winery-search-box" id="winery-search-container">
@@ -126,6 +176,9 @@
     <div class="item"><span class="swatch pc"></span> Premier Cru</div>
     <div class="item"><span class="swatch vi"></span> Village</div>
     <div class="item"><span class="swatch re"></span> Régionale / 其他</div>
+    <!-- 【新增】庫存地塊圖例 -->
+<div class="item"><span class="swatch" style="background:#800000; border-color:#800000; border-width: 0;"></span> 庫存地塊</div>
+<div class="item"><span class="swatch" style="background:#007bff; border-color:#007bff; border-width: 0;"></span> 已飲用地塊</div>
   </div>
 
   <!-- ************ 新增底部資訊面板 HTML ************ -->
@@ -137,27 +190,79 @@
 
   <script>
     // ====== 設定 ======
-    const AOC_DATA_FILE = './burgundy.geojson';
-    const WINERY_DATA_FILE = './wineries.geojson';
-    const START = { lng: 4.80, lat: 47.00, zoom: 8.8, pitch: 45, bearing: 0 };
-
+    const AOC_DATA_FILE = 'https://raw.githubusercontent.com/cheyuan1115/burgundy-app/main/burgundy.geojson'
+    const WINERY_DATA_FILE = 'https://raw.githubusercontent.com/cheyuan1115/burgundy-app/main/wineries.geojson';
+const START = { 
+  lng: 4.956, 
+  lat: 47.161, 
+  zoom: 10,         // 將初始縮放級別調高，讓用戶直接看到地塊細節
+  pitch: 45, 
+  bearing: 0 
+};
 
     // ====== 名稱正規化 & 分級判定 ======
     
     // 正規化
     function _norm(s=''){
-      return s.toLowerCase()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g,'')   // 去重音
-        .replace(/['’`´\.·]/g,'')                         // 去標點
-        .replace(/st[\.\s]/g,'saint ')                    // St→Saint
-        .replace(/[\-–—]/g,'')                           // 各式連字號轉空白
-        .replace(/[\s\u00A0\u2000-\u200D]+/g,'')          // 消所有空白
-        .trim();
-    }
+  return s.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')   // 去重音
+    .replace(/['’`´\.·]/g,'')                         // 去標點
+    .replace(/st[\.\s]/g,'saint ')                    // St→Saint
+    // 【最終修復】：只將連字號和空格都轉為單一空字串，以匹配最簡潔的 Key
+    .replace(/[\-–—]/g,'')                           // 移除連字號
+    .replace(/[\s\u00A0\u2000-\u200D]+/g,'')          // 移除所有空白
+    .trim();
+}
+// 原本的：全部變小寫、去重音、去空白和連字號
+function _normBase(s=''){
+  return s.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .trim();
+}
+
+// 一級園 / GC 用的：全部黏起來，不要破折號、不要空白
+function _compactNoHyphen(s=''){
+  return _normBase(s)
+    .replace(/['’`´\.·]/g,'')
+    .replace(/[\-–—\s\u00A0\u2000-\u200D]+/g,'');
+}
+
+// 村莊級用的：保留「-」，空白轉成「-」(因為你備份是 aloxe-corton, chambolle-musigny)
+function _slugWithHyphen(s=''){
+  return _normBase(s)
+    .replace(/['’`´\.·]/g,'')
+    .replace(/\s+/g, '-')     // 空白變 -
+    .replace(/-+/g, '-');     // 多個 - 合成一個
+}
+function makeAocKeyFromInfo(info){
+  // GC：你備份裡就是單一字例如 chambertin，所以拿地塊名或 title 壓成無破折號版
+  if (info.level === 'GC') {
+    const climat = (info.climats && info.climats[0]) ? info.climats[0] : info.title;
+    return _compactNoHyphen(climat);
+  }
+
+  // 一級園：你的備份是「地塊_村莊」，兩段都要去掉破折號和空白
+  if (info.level === 'PC') {
+    const climat = (info.climats && info.climats[0]) ? info.climats[0] : '';
+    const village = info.village || '';
+    const c = _compactNoHyphen(climat);
+    const v = _compactNoHyphen(village);
+    return c + '_' + v; // ← 就是你 JSON 那種
+  }
+
+  // 村莊級：你的備份是 aloxe-corton, chambolle-musigny → 要保留破折號
+  if (info.level === 'VI') {
+    return _slugWithHyphen(info.title);
+  }
+
+  // 其他就先用 slug
+  return _slugWithHyphen(info.title || 'aoc');
+}
+
     
     /* ---------- 常數 ---------- */
     const GC_LIST = [
-      "Chambertin","Chambertin-Clos de Bèze","Mazis-Chambertin","Charmes-Chambertin","Griotte-Chambertin","Latricières-Chambertin","Ruchottes-Chambertin","Mazoyères-Chambertin",
+      "Chambertin","Chambertin-Clos de Bèze","Mazis-Chambertin","Chapelle-Chambertin","Charmes-Chambertin","Griotte-Chambertin","Latricières-Chambertin","Ruchottes-Chambertin","Mazoyères-Chambertin",
       "Clos de la Roche","Clos Saint-Denis","Clos des Lambrays","Clos de Tart","Bonnes-Mares","Musigny","Clos de Vougeot",
       "Échezeaux","Grands Échezeaux","Richebourg","Romanée-Conti","La Romanée","Romanée-Saint-Vivant","La Tâche","La Grande Rue",
       "Corton","Corton-Charlemagne","Charlemagne",
@@ -191,6 +296,173 @@
 
     /* ---------- 單一版解析器（判斷等級並傳回顯示名稱）- 此處保留不變，因為修改點擊事件查找邏輯更安全 ---------- */
     /* ---------- 單一版解析器（判斷等級並傳回顯示名稱）- 修復版 ---------- */
+
+// ************ 新增：外部連結處理函數 ************
+  function openExternalLink(url) {
+    if (window.ReactNativeWebView) {
+      // 向 React Native 發送訊息
+      window.ReactNativeWebView.postMessage(JSON.stringify({
+        __from: 'wv_link', // 自訂標籤，用於 app.js 識別
+        type: 'open_url',
+        url: url
+      }));
+    } else {
+      // 在瀏覽器環境中直接打開（非 App 環境的測試）
+      window.open(url, '_blank');
+    }
+  }
+  // ************************************************
+  function goBackToHome() {
+    if (window.ReactNativeWebView) {
+        window.ReactNativeWebView.postMessage(JSON.stringify({
+            __from: 'wv_home', // 自定義標籤
+            type: 'go_back_home' // 自定義類型
+        }));
+    }
+  }
+  // 【核心】：接收庫存數據並在地圖上繪製標記
+window.drawCellarMarkers = function(summary = {}) {
+  // 還沒準備好就先存起來
+  if (!window.__MAP_READY__ || !masterAOC) {
+    window.__PENDING_CELLAR__ = summary;
+    return;
+  }
+
+  // 清掉舊的 marker
+  if (!window.inventoryMarkers) window.inventoryMarkers = [];
+  window.inventoryMarkers.forEach(m => m.remove());
+  window.inventoryMarkers = [];
+
+  // 偵錯角標（可留可刪）
+  let dbg = document.getElementById('cellar-debug');
+  if (!dbg) {
+    dbg = document.createElement('div');
+    dbg.id = 'cellar-debug';
+    dbg.style.position = 'absolute';
+    dbg.style.top = '8px';
+    dbg.style.right = '8px';
+    dbg.style.zIndex = 9999;
+    dbg.style.background = 'rgba(255,255,255,0.85)';
+    dbg.style.padding = '4px 8px';
+    dbg.style.fontSize = '11px';
+    dbg.style.borderRadius = '6px';
+    document.body.appendChild(dbg);
+  }
+
+  const inv = summary || {};
+  const seenKeys = new Set();   // ← 這個就是避免同一地塊重複畫
+  let total = 0;
+  let matched = 0;
+
+  (masterAOC.features || []).forEach(f => {
+    total++;
+    const props = f.properties || {};
+    const aocKey = props.aoc_key;
+    if (!aocKey) return;
+
+    // 如果這個 key 畫過了，就不要再畫
+    if (seenKeys.has(aocKey)) return;
+
+    const data = inv[aocKey];
+    if (!data) return;
+
+    const cellarCount   = Number(data.cellar   || 0);
+    const consumedCount = Number(data.consumed || 0);
+    if (cellarCount === 0 && consumedCount === 0) return;
+
+    // 到這邊代表這個 key 真的要畫了，標記一下
+    seenKeys.add(aocKey);
+    matched++;
+
+    // 算中心
+    const bounds = new maplibregl.LngLatBounds();
+    const addCoords = (coords) => {
+      if (!coords) return;
+      if (Array.isArray(coords) && typeof coords[0] === 'number') {
+        bounds.extend(coords);
+      } else if (Array.isArray(coords)) {
+        coords.forEach(addCoords);
+      }
+    };
+    addCoords(f.geometry && f.geometry.coordinates);
+    if (bounds.isEmpty()) return;
+    const center = bounds.getCenter();
+
+    const onlyConsumed = (cellarCount === 0 && consumedCount > 0);
+
+    const el = document.createElement('div');
+    el.className = 'cellar-marker' + (onlyConsumed ? ' consumed' : '');
+    el.style.backgroundColor = onlyConsumed ? '#007bff' : '#800000';
+    el.innerHTML = `<span>${cellarCount > 0 ? cellarCount : '🥂'}</span>`;
+
+    const marker = new maplibregl.Marker({ element: el, anchor: 'center' })
+      .setLngLat(center)
+      .setPopup(
+        new maplibregl.Popup({ offset: 25 }).setHTML(`
+          <strong>${data.aoc_fullname || props.denom || 'AOC'}</strong><br>
+          庫存: ${cellarCount} 🍷<br>
+          已飲: ${consumedCount} 🥂
+        `)
+      )
+      .addTo(map);
+
+    window.inventoryMarkers.push(marker);
+  });
+
+  dbg.textContent = `Cellar markers: ${matched}`;
+};
+
+// index.html (在 openExternalLink 函數之後)
+
+// --- 查詢狀態函數：由 AOC 點擊事件觸發 ---
+function checkCellarStatus(aocName, featureId) {
+    if (window.ReactNativeWebView) {
+        window.ReactNativeWebView.postMessage(JSON.stringify({
+            __from: 'wv_cellar',
+            type: 'query_status',
+            aocName: aocName, // 傳遞 AOC 名稱
+            featureId: featureId // 傳遞地塊 ID (用於回傳時更新 UI)
+        }));
+    }
+}
+
+// --- 開啟管理頁面函數：由按鈕觸發 ---
+function openCellarManager(aocTitle, aocLevel, climatName) {
+    if (window.ReactNativeWebView) {
+        window.ReactNativeWebView.postMessage(JSON.stringify({
+            __from: 'wv_cellar',
+            type: 'open_manager',
+            aocTitle: aocTitle,
+            aocLevel: aocLevel,
+            climatName: climatName
+        }));
+    }
+}
+
+// --- 接收 RN 層傳回的狀態，更新 UI ---
+window.updateCellarStatus = (featureId, stockCount, consumedCount) => {
+    const statusDiv = document.getElementById(`cellar-status-${featureId}`);
+    const iconSpan = document.getElementById(`cellar-icon-${featureId}`);
+    
+    if (statusDiv) {
+        let text = '目前狀態：';
+        if (stockCount > 0) {
+            text += `庫存 ${stockCount} 瓶 `;
+            if (iconSpan) iconSpan.textContent = '🥂'; // 換個圖示
+        }
+        if (consumedCount > 0) {
+            text += `飲用 ${consumedCount} 瓶`;
+            if (iconSpan && stockCount === 0) iconSpan.textContent = '🍷'; // 換個圖示
+        }
+        if (stockCount === 0 && consumedCount === 0) {
+            text += '尚無紀錄';
+            if (iconSpan) iconSpan.textContent = '🚫🍷'; // 換個圖示
+        }
+        statusDiv.innerHTML = text;
+    }
+};
+
+// ----------------------------------------------------
 function parseAOC(props){
     const raw = String(props?.denom || '');
     const parts = raw.split(',').map(s=>s.trim()).filter(Boolean);
@@ -248,19 +520,19 @@ function parseAOC(props){
 // 提取地塊名稱
         const allClimats = pcParts
           .flatMap(p => {
-              // 從 e.g., "Meursault 1er cru Les Perrières (Domaine XYZ)" 中提取地塊名
+              // 從 e.g., "Gevrey-Chambertin 1er cru La Bossière" 中提取地塊名
               let tail = p.replace(/^(.+?)\s+(premier|1er)\s*cru/i, '').trim();
               
-              // 刪除前綴標點符號和括號 (保持這個清理邏輯)
+              // 刪除各種前綴和括號 (這是修復的重點之一)
               tail = tail.replace(/^[\s:\/–—\-]+/, '').replace(/^\((.*)\)$/, '$1').trim();
               
               if (!tail || /premier\s*cru/i.test(tail)) return [];
               
-              // *** 【關鍵修復】: 不再用空格分隔，讓整個地塊名 (如 "Les Amoureuses") 成為一個單一元素 ***
+              // *** 保持為單一元素，確保 "La Bossière" 不被切割 ***
               return [tail]; 
           })
-          .filter(c => c.length > 2) // 排除掉過短的殘餘字串
-          .filter((value, index, self) => self.indexOf(value) === index); // 去重
+          .filter(c => c.length > 2)
+          .filter((value, index, self) => self.indexOf(value) === index);
 
         const title = titleAOC;
         const subtitle = allClimats.length ? `地塊：${allClimats.join(', ')}` : ''; 
@@ -283,7 +555,8 @@ function parseAOC(props){
 
 const getLevel = (props) => parseAOC(props).level;
     // ... (Map 初始化部分不變) ...
-    
+    const MAPTILER_KEY = 'f7b4hpnXcweudZNc8c1V'; // ← 您的 MapTiler Key
+
     // ====== Map 初始化（MapLibre GL）======
     const map = new maplibregl.Map({
       container: 'map',
@@ -299,7 +572,7 @@ const getLevel = (props) => parseAOC(props).level;
               'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'
             ],
             tileSize: 256,
-            maxzoom: 19,
+            maxzoom: 14.5,
             attribution: '© OpenStreetMap contributors'
           },
           'terrain-dem': {
@@ -320,7 +593,10 @@ const getLevel = (props) => parseAOC(props).level;
       pitch: START.pitch,
       bearing: START.bearing,
       antialias: true,
-      hash: false
+      hash: false,
+      maxzoom: 14.5 ,// <--- 新增或修改：限制最大縮放級別為 17.5
+      maxBounds: [[3.5, 46.0], [5.5, 48.5]] // [西南角經緯度, 東北角經緯度]
+
     });
 
     map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
@@ -331,76 +607,206 @@ const getLevel = (props) => parseAOC(props).level;
     let currentFilterQ = '';
     let wineriesVisible = false; // 預設為隱藏
 
-    map.on('load', async () => {
+map.on('load', async () => {
+  // ====== 【改成這一段】 ======
+  const AOC_DATA_FILE    = 'https://raw.githubusercontent.com/cheyuan1115/burgundy-app/main/burgundy.geojson';
+  const WINERY_DATA_FILE = 'https://raw.githubusercontent.com/cheyuan1115/burgundy-app/main/wineries.geojson';
+  const META_DATA_FILE   = 'https://raw.githubusercontent.com/cheyuan1115/burgundy-app/main/meta.json';
 
-      // 1) 載入 meta.json
-      let META = { wineries: {}, climat_owners: {} }; // 確保 climat_owners 存在
-      try {
-        const mRes = await fetch('./meta.json');
-        META = await mRes.json();
-      } catch (e) {
-        console.warn('meta.json 載入失敗：', e);
-      }
+  // 1) 先載入 meta.json
+  let META = { wineries: {}, climat_owners: {} };
+  try {
+    const mRes = await fetch(META_DATA_FILE);
+    META = await mRes.json();
+    console.log('✅ meta.json 載入成功');
+  } catch (e) {
+    console.warn('❌ meta.json 載入失敗：', e);
+  }
+
+try {
+  masterAOC = await (await fetch(AOC_DATA_FILE)).json();
+  console.log('✅ burgundy.geojson 載入成功');
+} catch (e) {
+  console.warn('❌ burgundy.geojson 載入失敗：', e);
+}
+
+// 3) 載入 wineries (注意你的檔名是 .json 還是 .geojson)
+try {
+  masterWineries = await (await fetch(WINERY_DATA_FILE)).json();
+  console.log('✅ wineries 載入成功');
+} catch (e) {
+  console.warn('❌ wineries 載入失敗：', e);
+}
+
         
-      // ... (Sky, Hillshade, AOC 圖層初始化代碼不變) ...
-      // Sky + Hillshade
-      map.addLayer({
-        id: 'sky',
-        type: 'sky',
-        paint: {
-          'sky-type': 'atmosphere',
-          'sky-atmosphere-sun': [0.0, 0.0],
-          'sky-atmosphere-sun-intensity': 12
-        }
-      });
-
+      // === Hillshade ===
       map.addLayer({
         id: 'hillshade',
         type: 'hillshade',
         source: 'terrain-dem',
         layout: { visibility: 'visible' },
         paint: {
-          'hillshade-exaggeration': 1.0, // 增強陰影視覺效果
+          'hillshade-exaggeration': 1.0, 
           'hillshade-shadow-color': 'rgba(0,0,0,0.55)',
           'hillshade-illumination-direction': 315
         }
       });
+      
+      // ==== 等高線（MapTiler Vector）====
+      //const MAPTILER_KEY = 'f7b4hpnXcweudZNc8c1V'; // ← 換成你的 key
 
-      // AOC
-      const aocRes = await fetch(AOC_DATA_FILE);
-      masterAOC = await aocRes.json();
-
-      const enrich = (fc) => ({
-        type: 'FeatureCollection',
-        features: (fc.features || []).map(f => {
-          const p = f.properties || {};
-          const lvl = getLevel(p);
-          return { ...f, properties: { ...p, lvl } };
-        })
+      // 1️⃣ 先建立 Source
+      map.addSource('contours', {
+        type: 'vector',
+        url: `https://api.maptiler.com/tiles/contours/tiles.json?key=${MAPTILER_KEY}`
       });
 
-      map.addSource('aoc', { type: 'geojson', data: enrich(masterAOC), promoteId: 'id', generateId: true });
+      // 2️⃣ 讀取 tiles.json，找正確的 source-layer 名稱
+      let contourLayerName = 'contour'; 
+      try {
+        const metaUrl = `https://api.maptiler.com/tiles/contours/tiles.json?key=${MAPTILER_KEY}`;
+        const tilesMeta = await fetch(metaUrl).then(r => r.json()).catch(() => null);
+
+        if (tilesMeta && Array.isArray(tilesMeta.vector_layers)) {
+          const cand = tilesMeta.vector_layers.find(v => /contour/i.test(v.id));
+          if (cand) contourLayerName = cand.id;
+        }
+
+      } catch (err) {
+        console.warn('Failed to fetch contour tiles.json:', err);
+      }
+      
+      // 線：主等高線比較粗、比較黑
+      if (map.getLayer('contour-lines')) map.removeLayer('contour-lines');
+      map.addLayer({
+        id: 'contour-lines',
+        type: 'line',
+        source: 'contours',
+        'source-layer': contourLayerName, // 使用解析後的名稱
+        minzoom: 8,
+        layout: { 'line-join': 'round', 'line-cap': 'round' },
+        paint: {
+          'line-color': '#000',
+          'line-opacity': 0.5,
+          'line-width': [
+            'interpolate', ['linear'], ['zoom'],
+            8, 0.6,
+            12, 1.0,
+            14, 1.4
+          ]
+        }
+      }, 'aoc-line'); // 插在 aoc-line 之下
+
+      // 標籤：從 zoom 11 開始顯示
+      if (map.getLayer('contour-labels')) map.removeLayer('contour-labels');
+      map.addLayer({
+        id: 'contour-labels',
+        type: 'symbol',
+        source: 'contours',
+        'source-layer': contourLayerName,
+        minzoom: 11, 
+        layout: {
+          'symbol-placement': 'line-center',
+          'text-field': [
+            'format',
+            ['to-string', ['round', ['get', 'height']]], {}, 
+            ' m', { 'font-scale': 0.9 }
+          ],
+          'text-font': ['Open Sans Regular', 'Arial Unicode MS Regular'],
+          'text-size': [
+            'interpolate', ['linear'], ['zoom'],
+            11, 12,
+            13, 14,
+            15, 16
+          ],
+          'text-allow-overlap': true,
+          'text-ignore-placement': true,
+          'text-rotation-alignment': 'map',
+          'text-pitch-alignment': 'map'
+        },
+        paint: {
+          'text-color': '#111',
+          'text-halo-color': '#fff',
+          'text-halo-width': 2,
+          'text-opacity': [
+            'step', ['zoom'],
+            0,
+            11, [
+              'case',
+              ['==', ['get', 'nth_line'], 5], 1, 0
+            ],
+            13, 1
+          ]
+        }
+      });
+      // ===================================
+      
+     // AOC
+const aocRes = await fetch(AOC_DATA_FILE);
+const rawAOC = await aocRes.json();
+
+// ➤ 幫每個 AOC feature 加上 level + label
+const makeLabel = (p) => {
+  const info = parseAOC(p);
+  if (info.level === 'GC' || info.level === 'PC') {
+    const climat = info.climats && info.climats.length ? info.climats[0] : '';
+    return climat || info.title || '';
+  }
+  if (info.level === 'VI') return info.title || '';
+  return '';
+};
+
+// 【核心修正】：為每個 Feature 添加唯一的 aoc_key + 數字 id
+const enrichWithKey = (fc) => ({
+  type: 'FeatureCollection',
+  features: (fc.features || []).map((f, idx) => {
+    const p = f.properties || {};
+    const info = parseAOC(p);
+    const lvl = info.level;
+    const label = makeLabel(p);
+    const aoc_key = makeAocKeyFromInfo(info); // ← 用你前面做的那個產 key 的函式
+
+    return {
+      ...f,
+      id: idx,                 // ← 一律用數字，避免字串被轉成 NaN
+      properties: {
+        ...p,
+        lvl,
+        label,
+        aoc_key
+      }
+    };
+  })
+});
+
+// 先做出 enrich 過的版本
+const enrichedAOC = enrichWithKey(rawAOC);
+
+// 給 map 用
+map.addSource('aoc', { 
+  type: 'geojson', 
+  data: enrichedAOC, 
+  promoteId: 'id'
+});
+
+// 再回存一份，給 drawCellarMarkers 用
+masterAOC = enrichedAOC;
 
       // Fill 著色
       map.addLayer({
         id: 'aoc-fill',
         type: 'fill',
         source: 'aoc',
+        maxzoom: 15,
         paint: {
           'fill-color': [
             'match', ['get', 'lvl'],
             'GC', '#cc0033',
             'PC', '#ff7f0e',
             'VI', '#1f77b4',
-            /* 其他（RE）*/ '#2ca02c'
+            /* RE */ '#2ca02c'
           ],
-          'fill-opacity': [
-            'match', ['get', 'lvl'],
-            'GC', 0.18,
-            'PC', 0.16,
-            'VI', 0.14,
-            /* RE */   0.12
-          ]
+          'fill-opacity': 0.35
         }
       });
 
@@ -409,6 +815,7 @@ const getLevel = (props) => parseAOC(props).level;
         id: 'aoc-line',
         type: 'line',
         source: 'aoc',
+        maxzoom: 15,
         paint: {
           'line-color': [
             'match', ['get', 'lvl'],
@@ -417,15 +824,50 @@ const getLevel = (props) => parseAOC(props).level;
             'VI', '#1f77b4',
             /* RE */ '#2ca02c'
           ],
-          'line-width': 1.2
+          'line-width': 1.5
         }
       });
+
+      // ➤ 新增：地塊名稱標籤圖層
+      map.addLayer({
+        id: 'aoc-labels',
+        type: 'symbol',
+        source: 'aoc',
+        minzoom: 13, // 放大到這層級以上才顯示
+        layout: {
+          'text-field': ['get', 'label'],
+          'text-font': ['Open Sans Regular', 'Arial Unicode MS Regular'],
+          'text-size': [
+            'interpolate', ['linear'], ['zoom'],
+            12, 10,
+            14, 12,
+            16, 14
+          ],
+          'symbol-placement': 'point',
+          'text-pitch-alignment': 'map',
+          'text-rotation-alignment': 'map',
+          'text-allow-overlap': false
+        },
+        paint: {
+          'text-color': '#222',
+          'text-halo-color': '#fff',
+          'text-halo-width': 1.2,
+          'text-opacity': [
+            'case',
+            ['==', ['get', 'lvl'], 'RE'], 0,
+            1
+          ]
+        },
+        filter: ['all', ['has', 'label'], ['!=', ['get', 'label'], '']]
+      }, 'aoc-line'); // 插在 aoc-line 之上
+
 
       // Hover 高亮
       map.addLayer({
         id: 'aoc-line-hl',
         type: 'line',
         source: 'aoc',
+        maxzoom: 15, // <--- 新增：限制最大縮放級別
         paint: {
           'line-color': [
             'match', ['get', 'lvl'],
@@ -437,19 +879,69 @@ const getLevel = (props) => parseAOC(props).level;
           'line-width': ['case', ['boolean', ['feature-state', 'hover'], false], 2.4, 0]
         }
       });
-      
+      const aocHoverPopup = new maplibregl.Popup({
+        closeButton: false, // 不顯示關閉按鈕
+        closeOnClick: false // 點擊時不關閉
+      });
 
       let hoveredId = null;
       map.on('mousemove', 'aoc-fill', (e) => {
-        if (!e.features?.length) return;
+        if (!e.features?.length) {
+            // 如果游標移出地塊，確保移除
+            if (hoveredId !== null) map.setFeatureState({ source: 'aoc', id: hoveredId }, { hover: false });
+            hoveredId = null;
+            map.getCanvas().style.cursor = '';
+            aocHoverPopup.remove(); // 移除 Popup
+            return;
+        }
+
         const f = e.features[0];
-        if (hoveredId !== null) map.setFeatureState({ source: 'aoc', id: hoveredId }, { hover: false });
+        const properties = f.properties || {};
+        const info = parseAOC(properties);
+        
+        // 1. 高亮處理
+        if (hoveredId !== null && hoveredId !== f.id) {
+             map.setFeatureState({ source: 'aoc', id: hoveredId }, { hover: false });
+        }
         hoveredId = f.id;
         map.setFeatureState({ source: 'aoc', id: hoveredId }, { hover: true });
+        map.getCanvas().style.cursor = 'pointer';
+
+        // 2. Popup/Tooltip 處理
+        const levelText = { GC:'Grand Cru', PC:'Premier Cru', VI:'Village', RE:'Régionale / 其他' }[info.level] || 'AOC';
+        
+        // 提取主要顯示名稱
+        let displayName = info.title; 
+        if (info.level === 'GC' || info.level === 'PC') {
+            // 嘗試顯示 地塊名 + (村莊名/等級)
+            const climatName = info.climats.length ? info.climats[0] : '';
+            if (climatName) {
+                displayName = climatName;
+                if (info.village && info.village !== 'Premier Cru') {
+                    displayName += ` (${info.village})`;
+                }
+            }
+        }
+        
+        const contentHTML = `
+            <div style="font-size:12px; font-weight:700; max-width: 240px;">
+                ${displayName}
+            </div>
+            <div style="font-size:10px; color:#666">${levelText}</div>
+        `;
+        
+        aocHoverPopup
+          .setLngLat(e.lngLat) // 設置在當前鼠標位置
+          .setHTML(contentHTML)
+          .addTo(map);
+
       });
+
       map.on('mouseleave', 'aoc-fill', () => {
         if (hoveredId !== null) map.setFeatureState({ source: 'aoc', id: hoveredId }, { hover: false });
         hoveredId = null;
+        map.getCanvas().style.cursor = '';
+        aocHoverPopup.remove(); // 移除 Popup
       });
       
       // ************ 獲取面板元素並綁定關閉事件 ************
@@ -464,134 +956,168 @@ const getLevel = (props) => parseAOC(props).level;
 
       // --- 點擊 AOC 顯示底部面板 ---
       map.on('click', 'aoc-fill', (e) => {
-    const f = e.features && e.features[0];
-    if (!f) return;
-
-    const info = parseAOC(f.properties || {});
-    const levelText = { GC:'Grand Cru', PC:'Premier Cru', VI:'Village', RE:'Régionale / 其他' }[info.level] || 'AOC';
-    
-    
-    // ************ 強化 META 資料查找邏輯 (最終修復版本 V3: 移除 break) ************
-    let meta = null;
-    let foundKey = '';
-    const props = f.properties || {};
-
-    // --- 1. Premier Cru / Grand Cru Climat 專屬查找（最優先，依賴 parseAOC 提取的完整地塊名） ---
-    if ((info.level === 'PC' || info.level === 'GC') && info.climats.length > 0) {
-        const villNorm = _norm(info.village || ''); 
+        const f = e.features && e.features[0];
+        if (!f) return;
+// 【新增】：從全局數據中直接查找庫存狀態
+        const summary = window.CELLAR_DATA_TO_DRAW || window.__INVENTORY_SUMMARY__ || {};
+        const aoc_key = f.properties.aoc_key || '';
+        const inventory = summary[aoc_key] || { cellar: 0, consumed: 0 };
         
-        // 此時 info.climats 裡只有一個完整的地塊名，例如 "Les Amoureuses"
-        const fullClimatRaw = info.climats[0];
-        const fullClimatNorm = _norm(fullClimatRaw); // "lesamoureuses"
+        const stockQty = inventory.cellar || 0;
+        const consumedQty = inventory.consumed || 0;
         
-        // 排除通用 AOC 名稱
-        if (!fullClimatNorm.includes(_norm(info.title))) {
+        const info = parseAOC(f.properties || {});
+        const levelText = { GC:'Grand Cru', PC:'Premier Cru', VI:'Village', RE:'Régionale / 其他' }[info.level] || 'AOC';
+        // 【這裡開始替換：確保您在替換前定義了 featureState, stockQty, consumedQty】
 
-            // 嘗試 1A: 地塊名 + 村莊名 (如 lesamoureuseschambollemusigny)
-            if (villNorm && villNorm.length > 2 && villNorm !== 'bourgogne') {
-                foundKey = fullClimatNorm + villNorm;
-                if (META[foundKey]) {
-                    meta = META[foundKey];
-                }
-            }
+        
+        
+        
+        // ************ 強化 META 資料查找邏輯 ************
+        let meta = null;
+        let foundKey = '';
+        const props = f.properties || {};
+        
+        // --- 1. Premier Cru / Grand Cru Climat 專屬查找 ---
+        if ((info.level === 'PC' || info.level === 'GC') && info.climats.length > 0) {
+            const villNorm = _norm(info.village || ''); 
+            const fullClimatRaw = info.climats[0];
+            const fullClimatNorm = _norm(fullClimatRaw); 
             
-            // 嘗試 1B: 只有地塊名 (如 lesamoureuses，這是您 meta.json 中的鍵)
-            if (!meta) {
-                foundKey = fullClimatNorm; 
-                if (META[foundKey]) {
-                    meta = META[foundKey];
+            if (!fullClimatNorm.includes(_norm(info.title))) {
+
+                if (villNorm && villNorm.length > 2 && villNorm !== 'bourgogne') {
+                    foundKey = fullClimatNorm + villNorm;
+                    if (META[foundKey]) {
+                        meta = META[foundKey];
+                    }
                 }
-            }
-        }
-    } 
-
-
-    // --- 2. 通用 AOC 名稱查找（如果 1 失敗） ---
-    if (!meta) {
-        foundKey = _norm(info.title || '');
-        meta = META[foundKey] || null;
-    }
-        
-        // **********************************************
-
-        // 確保地塊/地點的標籤正確且不重複
-        let subText = '';
-        if (info.level === 'PC') {
-            // Premier Cru: 顯示地塊，並移除地塊名中間的逗號
-            const rawSub = info.subtitle.replace('地塊：', '');
-            const cleanSub = rawSub.replace(/,\s*/g, ' '); // 將逗號替換為空格
-            subText = rawSub ? `地塊：${cleanSub}` : '';
-        } else if (info.level === 'GC') {
-            // Grand Cru: 顯示地點
-            subText = info.subtitle ? `地點：${info.subtitle.replace('地點：', '')}` : ''; 
-        }
-        
-        const subRow = subText ? `<div class="small" style="color:#666;margin-top:2px">${subText}</div>` : '';
-
-        
-        // ************ 新增：查詢地塊擁有者列表 ************
-        const ownerKey = foundKey; // 使用與 meta 相同的 key 進行查詢
-        const owners = META.climat_owners && META.climat_owners[ownerKey] || null;
-        let ownersHTML = '';
-
-        if (owners && owners.length > 0) {
-            let listItems = owners.map(owner => {
-                const monopole = owner.is_monopole ? ' (獨佔園)' : '';
-                const area = owner.ha ? ` (${owner.ha} ha)` : '';
                 
-                // 檢查是否有連結，並生成超連結
-                const ownerName = owner.search_link ? 
-                                    `<a href="${owner.search_link}" target="_blank" rel="noopener">${owner.name}</a>` : 
-                                    owner.name;
+                if (!meta) {
+                    foundKey = fullClimatNorm; 
+                    if (META[foundKey]) {
+                        meta = META[foundKey];
+                    }
+                }
+            }
+        } 
 
-                return `<li>${ownerName}<b>${monopole}</b>${area}</li>`;
-            }).join('');
-            
-            ownersHTML = `
-                <div style="margin-top:10px; font-weight: bold;">🥂 擁有酒莊：</div>
-                <ul style="margin: 4px 0 0 16px; padding: 0; list-style-type: none; font-size: 13px;">
-                    ${listItems}
-                </ul>
-            `;
+        // --- 2. 通用 AOC 名稱查找（如果 1 失敗） ---
+        if (!meta) {
+            foundKey = _norm(info.title || '');
+            meta = META[foundKey] || null;
         }
-        // ************************************************
+            
+            // **********************************************
+
+            // 確保地塊/地點的標籤正確且不重複
+            let subText = '';
+            if (info.level === 'PC') {
+                const rawSub = info.subtitle.replace('地塊：', '');
+                const cleanSub = rawSub.replace(/,\s*/g, ' '); 
+                subText = rawSub ? `地塊：${cleanSub}` : '';
+            } else if (info.level === 'GC') {
+                subText = info.subtitle ? `地點：${info.subtitle.replace('地點：', '')}` : ''; 
+            }
+            
+            const subRow = subText ? `<div class="small" style="color:#666;margin-top:2px">${subText}</div>` : '';
+
+            
+            // ************ 新增：查詢地塊擁有者列表 ************
+            const ownerKey = foundKey; 
+            const owners = META.climat_owners && META.climat_owners[ownerKey] || null;
+            let ownersHTML = '';
+
+            if (owners && owners.length > 0) {
+                let listItems = owners.map(owner => {
+                    const monopole = owner.is_monopole ? ' (獨佔園)' : '';
+                    const area = owner.ha ? ` (${owner.ha} ha)` : '';
+                    
+                    const ownerName = owner.search_link ? 
+                        `<a href="javascript:void(0)" onclick="openExternalLink('${owner.search_link.replace(/'/g, "\\'")}')" rel="noopener">${owner.name}</a>` : 
+                        owner.name;
+
+                    return `<li>${ownerName}<b>${monopole}</b>${area}</li>`;
+                }).join('');
+                
+                ownersHTML = `
+                    <div style="margin-top:10px; font-weight: bold;">🥂 擁有酒莊：</div>
+                    <ul style="margin: 4px 0 0 16px; padding: 0; list-style-type: none; font-size: 13px;">
+                        ${listItems}
+                    </ul>
+                `;
+            }
+            // ************************************************
+            // --- 簡化 cellarStatusHTML 的生成 (在下方 finalHTML 中進行) ---
+            // const cellarStatusHTML = `<div id="cellar-status-${f.id}" style="font-weight: bold; font-size: 14px; margin-bottom: 8px;"></div>`;
+            
+            // ************************************************
+
+            // 只有在有 meta 資料時才顯示 extra 區塊
+            const extra = meta ? `
+              <div style="margin-top:8px">
+              <div class="small" style="margin-top:6px">
+                <b>${meta.zh || (foundKey.includes('premiercru') ? info.village + ' ' + (info.climats[0]||'PC') : info.title)}</b>｜${meta.level || levelText}<br>
+                村莊：${meta.village || info.subtitle.replace('地點：', '').replace('地塊：', '') || '未知'}
+              </div>
+              <div style="margin-top:8px">
+                ${meta.area_ha ? `<div class="small">面積: <b>${meta.area_ha} ha</b></div>` : ''}
+                ${meta.elevation ? `<div class="small">海拔: ${meta.elevation}</div>` : ''}
+                ${meta.aspect ? `<div class="small">坡向: ${meta.aspect}</div>` : ''}
+                ${meta.soil ? `<div class="small">土壤: ${meta.soil}</div>` : ''}
+              </div>
+              ${meta.style_note ? `<div class="small" style="color:#2c7d2c;margin-top:6px">風格: ${meta.style_note}</div>` : ''}
+              <div class="small" style="color:#555;margin-top:6px">${meta.notes || ''}</div>
+              ${ownersHTML} <!-- 插入酒莊列表 -->
+              ${meta.link ? `<div class="small" style="margin-top:4px">
+              <!-- 修正 Wine-Searcher 連結：改用 openExternalLink 函數 -->
+              <a href="javascript:void(0)" onclick="openExternalLink('${meta.link.replace(/'/g, "\\'")}')" rel="noopener noreferrer">🔗 Wine-Searcher</a>
+              </div>` : ''}
+              </div>
+            ` : '';
+            
+            // 確保 AOC 識別符是唯一的
+            const aocTitle = info.title;
+            const aocLevel = info.level;
+            const climatName = info.climats[0] || '';
+            const aoc_key_for_cellar = f.properties.aoc_key || aocTitle; // Fallback 到 aocTitle
+
+            // 【核心修正】：生成狀態文本
+            let statusText = '目前狀態：尚無紀錄 🚫🍷';
+            if (stockQty > 0) {
+                statusText = `目前狀態：庫存 ${stockQty} 瓶 🍷`;
+            }
+            if (consumedQty > 0) {
+                statusText += (stockQty > 0 ? ' / ' : '目前狀態：') + `已飲用 ${consumedQty} 瓶 🥂`;
+            }
+            const cellarStatusHTML = `<div id="cellar-status-${f.id}" style="font-weight: bold; font-size: 14px; margin-bottom: 8px;">${statusText}</div>`;
 
 
-        // 只有在有 meta 資料時才顯示 extra 區塊
-        const extra = meta ? `
-          <div style="margin-top:8px">
-          <div class="small" style="margin-top:6px">
-            <b>${meta.zh || (foundKey.includes('premiercru') ? info.village + ' ' + (info.climats[0]||'PC') : info.title)}</b>｜${meta.level || levelText}<br>
-            村莊：${meta.village || info.subtitle.replace('地點：', '').replace('地塊：', '') || '未知'}
-          </div>
-          <div style="margin-top:8px">
-            ${meta.area_ha ? `<div class="small">面積: <b>${meta.area_ha} ha</b></div>` : ''}
-            ${meta.elevation ? `<div class="small">海拔: ${meta.elevation}</div>` : ''}
-            ${meta.aspect ? `<div class="small">坡向: ${meta.aspect}</div>` : ''}
-            ${meta.soil ? `<div class="small">土壤: ${meta.soil}</div>` : ''}
-          </div>
-          ${meta.style_note ? `<div class="small" style="color:#2c7d2c;margin-top:6px">風格: ${meta.style_note}</div>` : ''}
-          <div class="small" style="color:#555;margin-top:6px">${meta.notes || ''}</div>
-          ${ownersHTML} <!-- 插入酒莊列表 -->
-          ${meta.link ? `<div class="small" style="margin-top:4px">
-            <a href="${meta.link}" target="_blank" rel="noopener">🔗 Wine-Searcher</a>
-          </div>` : ''}
-          </div>
-        ` : '';
+            // ************ 填充內容並顯示底部面板 ************
+            const finalHTML = `
+               <div style="font-weight:700">${info.title}</div>
+               <div class="small" style="color:#666;margin-top:6px">等級：${levelText}</div>
+               ${subRow}   <!-- 插入地塊/地點名 -->
+               ${extra}    <!-- 插入 meta 資料 (如果存在) -->
 
-        // ************ 填充內容並顯示底部面板 ************
-        const finalHTML = `
-           <div style="font-weight:700">${info.title}</div>
-           <div class="small" style="color:#666;margin-top:6px">等級：${levelText}</div>
-           ${subRow}   <!-- 插入地塊/地點名 -->
-           ${extra}    <!-- 插入 meta 資料 (如果存在) -->
-        `;
-        
-        panelContent.innerHTML = finalHTML;
-        infoPanel.classList.add('visible');
-        // ************************************************
-      });
+               <div style="margin-top:10px; border-top: 1px solid #eee; padding-top: 8px;">
+                   
+                   <!-- 【修正】：直接使用計算好的 statusText -->
+                   ${cellarStatusHTML} 
 
+                   <!-- 管理收藏按鈕 (點擊導航到 RN 畫面) -->
+                   <button class="btn" style="width: 100%; display: flex; align-items: center; justify-content: center; background: #f0f0f0;"
+                           onclick="openCellarManager('${aoc_key_for_cellar}', '${aocLevel}', '${climatName}')"> 
+                       <span style="font-size: 18px; margin-right: 8px;">🍷</span> 管理我的收藏 / 紀錄
+                   </button>
+               </div>
+            `;
+            
+            panelContent.innerHTML = finalHTML;
+            infoPanel.classList.add('visible');
+            
+            // 【關鍵移除】：不再需要 setTimeout 呼叫 checkCellarStatus
+        });
       // ... (酒莊圖層及搜尋代碼不變) ...
       // 酒莊圖層設定
       const wRes = await fetch(WINERY_DATA_FILE);
@@ -611,7 +1137,12 @@ const getLevel = (props) => parseAOC(props).level;
           'circle-stroke-color': '#ffffff'
         }
       });
-      
+      //限制放大
+const ZMAX = 14.5;
+map.setMaxZoom(ZMAX);
+map.on('move', () => { if (map.getZoom() > ZMAX) map.setZoom(ZMAX); });
+//****************
+
       // ===== 酒莊互動：滑入改游標、點擊顯示 popup（含 meta 合併） =====
       map.on('mouseenter', 'wineries', () => { map.getCanvas().style.cursor = 'pointer'; });
       map.on('mouseleave', 'wineries', () => { map.getCanvas().style.cursor = ''; });
@@ -672,10 +1203,21 @@ const getLevel = (props) => parseAOC(props).level;
           return score > 0;
         });
 
-        const filtered = { type:'FeatureCollection', features: feats.map(f => {
-          const p = f.properties || {};
-          return { ...f, properties: { ...p, lvl: getLevel(p) } };
-        })};
+        const filtered = {
+  type: 'FeatureCollection',
+  features: feats.map(f => {
+    const p = f.properties || {};
+    const info = parseAOC(p);
+    return {
+      ...f,
+      properties: {
+        ...p,
+        lvl: info.level,
+        aoc_key: makeAocKeyFromInfo(info)  // ←補回來
+      }
+    };
+  })
+};
 
         map.getSource('aoc').setData(filtered);
 
@@ -702,7 +1244,7 @@ const getLevel = (props) => parseAOC(props).level;
               return;
           }
           
-          map.fitBounds(b, { padding: 40, maxZoom: 14, duration: 600 });
+          map.fitBounds(b, { padding: 40, maxzoom: 15, duration: 600 });
         }
       }
       
@@ -733,7 +1275,7 @@ const getLevel = (props) => parseAOC(props).level;
             const firstFeature = filteredWineries[0];
             const coords = firstFeature.geometry.coordinates;
             if (coords && coords.length === 2 && typeof coords[0] === 'number') {
-                map.flyTo({ center: coords, zoom: Math.max(map.getZoom(), 12), duration: 600 });
+                map.flyTo({ center: coords, zoom: Math.min(Math.max(map.getZoom(), 12), 14.5), duration: 600 });
             }
         }
       }
@@ -747,12 +1289,16 @@ const getLevel = (props) => parseAOC(props).level;
       
       const wineryQ = document.getElementById('winery-q'); 
       const btnClearWinery = document.getElementById('clear-winery'); 
-      const wineryContainer = document.getElementById('winery-search-container'); // 取得容器元素
+      const wineryContainer = document.getElementById('winery-search-container');
+      const goHomeBtn = document.getElementById('goHomeBtn'); // 【新增】獲取按鈕
       
       
       let tAOC = null;
       q.addEventListener('input', ()=>{ clearTimeout(tAOC); tAOC = setTimeout(()=> applySearch(q.value), 220); });
       btnAll.onclick   = ()=> { q.value=''; applySearch(''); };
+      
+      // 🍷 綁定回主選單按鈕
+      goHomeBtn.onclick = goBackToHome;
       
       // 🍷 酒莊顯示功能實作 - 使用圖示切換
       btnWineries.onclick = () => {
@@ -793,7 +1339,14 @@ const getLevel = (props) => parseAOC(props).level;
             btnWineries.title = '隱藏酒莊';
         }
       };
-      
+            // ************ 確保掃描按鈕綁定存在 ************
+    
+        
+        // 注意：如果您保留了原來的 btnScanner.onclick = ... 則需要刪除它
+        // 因為 addEventListener 已經完成了綁定
+    
+// ****************************************
+      // ****************************************
       // 視角控制程式碼 (為保持完整性保留)
       const pitchEl = document.getElementById('pitch');
       const pitchVal = document.getElementById('pitchVal');
@@ -843,9 +1396,29 @@ const getLevel = (props) => parseAOC(props).level;
         map.setLayoutProperty('sky', 'visibility', vis);
       };
 
+
+            if (window.CELLAR_DATA_TO_DRAW) {
+          // 確保 drawCellarMarkers 函式已被定義
+          if (typeof window.drawCellarMarkers === 'function') {
+             window.drawCellarMarkers(window.CELLAR_DATA_TO_DRAW);
+             // 清除全局變量，避免重複繪製
+             delete window.CELLAR_DATA_TO_DRAW; 
+          } else {
+             console.error("drawCellarMarkers 尚未定義，無法繪製地窖標記。");
+          }
+      }
+      window.__MAP_READY__ = true;
+
+// 如果之前有人先塞了庫存進來，就現在畫
+if (window.__PENDING_CELLAR__) {
+  window.drawCellarMarkers(window.__PENDING_CELLAR__);
+  window.__PENDING_CELLAR__ = null;
+}
       // 初始顯示
-      applySearch('');
+    //  applySearch('');
     });
+
+
   </script>
 </body>
 </html>
