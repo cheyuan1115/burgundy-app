@@ -5,8 +5,8 @@
     "village": "Gevrey-Chambertin",
     "area_ha": 12.9,
     "soil": "坡上為堅硬石灰岩，坡下為黏土與泥灰岩混合，排水良好。",
-    "aspect": "東南",
-    "elevation": "260-300 公尺",
+    "aspect": "115–130°（東南偏東)",
+    "elevation": "260-300 公尺，中上坡7~9°",
     "style_note": "「王者之酒」風格雄渾、結構宏大、陳年潛力極佳。",
     "notes": "拿破崙最愛的酒。為所有 Gevrey 特級園的標準。",
     "link": "https://www.wine-searcher.com/find/chambertin"
@@ -17,8 +17,8 @@
     "village": "Gevrey-Chambertin",
     "area_ha": 15.4,
     "soil": "與 Chambertin 土壤相似，但表土較薄，含有更多石灰岩碎石。",
-    "aspect": "正東",
-    "elevation": "260-290 公尺",
+    "aspect": "約120°（東南)",
+    "elevation": "270-310 公尺，中上至上坡8-10°",
     "style_note": "風格強勁而帶有優雅的紅色水果香氣，結構宏大、尾韻極長。",
     "notes": "歷史比 Chambertin 更悠久，為勃根地最早的葡萄園之一。",
     "link": "https://www.wine-searcher.com/find/chambertin+clos+debeze"
@@ -29,8 +29,8 @@
     "village": "Gevrey-Chambertin",
     "area_ha": 8.3,
     "soil": "表土深厚且富含鐵質的黏土與石灰岩碎石，排水良好。",
-    "aspect": "東南",
-    "elevation": "260-300 公尺",
+    "aspect": "110–125°（東南偏東）",
+    "elevation": "260-290 公尺，中坡6-8°",
     "style_note": "風格強勁厚實，帶黑莓、皮革與松露香氣。",
     "notes": "為最接近 Chambertin 的風格，被視為「Chambertin 的兄弟」。",
     "link": "https://www.wine-searcher.com/find/mazis+chambertin"
@@ -41,8 +41,8 @@
     "village": "Gevrey-Chambertin",
     "area_ha": 3.3,
     "soil": "土壤貧瘠，多石灰岩與小石塊。",
-    "aspect": "東南",
-    "elevation": "260-300 公尺",
+    "aspect": "約125°（東南）",
+    "elevation": "260-300 公尺，高坡10–12°",
     "style_note": "風格優雅、礦物感強、香氣細緻。",
     "notes": "最小的 Gevrey 特級園之一。",
     "link": "https://www.wine-searcher.com/find/ruchottes+chambertin"
@@ -53,8 +53,8 @@
     "village": "Morey-Saint-Denis",
     "area_ha": 16.9,
     "soil": "表土深厚，黏土與石灰岩混合，礦物質豐富。",
-    "aspect": "東南",
-    "elevation": "250-300 公尺",
+    "aspect": "約115°（東南偏東）",
+    "elevation": "250-300 公尺，坡度5~8°",
     "style_note": "風格強勁、結構嚴謹，具有黑色水果、皮革與香料風味。",
     "notes": "Morey-Saint-Denis 最大的特級園，名氣僅次於 Chambertin。",
     "link": "https://www.wine-searcher.com/find/clos+de+la+roche"
@@ -65,8 +65,8 @@
     "village": "Morey-Saint-Denis",
     "area_ha": 6.6,
     "soil": "石灰岩比例高，表土淺薄，富含礦物質。",
-    "aspect": "東南",
-    "elevation": "260-290 公尺",
+    "aspect": "約120°（東南）",
+    "elevation": "260-300 公尺，坡度6~9°",
     "style_note": "風格柔和細膩，果香與花香兼具，帶玫瑰與紅莓氣息。",
     "notes": "Morey-Saint-Denis 最具女性化與優雅的特級園。",
     "link": "https://www.wine-searcher.com/find/clos+saint+denis"
@@ -80,8 +80,8 @@
     "village": "Morey-Saint-Denis",
     "area_ha": 7.53,
     "soil": "坡地石灰岩底層，表土含黏土與碎石。",
-    "aspect": "東南",
-    "elevation": "260-300 公尺",
+    "aspect": "約125°（東南）",
+    "elevation": "270-300 公尺，坡度6~9°",
     "style_note": "酒體濃郁、層次豐富，帶黑莓、紫羅蘭與香料氣息。",
     "notes": "歷史悠久，1130 年建成，Domaine Clos de Tart 為 Monopole。",
     "link": "https://www.wine-searcher.com/find/clos+de+tart"
@@ -92,8 +92,8 @@
     "village": "Morey-Saint-Denis / Chambolle-Musigny",
     "area_ha": 15.06,
     "soil": "土壤異質性高，上坡多石灰岩，下坡富黏土。",
-    "aspect": "東南",
-    "elevation": "250-300 公尺",
+    "aspect": "約130°（東南偏南）",
+    "elevation": "270-310 公尺，坡度10–12°",
     "style_note": "風格介於力量與優雅之間，兼具深度與香氣。",
     "notes": "地塊橫跨兩村，是兩村共享的特級園之一。",
     "link": "https://www.wine-searcher.com/find/bonnes+mares"
@@ -104,8 +104,8 @@
     "village": "Chambolle-Musigny",
     "area_ha": 10.86,
     "soil": "表土極薄，多石灰岩碎石與白色泥灰岩。",
-    "aspect": "東南",
-    "elevation": "270-300 公尺",
+    "aspect": "約120°（東南）",
+    "elevation": "260-320 公尺，坡度8~10°",
     "style_note": "被譽為「皇后之酒」，優雅細膩、結構完美，果香與花香並重。",
     "notes": "唯一能生產白酒的 Côte de Nuits 特級園（約 0.6 ha）。",
     "link": "https://www.wine-searcher.com/find/musigny"
@@ -116,8 +116,8 @@
     "village": "Vougeot",
     "area_ha": 50.96,
     "soil": "上坡：石灰岩；中坡：黏土與石灰混合；下坡：深黏土。",
-    "aspect": "東南",
-    "elevation": "240-275 公尺",
+    "aspect": "約115~125°（東南）",
+    "elevation": "240-270 公尺，坡度3–7°",
     "style_note": "風格多變，從濃郁厚重到柔和優雅皆有。",
     "notes": "勃根地最大單一圍牆特級園，由約 80 家酒莊分持。",
     "link": "https://www.wine-searcher.com/find/clos+de+vougeot"
@@ -128,8 +128,8 @@
     "village": "Flagey-Echézeaux",
     "area_ha": 37.69,
     "soil": "土壤異質性高，從黏土到石灰岩碎石皆有。",
-    "aspect": "東至東南",
-    "elevation": "240-330 公尺",
+    "aspect": "約120°（東南）",
+    "elevation": "250-300 公尺，坡度4–8°",
     "style_note": "風格多樣，通常比 Grands-Échezeaux 輕盈、奔放，帶紅色水果與花香。",
     "notes": "擁有者超過 80 家，是面積最大的特級園之一。",
     "link": "https://www.wine-searcher.com/find/echezeaux"
@@ -140,8 +140,8 @@
     "village": "Flagey-Echézeaux",
     "area_ha": 9.14,
     "soil": "多石灰岩碎石，表土薄且排水性佳。",
-    "aspect": "東南",
-    "elevation": "250-300 公尺",
+    "aspect": "約120°（東南）",
+    "elevation": "255-295 公尺，坡度5–9°",
     "style_note": "風格集中、深邃、陳年潛力強。",
     "notes": "品質穩定一致，被認為優於 Échezeaux。",
     "link": "https://www.wine-searcher.com/find/grands+echezeaux"
@@ -152,8 +152,8 @@
     "village": "Vosne-Romanée",
     "area_ha": 8.03,
     "soil": "深厚的石灰質棕色泥土，排水良好。",
-    "aspect": "正東",
-    "elevation": "250-310 公尺",
+    "aspect": "約120°（東南）",
+    "elevation": "265-300 公尺，坡度4~7°",
     "style_note": "風格雄壯飽滿，黑色水果、松露、皮革香氣明顯。",
     "notes": "結構強勁，陳年潛力極佳。",
     "link": "https://www.wine-searcher.com/find/richebourg"
@@ -164,8 +164,8 @@
     "village": "Vosne-Romanée",
     "area_ha": 9.44,
     "soil": "表土較深，以細黏土與石灰岩為主。",
-    "aspect": "正東",
-    "elevation": "240-280 公尺",
+    "aspect": "約115°（東南偏東）",
+    "elevation": "250-270 公尺，坡度3~5°",
     "style_note": "以優雅與芬芳聞名，紅莓、紫羅蘭、紅茶香氣。",
     "notes": "最具女性化的 Vosne-Romanée 風格。名稱源於中世紀的聖維馮修道院（Abbaye de Saint-Vivant de Vergy），意為「屬於聖維馮的羅曼尼」",
     "link": "https://www.wine-searcher.com/find/romanee+saint+vivant"
@@ -176,8 +176,8 @@
     "village": "Vosne-Romanée",
     "area_ha": 0.85,
     "soil": "淺層石灰岩與紅黏土混合，坡度大。",
-    "aspect": "東南",
-    "elevation": "260-280 公尺",
+    "aspect": "約120°（東南）",
+    "elevation": "260-280 公尺，坡度4~6°",
     "style_note": "極度集中與細膩，紫羅蘭、香料與礦物香。",
     "notes": "全世界最小的 AOC，Monopole：Domaine du Comte Liger-Belair。",
     "link": "https://www.wine-searcher.com/find/la+romanee"
@@ -188,8 +188,8 @@
     "village": "Vosne-Romanée",
     "area_ha": 1.63,
     "soil": "極薄表土，主要為石灰岩與富鐵泥灰岩。",
-    "aspect": "正東略偏南",
-    "elevation": "255-270 公尺",
+    "aspect": "約120°（東南）",
+    "elevation": "260-275 公尺，坡度3–4°",
     "style_note": "極致優雅、結構精巧、香氣細緻。",
     "notes": "DRC 獨佔園（Monopole），被譽為「天堂的味道」。",
     "link": "https://www.wine-searcher.com/find/romanee+conti"
@@ -200,8 +200,8 @@
     "village": "Vosne-Romanée",
     "area_ha": 6.06,
     "soil": "表土略厚於 Romanée-Conti，含黏土與石灰岩碎石。",
-    "aspect": "正東",
-    "elevation": "250-300 公尺",
+    "aspect": "約125°（東南）",
+    "elevation": "260-300 公尺，坡度5~8°",
     "style_note": "風格外放華麗，充滿黑櫻桃與玫瑰香。",
     "notes": "DRC 獨佔園，力量與性感兼具。",
     "link": "https://www.wine-searcher.com/find/la+tache"
@@ -212,8 +212,8 @@
     "village": "Gevrey-Chambertin",
     "area_ha": 18.58,
     "soil": "表土深厚，黏土比例高，礦物感強。",
-    "aspect": "東南",
-    "elevation": "260-290 公尺",
+    "aspect": "約115°（東南）",
+    "elevation": "260-270 公尺，下坡4–6°",
     "style_note": "風格厚重、結構紮實，黑莓與甘草香氣。",
     "notes": "可用「Charmes-Chambertin」名稱銷售，實際面積更大。",
     "link": "https://www.wine-searcher.com/find/mazoyeres+chambertin"
@@ -224,8 +224,8 @@
     "village": "Gevrey-Chambertin",
     "area_ha": 12.24,
     "soil": "表土較厚，黏土比例高，排水性良好。",
-    "aspect": "東南",
-    "elevation": "250-280 公尺",
+    "aspect": "約115°（東南）",
+    "elevation": "250-280 公尺，下坡4–6°",
     "style_note": "風格圓潤柔和，香氣甜美，紅果與花香為主。",
     "notes": "風格親和，被稱為「王者的柔情」。",
     "link": "https://www.wine-searcher.com/find/charmes+chambertin"
@@ -236,8 +236,8 @@
     "village": "Gevrey-Chambertin",
     "area_ha": 5.48,
     "soil": "上坡為石灰岩碎石，下坡為紅黏土，排水良好。",
-    "aspect": "東南",
-    "elevation": "260-280 公尺",
+    "aspect": "115–130°（東南）",
+    "elevation": "255–275公尺，中下坡6–8°",
     "style_note": "優雅柔順、香氣細膩、結構圓潤，帶成熟紅果與礦物香。",
     "notes": "名稱源自昔日園旁的禮拜堂 (Chapelle)；位於 Griotte-Chambertin 南側。",
     "link": "https://www.wine-searcher.com/find/chapelle+chambertin"
@@ -248,8 +248,8 @@
     "village": "Gevrey-Chambertin",
     "area_ha": 2.73,
     "soil": "土壤為細黏土與石灰岩混合，深層排水佳。",
-    "aspect": "東南",
-    "elevation": "260-280 公尺",
+    "aspect": "約120°（東南）",
+    "elevation": "255-265 公尺，坡腳3–5°",
     "style_note": "風格精緻細膩，櫻桃、玫瑰與香料香。",
     "notes": "最小且最迷人的特級園之一。",
     "link": "https://www.wine-searcher.com/find/griotte+chambertin"
@@ -260,8 +260,8 @@
     "village": "Gevrey-Chambertin",
     "area_ha": 7.35,
     "soil": "表層薄而多石，石灰岩碎石豐富，排水佳。",
-    "aspect": "東南",
-    "elevation": "260-290 公尺",
+    "aspect": "約120°（東南）",
+    "elevation": "250-280 公尺，坡腳5–7°",
     "style_note": "風格冷峻緊緻，黑莓與礦石風味明顯。",
     "notes": "比 Chambertin 更具礦物感與嚴謹結構。",
     "link": "https://www.wine-searcher.com/find/latricieres+chambertin"
@@ -272,8 +272,8 @@
     "village": "Vosne-Romanée",
     "area_ha": 1.65,
     "soil": "細黏土與石灰岩混合，坡度緩、排水佳。",
-    "aspect": "正東",
-    "elevation": "260-280 公尺",
+    "aspect": "約120°（東南）",
+    "elevation": "255-285 公尺，坡度3–6°",
     "style_note": "風格介於 La Tâche 與 Romanée-Conti 之間，兼具優雅與深度。",
     "notes": "Monopole：Domaine Lamarche，1992 年升格為特級園。",
     "link": "https://www.wine-searcher.com/find/la+grande+rue"
@@ -284,8 +284,8 @@
     "village": "Aloxe-Corton / Ladoix-Serrigny / Pernand-Vergelesses",
     "area_ha": 94,
     "soil": "上坡石灰岩、下坡富黏土與鐵質，適合紅白皆產。",
-    "aspect": "東南至東",
-    "elevation": "250-330 公尺",
+    "aspect": "約110–130°（東南偏東至南）",
+    "elevation": "250-330 公尺，坡度5~12°",
     "style_note": "紅酒：結構強勁、單寧厚實；白酒：圓潤飽滿、礦物感強。",
     "notes": "伯恩丘唯一同時產紅白兩色的特級園。",
     "link": "https://www.wine-searcher.com/find/corton"
@@ -296,8 +296,8 @@
     "village": "Aloxe-Corton / Pernand-Vergelesses",
     "area_ha": 52.4,
     "soil": "石灰岩與白色泥灰岩，坡度大、排水佳。",
-    "aspect": "南至西南",
-    "elevation": "280-330 公尺",
+    "aspect": "約100–130°（東、東南、西南）",
+    "elevation": "260-320 公尺，坡度6–14°",
     "style_note": "白酒：礦物感強烈、酸度高、層次深厚。",
     "notes": "據傳為查理曼大帝最愛的白酒。",
     "link": "https://www.wine-searcher.com/find/corton+charlemagne"
@@ -308,8 +308,8 @@
     "village": "Aloxe-Corton",
     "area_ha": 0.28,
     "soil": "與 Corton-Charlemagne 相似但表層更薄，多石灰岩。",
-    "aspect": "南至西南",
-    "elevation": "280-320 公尺",
+    "aspect": "約115°（東南）",
+    "elevation": "280-320 公尺，坡度8~12°",
     "style_note": "白酒：細膩、花香與蜂蜜香氣，酸度柔和。",
     "notes": "實際產量稀少，常併入 Corton-Charlemagne 銷售。",
     "link": "https://www.wine-searcher.com/find/charlemagne"
@@ -320,8 +320,8 @@
     "village": "Puligny-Montrachet / Chassagne-Montrachet",
     "area_ha": 7.99,
     "soil": "薄石灰岩與細黏土混合，極佳排水。",
-    "aspect": "東南",
-    "elevation": "260-300 公尺",
+    "aspect": "約115°（東南）",
+    "elevation": "260-280 公尺，坡度3–5°",
     "style_note": "白酒：優雅均衡、香氣複雜、尾韻極長。",
     "notes": "被譽為「白酒之王」。",
     "link": "https://www.wine-searcher.com/find/montrachet"
@@ -332,8 +332,8 @@
     "village": "Puligny-Montrachet",
     "area_ha": 7.47,
     "soil": "白色石灰岩與薄黏土層，坡度陡峭。",
-    "aspect": "東南",
-    "elevation": "280-300 公尺",
+    "aspect": "約120°（東南）",
+    "elevation": "265-290 公尺，坡度3–5°",
     "style_note": "白酒：礦物感強、結構緊緻、陳年力極佳。",
     "notes": "位於 Montrachet 上方。",
     "link": "https://www.wine-searcher.com/find/chevalier+montrachet"
@@ -344,8 +344,8 @@
     "village": "Puligny-Montrachet / Chassagne-Montrachet",
     "area_ha": 11.73,
     "soil": "富含黏土與石灰岩，土層較厚。",
-    "aspect": "東南",
-    "elevation": "240-270 公尺",
+    "aspect": "約115°（東南）",
+    "elevation": "250-270 公尺，坡度3–5°",
     "style_note": "白酒：濃郁飽滿、酒體厚重、尾韻悠長。",
     "notes": "Montrachet 家族中產量最高的一園。",
     "link": "https://www.wine-searcher.com/find/batard+montrachet"
@@ -356,8 +356,8 @@
     "village": "Puligny-Montrachet",
     "area_ha": 3.53,
     "soil": "細黏土與石灰岩混合，土壤均勻。",
-    "aspect": "東南",
-    "elevation": "250-270 公尺",
+    "aspect": "約115°（東南）",
+    "elevation": "250-265 公尺，坡度3–4°",
     "style_note": "白酒：優雅細膩、花香與蜂蜜香氣。",
     "notes": "名字意為「歡迎來到 Bâtard-Montrachet」。",
     "link": "https://www.wine-searcher.com/find/bienvenues+batard+montrachet"
@@ -368,8 +368,8 @@
     "village": "Chassagne-Montrachet",
     "area_ha": 1.57,
     "soil": "薄石灰岩上覆紅黏土，礦物感強。",
-    "aspect": "東南",
-    "elevation": "240-260 公尺",
+    "aspect": "約115°（東南）",
+    "elevation": "250-270 公尺，坡度4–6°",
     "style_note": "白酒：香氣濃郁、層次複雜、圓潤優雅。",
     "notes": "Montrachet 家族中最小的特級園。",
     "link": "https://www.wine-searcher.com/find/criot+batard+montrachet"
@@ -4955,6 +4955,18 @@
     "notes": "白酒 (≈95%)；又稱 Les Champs，是 Sur le Sentier du Clou 鄰近小園，名稱源自古法拼寫。",
     "link": "https://www.wine-searcher.com/find/es+champs+saint+aubin"
   },
+  "sousrochedumay": {
+    "zh": "杜馬岩下園",
+    "level": "一級園 (Premier Cru)",
+    "village": "Saint-Aubin",
+    "area_ha": 2.6,
+    "soil": "石灰岩碎石多、表層薄，排水極佳。",
+    "aspect": "東南",
+    "elevation": "280 公尺",
+    "style_note": "香氣集中、酸度明亮、礦物感強。",
+    "notes": "白酒 (100%)；名稱意為「杜馬岩下」，位於村北高坡地帶，氣候涼爽，風格緊緻有力，展現 Saint-Aubin 的典型礦物張力。",
+    "link": "https://www.wine-searcher.com/find/sous+roche+duma+saint+aubin"
+  },
   "leschenevottes": {
     "zh": "榛沃特園",
     "level": "一級園 (Premier Cru)",
@@ -5459,6 +5471,30 @@
     "notes": "白酒 (≈95%)；名稱意為「大界碑」，位於 Morgeot 區南端靠近 Santenay。",
     "link": "https://www.wine-searcher.com/find/la+grande+borne+chassagne+montrachet"
   },
+  "lesboirettes": {
+    "zh": "布瓦赫特園",
+    "level": "一級園 (Premier Cru)",
+    "village": "Chassagne-Montrachet",
+    "area_ha": 2.8,
+    "soil": "紅黏土與石灰岩碎石交錯，排水良好。",
+    "aspect": "東南",
+    "elevation": "250 公尺",
+    "style_note": "香氣柔和、酸度平衡、口感圓潤。",
+    "notes": "白酒為主 (≈90%)；位於 Morgeot 區南段，緊鄰 Santenay 邊界，風格飽滿圓潤、礦物感細膩，常見名莊：Jean-Noël Gagnard、Vincent Girardin。",
+    "link": "https://www.wine-searcher.com/find/les+boirettes+chassagne+montrachet"
+  },
+  "abbayedemorgeot": {
+    "zh": "摩熱修道院園",
+    "level": "一級園 (Premier Cru)",
+    "village": "Chassagne-Montrachet",
+    "area_ha": 6,
+    "soil": "紅黏土與石灰岩碎石混合，表層深厚。",
+    "aspect": "東南",
+    "elevation": "250 公尺",
+    "style_note": "香氣豐富、酸度柔順、酒體圓潤。",
+    "notes": "白酒為主 (≈85%)；位於歷史悠久的西多會修道院遺址周圍，是 Morgeot 區核心地塊，風格厚實飽滿、帶蜂蜜與礦物調。",
+    "link": "https://www.wine-searcher.com/find/abbaye+de+morgeot+chassagne+montrachet"
+  },
   "lesgravieres": {
     "zh": "格拉維耶園",
     "level": "一級園 (Premier Cru)",
@@ -5542,6 +5578,18 @@
     "style_note": "香氣濃郁、結構紮實、單寧堅實。",
     "notes": "紅酒 (≈95%)；為 Clos Rousseau 的主體區。",
     "link": "https://www.wine-searcher.com/find/grand+clos+rousseau+santenay"
+  },
+  "closrousseau": {
+    "zh": "盧梭園",
+    "level": "一級園 (Premier Cru)",
+    "village": "Santenay",
+    "area_ha": 10.4,
+    "soil": "紅黏土與石灰岩交錯，排水良好。",
+    "aspect": "東南",
+    "elevation": "260 公尺",
+    "style_note": "果香濃郁、酸度明亮、結構紮實。",
+    "notes": "紅酒 (≈95%)；Santenay 最著名園之一，風格結構厚實、單寧緊緻，具長期陳年潛力。常見名莊：Domaine Bruno Colin、Vincent Girardin。",
+    "link": "https://www.wine-searcher.com/find/clos+rousseau+santenay"
   },
   "lesgravieresclosdetavannes": {
     "zh": "格拉維耶-塔瓦訥園",
@@ -7522,6 +7570,18 @@
     "style_note": "香氣集中、酸度明亮、帶蜂蜜與火石氣息。",
     "notes": "白酒 (100%)；名稱意為「焦土園」，著名高坡暖地。",
     "link": "https://www.wine-searcher.com/find/les+brules+pouilly+fuisse"
+  },
+  "lagarenneousurlagarenne": {
+    "zh": "加倫園",
+    "level": "一級園 (Premier Cru)",
+    "village": "Blagny",
+    "area_ha": 4,
+    "soil": "石灰岩碎石多、表層薄，排水性極佳。",
+    "aspect": "東南",
+    "elevation": "320 公尺",
+    "style_note": "香氣清新、酸度高、礦物感強。",
+    "notes": "白酒 (100%)；又稱「Sur la Garenne」，位於 Blagny 與 Puligny-Montrachet 接壤處，為高坡園，氣候涼爽、線條銳利，展現純淨花香與火石風味。",
+    "link": "https://www.wine-searcher.com/find/la+garenne+blagny"
   },
   "climat_owners": {
     "chambertin": [
