@@ -112,32 +112,26 @@
     }
 /* 【新增】地窖標記樣式 */
 .cellar-marker {
+    width: 32px;
+    height: 32px;
+    border-radius: 16px;
+    background-color: #800000;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px; /* 這裡的字體大小控制 Marker 的整體大小 */
     font-weight: bold;
-    color: #800000; /* 預設顏色 (會被覆蓋或當作數字的顏色) */
-    text-shadow: 0 0 3px rgba(255, 255, 255, 0.9); /* 讓標記在深色背景上也清晰 */
-    /* 確保 Marker 放在地圖中心 */
-    transform: translate(-50%, -50%); 
+    color: white;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    border: 2px solid white;
 }
 .cellar-marker.consumed {
     background-color: #007bff; /* 已飲用狀態的顏色 */
 }
 .cellar-marker span {
-    /* 關鍵：將內容轉正，並確保文本清晰 */
-    transform: rotate(45deg); /* 將文本轉正 */
-    font-size: 14px; 
-    color: white;
-    font-weight: bold;
-    text-shadow: 0 0 2px rgba(0,0,0,0.5); /* 增加陰影，讓文本更清晰 */
+    font-size: 18px; /* 確保數字或符號清晰 */
 }
 
-/* 確保 marker 能夠正確堆疊 */
-.maplibregl-marker {
-    z-index: 100;
-}
   </style>
   <script>
     // 阻止 iOS 的全頁 pinch-zoom（不影響地圖手勢）
