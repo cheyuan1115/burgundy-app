@@ -112,27 +112,15 @@
     }
 /* 【新增】地窖標記樣式 */
 .cellar-marker {
-    /* 移除圓形和固定尺寸，改為 Pin 標記 */
-    width: 24px;
-    height: 36px;
-    background-color: #800000;
-    
-    /* 關鍵：使用 clip-path 或 border-radius 製作 Pin 效果 */
-    /* 這裡使用 Border Radius 和 Transform 模擬旗子或 Pin */
-    border-radius: 50% 50% 50% 0; /* 模擬 Pin 頭 */
-    transform: rotate(-45deg); /* 將 Pin 頭朝上 */
-    
     display: flex;
     align-items: center;
     justify-content: center;
-    
-    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    border: none; /* 移除邊框 */
-    
-    /* 【新增】: 確保內容可見 */
-    position: relative; 
-    left: -12px; /* 為了讓 Pin 的尖端對準坐標，需要調整偏移 */
-    top: -18px;
+    font-size: 16px; /* 這裡的字體大小控制 Marker 的整體大小 */
+    font-weight: bold;
+    color: #800000; /* 預設顏色 (會被覆蓋或當作數字的顏色) */
+    text-shadow: 0 0 3px rgba(255, 255, 255, 0.9); /* 讓標記在深色背景上也清晰 */
+    /* 確保 Marker 放在地圖中心 */
+    transform: translate(-50%, -50%); 
 }
 .cellar-marker.consumed {
     background-color: #007bff; /* 已飲用狀態的顏色 */
