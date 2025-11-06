@@ -474,7 +474,7 @@ window.drawCellarMarkers = function(summary = {}) {
     el.className = 'cellar-marker' + (cellarCount === 0 && consumedCount > 0 ? ' consumed' : '');
     el.style.backgroundColor = 'transparent';   // 我們用 emoji 就好
     el.style.border = 'none';
-    el.innerHTML = `<span style="font-size: 20px">${emoji}</span>`;
+    el.innerHTML = `<span style="font-size: 28px">${emoji}</span>`;
 
     const marker = new maplibregl.Marker({ element: el, anchor: 'center' })
       .setLngLat(center)
