@@ -320,6 +320,7 @@ function makeAocKeyFromInfo(info){
         }));
     }
   }
+  /*顯示庫存數字
   // 【核心】：接收庫存數據並在地圖上繪製標記
 window.drawCellarMarkers = function(summary = {}) {
   // 還沒準備好就先存起來
@@ -411,9 +412,102 @@ window.drawCellarMarkers = function(summary = {}) {
 
   dbg.textContent = `Cellar markers: ${matched}`;
 };
-
+*/
 // index.html (在 openExternalLink 函數之後)
+window.drawCellarMarkers = function(summary = {}) {
+  // 還沒準備好就先存起來
+  if (!window.__MAP_READY__ || !masterAOC) {
+    window.__PENDING_CELLAR__ = summary;
+    return;
+  }
 
+  // 清掉舊的 marker
+  if (!window.inventoryMarkers) window.inventoryMarkers = [];
+  window.inventoryMarkers.forEach(m => m.remove());
+  window.inventoryMarkers = [];
+
+  const inv = summary || {};
+  const seenKeys = new Set();
+  let matched = 0;
+
+  (masterAOC.features || []).forEach(f => {
+    const props = f.properties || {};
+    const aocKey = props.aoc_key;
+    if (!aocKey) return;
+    if (seenKeys.has(aocKey)) return;
+
+    const data = inv[aocKey];
+    if (!data) return;
+
+    const cellarCount   = Number(data.cellar   || 0);
+    const consumedCount = Number(data.consumed || 0);
+
+    // 兩個都 0 就不用畫
+    if (cellarCount === 0 && consumedCount === 0) return;
+
+    seenKeys.add(aocKey);
+    matched++;
+
+    // 算中心
+    const bounds = new maplibregl.LngLatBounds();
+    const addCoords = (coords) => {
+      if (!coords) return;
+      if (Array.isArray(coords) && typeof coords[0] === 'number') {
+        bounds.extend(coords);
+      } else if (Array.isArray(coords)) {
+        coords.forEach(addCoords);
+      }
+    };
+    addCoords(f.geometry && f.geometry.coordinates);
+    if (bounds.isEmpty()) return;
+    const center = bounds.getCenter();
+
+    // ✅ 這裡改成 emoji 邏輯
+    let emoji = '';
+    if (cellarCount > 0) {
+      emoji = '🚩';           // 有庫存
+    } else if (consumedCount > 0) {
+      emoji = '🏁';           // 沒庫存、有已喝
+    }
+
+    const el = document.createElement('div');
+    el.className = 'cellar-marker' + (cellarCount === 0 && consumedCount > 0 ? ' consumed' : '');
+    el.style.backgroundColor = 'transparent';   // 我們用 emoji 就好
+    el.style.border = 'none';
+    el.innerHTML = `<span style="font-size: 20px">${emoji}</span>`;
+
+    const marker = new maplibregl.Marker({ element: el, anchor: 'center' })
+      .setLngLat(center)
+      .setPopup(
+        new maplibregl.Popup({ offset: 25 }).setHTML(`
+          <strong>${data.aoc_fullname || props.denom || 'AOC'}</strong><br>
+          庫存: ${cellarCount} 🍷<br>
+          已飲: ${consumedCount} 🥂
+        `)
+      )
+      .addTo(map);
+
+    window.inventoryMarkers.push(marker);
+  });
+
+  // 可以保留右上角小計
+  let dbg = document.getElementById('cellar-debug');
+  if (!dbg) {
+    dbg = document.createElement('div');
+    dbg.id = 'cellar-debug';
+    dbg.style.position = 'absolute';
+    dbg.style.top = '8px';
+    dbg.style.right = '8px';
+    dbg.style.zIndex = 9999;
+    dbg.style.background = 'rgba(255,255,255,0.85)';
+    dbg.style.padding = '4px 8px';
+    dbg.style.fontSize = '11px';
+    dbg.style.borderRadius = '6px';
+    document.body.appendChild(dbg);
+  }
+  dbg.textContent = `Cellar markers: ${matched}`;
+};
+//**********************************************顯示旗子段尾//
 // --- 查詢狀態函數：由 AOC 點擊事件觸發 ---
 function checkCellarStatus(aocName, featureId) {
     if (window.ReactNativeWebView) {
