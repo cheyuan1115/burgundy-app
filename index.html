@@ -427,16 +427,17 @@ function checkCellarStatus(aocName, featureId) {
 }
 
 // --- 開啟管理頁面函數：由按鈕觸發 ---
-function openCellarManager(aocTitle, aocLevel, climatName) {
-    if (window.ReactNativeWebView) {
-        window.ReactNativeWebView.postMessage(JSON.stringify({
-            __from: 'wv_cellar',
-            type: 'open_manager',
-            aocTitle: aocTitle,
-            aocLevel: aocLevel,
-            climatName: climatName
-        }));
-    }
+function openCellarManager(aocTitle, aocLevel, climatName, aocKey) {
+  if (window.ReactNativeWebView) {
+    window.ReactNativeWebView.postMessage(JSON.stringify({
+      __from: 'wv_cellar',
+      type: 'open_manager',
+      aocTitle: aocTitle,
+      aocLevel: aocLevel,
+      climatName: climatName,
+      aocKey: aocKey   // ✅ 多送這個
+    }));
+  }
 }
 
 // --- 接收 RN 層傳回的狀態，更新 UI ---
