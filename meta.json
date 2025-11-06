@@ -5135,6 +5135,18 @@
     "notes": "白酒 (100%)；位於南端高坡，風格精緻。",
     "link": "https://www.wine-searcher.com/find/les+baudines+chassagne+montrachet"
   },
+   "laromanee(cm)": {
+    "zh": "羅曼尼園",
+    "level": "一級園 (Premier Cru)",
+    "village": "Chassagne-Montrachet",
+    "area_ha": 2,
+    "soil": "白黏土與石灰岩混合。。",
+    "aspect": "東南",
+    "elevation": "270 公尺",
+    "style_note": "香氣優雅、酸度高、結構緊密。",
+    "notes": "白酒 (≈100%)；名稱來自修道院，風格高雅細膩。",
+    "link": "https://www.wine-searcher.com/find/la+romanee+chassagne+montrachet"
+  },
   "boisdechassagne": {
     "zh": "夏山林園",
     "level": "一級園 (Premier Cru)",
