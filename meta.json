@@ -1,6 +1,6 @@
 {
   "chambertin": {
-    "zh": "香貝丹丹丹",
+    "zh": "香貝丹",
     "level": "特級園 (Grand Cru)",
     "village": "Gevrey-Chambertin",
     "area_ha": 12.9,
@@ -455,7 +455,7 @@
     "notes": "Monopole：La Chablisienne。",
     "link": "https://www.wine-searcher.com/find/chablis+grenouilles"
   },
-  "lesamoureusestesttest": {
+  "lesamoureuses": {
     "zh": "愛侶園",
     "level": "一級園 (Premier Cru)",
     "village": "Chambolle-Musigny",
