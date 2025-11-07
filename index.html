@@ -483,11 +483,11 @@ window.drawCellarMarkers = function(summary = {}) {
  const el = document.createElement('div');
 el.className = 'cellar-marker';
 el.style.background = 'rgba(255, 255, 255, 0.3)';   // ✅ 半透明白底
-el.style.border = '1px solid white';                // ✅ 白邊
+el.style.border = '0px solid white';                // ✅ 白邊
 el.style.borderRadius = '50%';                      // ✅ 圓形
 el.style.boxShadow = '0 0 6px rgba(0,0,0,0.4)';     // ✅ 陰影
-el.style.width = '28px';
-el.style.height = '28px';
+el.style.width = '32px';
+el.style.height = '32px';
 el.style.display = 'flex';
 el.style.flexDirection = 'column';
 el.style.alignItems = 'center';
