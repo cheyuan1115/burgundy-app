@@ -721,9 +721,9 @@ const getLevel = (props) => parseAOC(props).level;
 
 map.on('load', async () => {
   // ====== 【改成這一段】 ======
-  const AOC_DATA_FILE    = 'https://raw.githubusercontent.com/cheyuan1115/burgundy-app/main/burgundy.geojson';
-  const WINERY_DATA_FILE = 'https://raw.githubusercontent.com/cheyuan1115/burgundy-app/main/wineries.geojson';
-  const META_DATA_FILE   = 'https://raw.githubusercontent.com/cheyuan1115/burgundy-app/main/meta.json';
+const AOC_DATA_FILE    = './assets/burgundy.geojson';
+const WINERY_DATA_FILE = './assets/wineries.geojson';
+const META_DATA_FILE   = './assets/meta.json';
 
   // 1) 先載入 meta.json
   let META = { wineries: {}, climat_owners: {} };
