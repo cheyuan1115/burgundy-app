@@ -894,10 +894,43 @@ const enrichWithKey = (fc) => ({
 // 先做出 enrich 過的版本
 const enrichedAOC = enrichWithKey(rawAOC);
 
+// ✅ 這裡做「一個 aoc_key 只顯示一次 label」
+const seenKeys = new Set();
+const dedupFeatures = enrichedAOC.features.map(f => {
+  const p = f.properties || {};
+  const key = p.aoc_key || p.label || p.denom || String(f.id);
+
+  // 第一個遇到的那塊，標記要顯示
+  if (!seenKeys.has(key)) {
+    seenKeys.add(key);
+    return {
+      ...f,
+      properties: {
+        ...p,
+        _show_label: 1,  // 要顯示字
+      }
+    };
+  }
+
+  // 後面同 key 的都標記不顯示
+  return {
+    ...f,
+    properties: {
+      ...p,
+      _show_label: 0,    // 不顯示字
+    }
+  };
+});
+
+const dedupAOC = {
+  type: 'FeatureCollection',
+  features: dedupFeatures,
+};
+
 // 給 map 用
 map.addSource('aoc', { 
   type: 'geojson', 
-  data: enrichedAOC, 
+  data: dedupAOC,
   promoteId: 'id'
 });
 
@@ -942,36 +975,42 @@ masterAOC = enrichedAOC;
 
       // ➤ 新增：地塊名稱標籤圖層
       map.addLayer({
-        id: 'aoc-labels',
-        type: 'symbol',
-        source: 'aoc',
-        minzoom: 13, // 放大到這層級以上才顯示
-        layout: {
-          'text-field': ['get', 'label'],
-          'text-font': ['Open Sans Regular', 'Arial Unicode MS Regular'],
-          'text-size': [
-            'interpolate', ['linear'], ['zoom'],
-            12, 10,
-            14, 12,
-            16, 14
-          ],
-          'symbol-placement': 'point',
-          'text-pitch-alignment': 'map',
-          'text-rotation-alignment': 'map',
-          'text-allow-overlap': false
-        },
-        paint: {
-          'text-color': '#222',
-          'text-halo-color': '#fff',
-          'text-halo-width': 1.2,
-          'text-opacity': [
-            'case',
-            ['==', ['get', 'lvl'], 'RE'], 0,
-            1
-          ]
-        },
-        filter: ['all', ['has', 'label'], ['!=', ['get', 'label'], '']]
-      }, 'aoc-line'); // 插在 aoc-line 之上
+  id: 'aoc-labels',
+  type: 'symbol',
+  source: 'aoc',
+  minzoom: 13,
+  layout: {
+    'text-field': ['get', 'label'],
+    'text-font': ['Open Sans Regular', 'Arial Unicode MS Regular'],
+    'text-size': [
+      'interpolate', ['linear'], ['zoom'],
+      12, 10,
+      14, 12,
+      16, 14
+    ],
+    'symbol-placement': 'point',
+    'text-pitch-alignment': 'map',
+    'text-rotation-alignment': 'map',
+    'text-allow-overlap': false
+  },
+  paint: {
+    'text-color': '#222',
+    'text-halo-color': '#fff',
+    'text-halo-width': 1.2,
+    'text-opacity': [
+      'case',
+      ['==', ['get', 'lvl'], 'RE'], 0,
+      1
+    ]
+  },
+  // 👇 多這一個判斷
+  filter: [
+    'all',
+    ['has', 'label'],
+    ['!=', ['get', 'label'], ''],
+    ['==', ['get', '_show_label'], 1]  // 只畫第一個
+  ]
+}, 'aoc-line');
 
 
       // Hover 高亮
