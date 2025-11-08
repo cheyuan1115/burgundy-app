@@ -1380,9 +1380,9 @@ let lastSearchIds = [];
 function applySearch(qRaw) {
   const q = _norm(qRaw || '');
   const base = window.__AOC_BASE_FC__;
-  if (!base) return;
+  if (!base || !masterAOC) return;
 
-  // 沒輸入：清掉
+  // 沒輸入 → 清掉所有標記
   if (!q) {
     const cleared = {
       type: 'FeatureCollection',
@@ -1396,49 +1396,42 @@ function applySearch(qRaw) {
     return;
   }
 
-  // ---------- 第一步：用 masterAOC 找「完全相等」的 ----------
-  const strictHits = [];
+  // 這裡就是「你原本就有的」那種比對方式：等於 / 開頭 / 包含
+  const matchedIds = [];
   (masterAOC.features || []).forEach(f => {
     const denom = f.properties?.denom || '';
     const names = denom.split(',').map(s => s.trim()).filter(Boolean);
-    const hit = names.some(n => _norm(n) === q);  // 完全一致
-    if (hit) strictHits.push(f.id);
+
+    const hit = names.some(n => {
+      const nn = _norm(n);
+      return (
+        nn === q ||        // 完全一樣
+        nn.startsWith(q) ||// 開頭一樣
+        nn.includes(q)     // 有包含
+      );
+    });
+
+    if (hit) {
+      matchedIds.push(f.id);
+    }
   });
 
-  let hitIds = strictHits;
-
-  // ---------- 如果完全一致沒找到，再用包含 ----------
-  if (!hitIds.length) {
-    const loose = [];
-    (masterAOC.features || []).forEach(f => {
-      const denom = f.properties?.denom || '';
-      const names = denom.split(',').map(s => s.trim()).filter(Boolean);
-      const hit = names.some(n => {
-        const nn = _norm(n);
-        return nn.startsWith(q) || nn.includes(q);
-      });
-      if (hit) loose.push(f.id);
-    });
-    hitIds = loose;
-  }
-
-  // 用命中的 id 去組新的 FC
-  const idSet = new Set(hitIds);
+  // 把這些 match 回寫到地圖這份 data 裡
+  const idSet = new Set(matchedIds);
   const updated = {
     type: 'FeatureCollection',
     features: base.features.map(f => ({
       ...f,
       properties: {
         ...f.properties,
-        __searched: idSet.has(f.id) ? 1 : 0
+        __searched: idSet.has(f.id) ? 1 : 0   // 只有這裡加標記
       }
     }))
   };
-
   map.getSource('aoc').setData(updated);
 
-  // 飛過去
-  if (hitIds.length) {
+  // 鏡頭飛過去（也是飛這些 match 到的地塊）
+  if (matchedIds.length) {
     const b = new maplibregl.LngLatBounds();
     const add = (coords) => {
       if (Array.isArray(coords) && typeof coords[0] === 'number') b.extend(coords);
