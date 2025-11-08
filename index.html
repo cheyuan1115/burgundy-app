@@ -1352,27 +1352,29 @@ map.on('move', () => { if (map.getZoom() > ZMAX) map.setZoom(ZMAX); });
 
     // 放在外面，讓每次搜尋都能清掉舊的高亮
 // 放在外面
+// 放在外面，記得保留
 let lastHighlightedIds = [];
 
-// 全部顯示，只把搜尋到的設 feature-state: {highlight: true}
+// ✅ 只有這段要換
 async function applySearch(qRaw) {
   const q = _norm(qRaw || '');
+  const src = map.getSource('aoc');
+  if (!src || !masterAOC) return;
 
-  // 先還原上一次的高亮
+  // 1. 先把上一次的高亮關掉
   lastHighlightedIds.forEach(id => {
     map.setFeatureState({ source: 'aoc', id }, { highlight: false });
   });
   lastHighlightedIds = [];
 
-  // ✅ 不管有沒有搜尋字，都先把 source 換回完整的 masterAOC
-  //   這是你剛剛沒看到高亮的主要原因：source 還停在被你「篩過」的版本
-  map.getSource('aoc').setData(masterAOC);
+  // 2. 把資料換回完整的 masterAOC（你想要的就是「不要再真的篩選掉 feature，只是高亮」）
+  src.setData(masterAOC);
 
-  // 如果沒輸入就結束（全部顯示、也沒高亮）
-  if (!q) return;
+  // ⭐ 重點：等這次資料換好再做後面的事
+  map.once('idle', () => {
+    // 沒打字就只是全部顯示
+    if (!q) return;
 
-  // 等上一行 setData 生效後再設 state，簡單做法：下一個 event loop 再跑
-  setTimeout(() => {
     const matched = [];
 
     (masterAOC.features || []).forEach(f => {
@@ -1397,10 +1399,10 @@ async function applySearch(qRaw) {
       }
     });
 
-    // 有找到就縮放過去
+    // 有找到就飛過去
     if (matched.length) {
       const b = new maplibregl.LngLatBounds();
-      const addCoords = coords => {
+      const addCoords = (coords) => {
         if (Array.isArray(coords) && typeof coords[0] === 'number') b.extend(coords);
         else if (Array.isArray(coords)) coords.forEach(addCoords);
       };
@@ -1411,9 +1413,8 @@ async function applySearch(qRaw) {
         map.fitBounds(b, { padding: 40, maxzoom: 15, duration: 600 });
       }
     }
-  }, 0);
+  });
 }
-
 
       
       // ************ 酒莊搜尋邏輯：通過程式碼過濾然後更新 Source Data ************
