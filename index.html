@@ -945,50 +945,46 @@ map.addLayer({
   source: 'aoc',
   paint: {
     'fill-color': [
+      'match', ['get', 'lvl'],
+      'GC', '#cc0033',
+      'PC', '#ff7f0e',
+      'VI', '#1f77b4',
+      /* RE */ '#2ca02c'
+    ],
+    'fill-opacity': 0.35
+  }
+});
+
+
+
+
+      // 邊線
+map.addLayer({
+  id: 'aoc-line',
+  type: 'line',
+  source: 'aoc',
+  paint: {
+    // 命中搜尋的 → 黃色
+    'line-color': [
       'case',
-      // 有被搜尋到 → 黃色
       ['==', ['get', '__searched'], 1], '#ffff00',
-      // 其他照原本等級
       [
         'match', ['get', 'lvl'],
         'GC', '#cc0033',
         'PC', '#ff7f0e',
         'VI', '#1f77b4',
-        /* RE */ '#2ca02c'
+        '#2ca02c'
       ]
     ],
-    'fill-opacity': [
-      'case',
-      ['==', ['get', '__searched'], 1], 0.85,   // 搜到的比較實
-      0.35
-    ]
-  }
-});
-
-
-
-      // 邊線
-     map.addLayer({
-  id: 'aoc-line',
-  type: 'line',
-  source: 'aoc',
-  // 移除 maxzoom: 15
-  paint: {
-    'line-color': [
-      'match', ['get', 'lvl'],
-      'GC', '#cc0033',
-      'PC', '#ff7f0e',
-      'VI', '#1f77b4',
-      '#2ca02c'
-    ],
+    // 命中搜尋的 → 更粗
     'line-width': [
       'case',
-      ['boolean', ['feature-state', 'highlight'], false],
-      3,     // 高亮
-      1.5    // 原本
+      ['==', ['get', '__searched'], 1], 4,
+      1.5
     ]
   }
 });
+
 // 專門給「搜尋」用的超亮填色層，預設不畫任何東西
 map.addLayer({
   id: 'aoc-fill-search-hl',
@@ -1379,25 +1375,20 @@ map.on('move', () => { if (map.getZoom() > ZMAX) map.setZoom(ZMAX); });
 
 
 // 放在外面，當成全域變數，記錄上一次被搜尋高亮的 id
-// 記錄上一輪搜尋到的 id（這裡其實可有可無，主要是給你 debug 用）
 let lastSearchIds = [];
 
 function applySearch(qRaw) {
   const q = _norm(qRaw || '');
-  // 這一份是地圖現在在用的那個 dedup 版本
   const base = window.__AOC_BASE_FC__;
   if (!base) return;
 
-  // 1) 沒輸入 → 全部清掉 __searched
+  // 沒輸入：清掉
   if (!q) {
     const cleared = {
       type: 'FeatureCollection',
       features: base.features.map(f => ({
         ...f,
-        properties: {
-          ...f.properties,
-          __searched: 0
-        }
+        properties: { ...f.properties, __searched: 0 }
       }))
     };
     map.getSource('aoc').setData(cleared);
@@ -1405,21 +1396,33 @@ function applySearch(qRaw) {
     return;
   }
 
-  // 2) 先用你原本的 masterAOC 去找有哪些 feature 符合（因為 masterAOC 有完整 denom）
-  const hitIds = [];
+  // ---------- 第一步：用 masterAOC 找「完全相等」的 ----------
+  const strictHits = [];
   (masterAOC.features || []).forEach(f => {
     const denom = f.properties?.denom || '';
     const names = denom.split(',').map(s => s.trim()).filter(Boolean);
-    const hit = names.some(n => {
-      const nn = _norm(n);
-      return nn === q || nn.startsWith(q) || nn.includes(q);
-    });
-    if (hit) {
-      hitIds.push(f.id);   // ← 用 id 對應回 dedup 這一份
-    }
+    const hit = names.some(n => _norm(n) === q);  // 完全一致
+    if (hit) strictHits.push(f.id);
   });
 
-  // 3) 用這個命中的 id 去「重新組一份」給地圖
+  let hitIds = strictHits;
+
+  // ---------- 如果完全一致沒找到，再用包含 ----------
+  if (!hitIds.length) {
+    const loose = [];
+    (masterAOC.features || []).forEach(f => {
+      const denom = f.properties?.denom || '';
+      const names = denom.split(',').map(s => s.trim()).filter(Boolean);
+      const hit = names.some(n => {
+        const nn = _norm(n);
+        return nn.startsWith(q) || nn.includes(q);
+      });
+      if (hit) loose.push(f.id);
+    });
+    hitIds = loose;
+  }
+
+  // 用命中的 id 去組新的 FC
   const idSet = new Set(hitIds);
   const updated = {
     type: 'FeatureCollection',
@@ -1432,11 +1435,9 @@ function applySearch(qRaw) {
     }))
   };
 
-  // 4) 丟回地圖
   map.getSource('aoc').setData(updated);
-  lastSearchIds = hitIds;
 
-  // 5) 鏡頭飛過去（用命中的 masterAOC 那些）
+  // 飛過去
   if (hitIds.length) {
     const b = new maplibregl.LngLatBounds();
     const add = (coords) => {
@@ -1452,7 +1453,6 @@ function applySearch(qRaw) {
     }
   }
 }
-
 
       // ************ 酒莊搜尋邏輯：通過程式碼過濾然後更新 Source Data ************
       function applyWinerySearch(qRaw){
