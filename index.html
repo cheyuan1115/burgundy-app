@@ -938,28 +938,33 @@ map.addSource('aoc', {
 masterAOC = enrichedAOC;
 
 // Fill 著色
-      map.addLayer({
+map.addLayer({
   id: 'aoc-fill',
   type: 'fill',
   source: 'aoc',
-  // 移除 maxzoom: 15，讓它在地圖允許的最大縮放級別下始終可見
   paint: {
+    // ← 有被 highlight 的，一律亮黃
     'fill-color': [
-      'match', ['get', 'lvl'],
-      'GC', '#cc0033',
-      'PC', '#ff7f0e',
-      'VI', '#1f77b4',
-      /* RE */ '#2ca02c'
+      'case',
+      ['boolean', ['feature-state', 'highlight'], false],
+      '#ffff00',   // 高亮時的顏色，超級明顯
+      [
+        'match', ['get', 'lvl'],
+        'GC', '#cc0033',
+        'PC', '#ff7f0e',
+        'VI', '#1f77b4',
+        /* RE */ '#2ca02c'
+      ]
     ],
-    // 👇 有 highlight 就比較濃，沒有就正常
     'fill-opacity': [
       'case',
       ['boolean', ['feature-state', 'highlight'], false],
-      0.75,   // 高亮的不透明
-      0.35    // 其他原本的
+      0.9,   // 高亮時幾乎不透明
+      0.35   // 原來的透明度
     ]
   }
 });
+
 
 
       // 邊線
@@ -1374,75 +1379,54 @@ map.on('move', () => { if (map.getZoom() > ZMAX) map.setZoom(ZMAX); });
 
 
 // 放在外面，當成全域變數，記錄上一次被搜尋高亮的 id
+// 全域記錄上一輪被亮的 id
 let searchHighlightIds = [];
 
 function applySearch(qRaw) {
   const q = _norm(qRaw || '');
-  const src = map.getSource('aoc');
-  if (!src) return;
+  if (!masterAOC) return;
 
-  // 1. 清掉上一輪的 feature-state
+  // 1. 先把上一輪的高亮關掉
   searchHighlightIds.forEach(id => {
     map.setFeatureState({ source: 'aoc', id: Number(id) }, { highlight: false });
   });
   searchHighlightIds = [];
 
-  // 2. 沒輸入：清掉兩個搜尋圖層
-  if (!q) {
-    map.setFilter('aoc-search-hl', ['in', ['id'], -1]);       // 黃色線
-    map.setFilter('aoc-fill-search-hl', ['in', ['id'], -1]);  // 黃色面
-    return;
-  }
+  // 2. 沒輸入就結束
+  if (!q) return;
 
-  // 3. 用你原本的 masterAOC 去比
+  // 3. 用你現在的 masterAOC 去找名字
   const matched = [];
   (masterAOC.features || []).forEach(f => {
     const denom = f.properties?.denom || '';
     const names = denom.split(',').map(s => s.trim()).filter(Boolean);
     const hit = names.some(n => {
       const nn = _norm(n);
-      return (
-        nn === q ||
-        nn.startsWith(q) ||
-        nn.includes(q)
-      );
+      return nn === q || nn.startsWith(q) || nn.includes(q);
     });
     if (hit) matched.push(f);
   });
 
-  // 4. 有找到就高亮
+  // 4. 有找到 → 設 highlight
   if (matched.length) {
     const ids = matched.map(f => f.id);
 
-    // (a) feature-state 給你原本的 fill 看
     ids.forEach(id => {
       map.setFeatureState({ source: 'aoc', id: Number(id) }, { highlight: true });
     });
 
-    // (b) 線的搜尋層
-    map.setFilter('aoc-search-hl', ['in', ['id'], ...ids]);
-
-    // (c) 我們新加的「黃色填色」層
-    map.setFilter('aoc-fill-search-hl', ['in', ['id'], ...ids]);
-
     searchHighlightIds = ids;
 
-    // (d) 飛過去
+    // 5. 飛過去
     const b = new maplibregl.LngLatBounds();
-    const addCoords = (coords) => {
+    const add = (coords) => {
       if (Array.isArray(coords) && typeof coords[0] === 'number') b.extend(coords);
-      else if (Array.isArray(coords)) coords.forEach(addCoords);
+      else if (Array.isArray(coords)) coords.forEach(add);
     };
-    matched.forEach(f => {
-      if (f.geometry?.coordinates) addCoords(f.geometry.coordinates);
-    });
+    matched.forEach(f => f.geometry?.coordinates && add(f.geometry.coordinates));
     if (!b.isEmpty()) {
       map.fitBounds(b, { padding: 40, maxzoom: 15, duration: 600 });
     }
-  } else {
-    // 5. 沒找到就清掉
-    map.setFilter('aoc-search-hl', ['in', ['id'], -1]);
-    map.setFilter('aoc-fill-search-hl', ['in', ['id'], -1]);
   }
 }
 
