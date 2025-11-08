@@ -984,6 +984,19 @@ masterAOC = enrichedAOC;
     ]
   }
 });
+// 專門給「搜尋」用的超亮填色層，預設不畫任何東西
+map.addLayer({
+  id: 'aoc-fill-search-hl',
+  type: 'fill',
+  source: 'aoc',
+  paint: {
+    'fill-color': '#ffff00',   // 很亮的黃
+    'fill-opacity': 0.55
+  },
+  // 這裡一定要用 feature.id
+  filter: ['in', ['id'], -1]
+}, 'aoc-line'); // 放在線的下面或上面都可以，這裡我放在線下面
+
       // ➤ 新增：地塊名稱標籤圖層
       map.addLayer({
   id: 'aoc-labels',
@@ -1366,57 +1379,70 @@ let searchHighlightIds = [];
 function applySearch(qRaw) {
   const q = _norm(qRaw || '');
   const src = map.getSource('aoc');
-  if (!src || !masterAOC) return;
+  if (!src) return;
 
-  // 清掉上一輪
+  // 1. 清掉上一輪的 feature-state
   searchHighlightIds.forEach(id => {
     map.setFeatureState({ source: 'aoc', id: Number(id) }, { highlight: false });
   });
   searchHighlightIds = [];
 
+  // 2. 沒輸入：清掉兩個搜尋圖層
   if (!q) {
-    // 清掉黃色外框
-    map.setFilter('aoc-search-hl', ['in', ['id'], -1]);
+    map.setFilter('aoc-search-hl', ['in', ['id'], -1]);       // 黃色線
+    map.setFilter('aoc-fill-search-hl', ['in', ['id'], -1]);  // 黃色面
     return;
   }
 
-  // 用你原本的 masterAOC 找
+  // 3. 用你原本的 masterAOC 去比
   const matched = [];
   (masterAOC.features || []).forEach(f => {
     const denom = f.properties?.denom || '';
     const names = denom.split(',').map(s => s.trim()).filter(Boolean);
     const hit = names.some(n => {
       const nn = _norm(n);
-      return nn === q || nn.startsWith(q) || nn.includes(q);
+      return (
+        nn === q ||
+        nn.startsWith(q) ||
+        nn.includes(q)
+      );
     });
     if (hit) matched.push(f);
   });
 
+  // 4. 有找到就高亮
   if (matched.length) {
     const ids = matched.map(f => f.id);
 
-    // 設 highlight
+    // (a) feature-state 給你原本的 fill 看
     ids.forEach(id => {
       map.setFeatureState({ source: 'aoc', id: Number(id) }, { highlight: true });
     });
 
-    // 🔴 這行是重點：用 ["id"]
+    // (b) 線的搜尋層
     map.setFilter('aoc-search-hl', ['in', ['id'], ...ids]);
+
+    // (c) 我們新加的「黃色填色」層
+    map.setFilter('aoc-fill-search-hl', ['in', ['id'], ...ids]);
 
     searchHighlightIds = ids;
 
-    // 飛過去
+    // (d) 飛過去
     const b = new maplibregl.LngLatBounds();
     const addCoords = (coords) => {
       if (Array.isArray(coords) && typeof coords[0] === 'number') b.extend(coords);
       else if (Array.isArray(coords)) coords.forEach(addCoords);
     };
-    matched.forEach(f => f.geometry?.coordinates && addCoords(f.geometry.coordinates));
+    matched.forEach(f => {
+      if (f.geometry?.coordinates) addCoords(f.geometry.coordinates);
+    });
     if (!b.isEmpty()) {
       map.fitBounds(b, { padding: 40, maxzoom: 15, duration: 600 });
     }
   } else {
+    // 5. 沒找到就清掉
     map.setFilter('aoc-search-hl', ['in', ['id'], -1]);
+    map.setFilter('aoc-fill-search-hl', ['in', ['id'], -1]);
   }
 }
 
@@ -1466,10 +1492,8 @@ function applySearch(qRaw) {
       
       
       let tAOC = null;
-q.addEventListener('input', ()=>{ 
-  clearTimeout(tAOC); 
-  tAOC = setTimeout(()=> applySearch(q.value), 220); 
-});
+q.addEventListener('input', ()=>{ clearTimeout(tAOC); tAOC = setTimeout(()=> applySearch(q.value), 220); });
+
       btnAll.onclick   = ()=> { q.value=''; applySearch(''); };
       
       // 🍷 綁定回主選單按鈕
