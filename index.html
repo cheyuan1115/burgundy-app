@@ -1033,7 +1033,7 @@ map.addLayer({
     'line-opacity': 0.95
   },
   // 一開始不要顯示任何東西
-  filter: ['in', 'id', -1]
+filter: ['in', ['id'], -1]
 }, 'aoc-labels'); // 放在標籤下面/上面都可，你要最上面也行
 
       // Hover 高亮
@@ -1366,75 +1366,57 @@ let searchHighlightIds = [];
 function applySearch(qRaw) {
   const q = _norm(qRaw || '');
   const src = map.getSource('aoc');
-  if (!src) return;
+  if (!src || !masterAOC) return;
 
-  // 1) 先把上一輪亮過的全部關掉
+  // 清掉上一輪
   searchHighlightIds.forEach(id => {
-    // id 一定是數字，因為你 source 有 promoteId: 'id'
     map.setFeatureState({ source: 'aoc', id: Number(id) }, { highlight: false });
   });
   searchHighlightIds = [];
 
-  // 2) 如果輸入是空的，就把搜尋高亮層也清掉，然後回去
   if (!q) {
-    map.setFilter('aoc-search-hl', ['in', 'id', -1]); // 不顯示黃色邊
+    // 清掉黃色外框
+    map.setFilter('aoc-search-hl', ['in', ['id'], -1]);
     return;
   }
 
-  // 3) 拿「現在地圖上這份」資料來找（這是重點，不用 masterAOC）
-  //    MapLibre 把 geojson 存在 _data 或 _options.data 裡，兩個抓一個能用的就好
-  const data = src._data || src._options?.data;
-  const feats = (data && data.features) ? data.features : [];
-
+  // 用你原本的 masterAOC 找
   const matched = [];
-
-  feats.forEach(f => {
+  (masterAOC.features || []).forEach(f => {
     const denom = f.properties?.denom || '';
     const names = denom.split(',').map(s => s.trim()).filter(Boolean);
-
     const hit = names.some(n => {
       const nn = _norm(n);
-      return (
-        nn === q ||
-        nn.startsWith(q) ||
-        nn.includes(q)
-      );
+      return nn === q || nn.startsWith(q) || nn.includes(q);
     });
-
-    if (hit) {
-      matched.push(f);
-    }
+    if (hit) matched.push(f);
   });
 
-  // 4) 有找到的話就亮它們，並更新黃色描邊層
   if (matched.length) {
     const ids = matched.map(f => f.id);
 
+    // 設 highlight
     ids.forEach(id => {
       map.setFeatureState({ source: 'aoc', id: Number(id) }, { highlight: true });
     });
 
-    // 黃色外框只畫這些 id
-    map.setFilter('aoc-search-hl', ['in', 'id', ...ids]);
+    // 🔴 這行是重點：用 ["id"]
+    map.setFilter('aoc-search-hl', ['in', ['id'], ...ids]);
 
-    // 記起來，下一次要關掉
     searchHighlightIds = ids;
 
-    // 5) 飛到這些地塊範圍
+    // 飛過去
     const b = new maplibregl.LngLatBounds();
     const addCoords = (coords) => {
       if (Array.isArray(coords) && typeof coords[0] === 'number') b.extend(coords);
       else if (Array.isArray(coords)) coords.forEach(addCoords);
     };
-    matched.forEach(f => {
-      if (f.geometry?.coordinates) addCoords(f.geometry.coordinates);
-    });
+    matched.forEach(f => f.geometry?.coordinates && addCoords(f.geometry.coordinates));
     if (!b.isEmpty()) {
       map.fitBounds(b, { padding: 40, maxzoom: 15, duration: 600 });
     }
   } else {
-    // 6) 沒找到就把黃色邊線清掉
-    map.setFilter('aoc-search-hl', ['in', 'id', -1]);
+    map.setFilter('aoc-search-hl', ['in', ['id'], -1]);
   }
 }
 
