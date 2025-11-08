@@ -478,20 +478,19 @@ window.drawCellarMarkers = function(summary = {}) {
         emojiHTML += `<div style="font-size:10px; color:#222;">${consumedCount}</div>`;
       }
     }
+
     // 建立 marker 元素
- const el = document.createElement('div');
-el.className = 'cellar-marker';
-el.style.background = 'rgba(255, 255, 255, 0.3)';   // ✅ 半透明白底
-el.style.border = '0px solid white';                // ✅ 白邊
-el.style.borderRadius = '50%';                      // ✅ 圓形
-el.style.boxShadow = '0 0 6px rgba(0,0,0,0.4)';     // ✅ 陰影
-el.style.width = '32px';
-el.style.height = '32px';
-el.style.display = 'flex';
+    const el = document.createElement('div');
+    el.className = 'cellar-marker';
+    el.style.background = 'transparent';
+    el.style.border = 'none';
+    el.style.width = '38px';  // ⬅ 可改整體大小
+    el.style.height = '38px';
+    el.style.display = 'flex';
     el.style.flexDirection = 'column';
     el.style.alignItems = 'center';
     el.style.justifyContent = 'center';
-el.innerHTML = `<span style="font-size:28px; transform: translateY(2px);">${emojiHTML}</span>`;
+    el.innerHTML = `<span style="font-size:28px;">${emojiHTML}</span>`;
 
     const marker = new maplibregl.Marker({ element: el, anchor: 'center' })
       .setLngLat(center)
@@ -506,6 +505,7 @@ el.innerHTML = `<span style="font-size:28px; transform: translateY(2px);">${emoj
 
     window.inventoryMarkers.push(marker);
   });
+
   // 右上角小計
   let dbg = document.getElementById('cellar-debug');
   if (!dbg) {
@@ -721,9 +721,9 @@ const getLevel = (props) => parseAOC(props).level;
 
 map.on('load', async () => {
   // ====== 【改成這一段】 ======
-const AOC_DATA_FILE    = './assets/burgundy.geojson';
-const WINERY_DATA_FILE = './assets/wineries.geojson';
-const META_DATA_FILE   = './assets/meta.json';
+  const AOC_DATA_FILE    = 'https://raw.githubusercontent.com/cheyuan1115/burgundy-app/main/burgundy.geojson';
+  const WINERY_DATA_FILE = 'https://raw.githubusercontent.com/cheyuan1115/burgundy-app/main/wineries.geojson';
+  const META_DATA_FILE   = 'https://raw.githubusercontent.com/cheyuan1115/burgundy-app/main/meta.json';
 
   // 1) 先載入 meta.json
   let META = { wineries: {}, climat_owners: {} };
@@ -939,39 +939,52 @@ masterAOC = enrichedAOC;
 
       // Fill 著色
       map.addLayer({
-        id: 'aoc-fill',
-        type: 'fill',
-        source: 'aoc',
-        maxzoom: 15,
-        paint: {
-          'fill-color': [
-            'match', ['get', 'lvl'],
-            'GC', '#cc0033',
-            'PC', '#ff7f0e',
-            'VI', '#1f77b4',
-            /* RE */ '#2ca02c'
-          ],
-          'fill-opacity': 0.35
-        }
-      });
+  id: 'aoc-fill',
+  type: 'fill',
+  source: 'aoc',
+  maxzoom: 15,
+  paint: {
+    'fill-color': [
+      'match', ['get', 'lvl'],
+      'GC', '#cc0033',
+      'PC', '#ff7f0e',
+      'VI', '#1f77b4',
+      /* RE */ '#2ca02c'
+    ],
+    // 👇 有 highlight 就比較濃，沒有就正常
+    'fill-opacity': [
+      'case',
+      ['boolean', ['feature-state', 'highlight'], false],
+      0.75,   // 高亮的不透明
+      0.35    // 其他原本的
+    ]
+  }
+});
+
 
       // 邊線
-      map.addLayer({
-        id: 'aoc-line',
-        type: 'line',
-        source: 'aoc',
-        maxzoom: 15,
-        paint: {
-          'line-color': [
-            'match', ['get', 'lvl'],
-            'GC', '#cc0033',
-            'PC', '#ff7f0e',
-            'VI', '#1f77b4',
-            /* RE */ '#2ca02c'
-          ],
-          'line-width': 1.5
-        }
-      });
+     map.addLayer({
+  id: 'aoc-line',
+  type: 'line',
+  source: 'aoc',
+  maxzoom: 15,
+  paint: {
+    'line-color': [
+      'match', ['get', 'lvl'],
+      'GC', '#cc0033',
+      'PC', '#ff7f0e',
+      'VI', '#1f77b4',
+      '#2ca02c'
+    ],
+    'line-width': [
+      'case',
+      ['boolean', ['feature-state', 'highlight'], false],
+      3,     // 高亮
+      1.5    // 原本
+    ]
+  }
+});
+
 
       // ➤ 新增：地塊名稱標籤圖層
       map.addLayer({
@@ -1337,67 +1350,77 @@ map.on('move', () => { if (map.getZoom() > ZMAX) map.setZoom(ZMAX); });
       });
 
 
-      // ====== AOC 搜尋（直接對 masterAOC 篩選後 setData）======
-      async function applySearch(qRaw){
-        currentFilterQ = _norm(qRaw || ''); 
-        const feats = (masterAOC.features || []).filter(f => {
-          if (!currentFilterQ) return true;
-          const denom = f.properties?.denom || '';
-          const names = denom.split(',').map(s => s.trim()).filter(Boolean);
-          const score = Math.max(...names.map(n => {
-            const nn = _norm(n);
-            if (nn === currentFilterQ) return 100;
-            if (nn.startsWith(currentFilterQ)) return 50;
-            if (nn.includes(currentFilterQ)) return 10;
-            return 0;
-          }));
-          return score > 0;
-        });
+    // 放在外面，讓每次搜尋都能清掉舊的高亮
+let lastHighlightedIds = [];
 
-        const filtered = {
-  type: 'FeatureCollection',
-  features: feats.map(f => {
-    const p = f.properties || {};
-    const info = parseAOC(p);
-    return {
-      ...f,
-      properties: {
-        ...p,
-        lvl: info.level,
-        aoc_key: makeAocKeyFromInfo(info)  // ←補回來
+// ====== AOC 搜尋（全部顯示，只高亮命中的）======
+async function applySearch(qRaw) {
+  const q = _norm(qRaw || '');
+
+  // 1) 把上一次高亮的先還原
+  lastHighlightedIds.forEach(id => {
+    map.setFeatureState({ source: 'aoc', id }, { highlight: false });
+  });
+  lastHighlightedIds = [];
+
+  // 2) 如果輸入是空的，就把整包資料塞回去，然後結束
+  if (!q) {
+    // 確保 source 還是完整的 masterAOC
+    map.getSource('aoc').setData(masterAOC);
+    return;
+  }
+
+  // 3) 尋找符合的 feature，幫它們設 highlight
+  const matchedFeatures = [];
+
+  (masterAOC.features || []).forEach(f => {
+    const denom = f.properties?.denom || '';
+    const names = denom.split(',').map(s => s.trim()).filter(Boolean);
+
+    // 沿用你原本的打分邏輯
+    const score = Math.max(
+      ...names.map(n => {
+        const nn = _norm(n);
+        if (nn === q) return 100;
+        if (nn.startsWith(q)) return 50;
+        if (nn.includes(q)) return 10;
+        return 0;
+      }),
+      0
+    );
+
+    if (score > 0) {
+      matchedFeatures.push(f);
+
+      // 設高亮，圖層 paint 要能讀 feature-state.highlight
+      map.setFeatureState({ source: 'aoc', id: f.id }, { highlight: true });
+      lastHighlightedIds.push(f.id);
+    }
+  });
+
+  // 4) 依然可以幫使用者 zoom 到這些命中的地塊
+  if (matchedFeatures.length) {
+    const b = new maplibregl.LngLatBounds();
+
+    const addCoords = coords => {
+      if (Array.isArray(coords) && typeof coords[0] === 'number') {
+        b.extend(coords);
+      } else if (Array.isArray(coords)) {
+        coords.forEach(addCoords);
       }
     };
-  })
-};
 
-        map.getSource('aoc').setData(filtered);
+    matchedFeatures.forEach(f => {
+      const geom = f.geometry;
+      if (geom && geom.coordinates) addCoords(geom.coordinates);
+    });
 
-        if (feats.length) {
-          const b = new maplibregl.LngLatBounds();
-          
-          const addCoords = (coords) => {
-            if (Array.isArray(coords) && coords.length >= 2 && typeof coords[0] === 'number') {
-              b.extend(coords);
-            } else if (Array.isArray(coords)) {
-              coords.forEach(addCoords);
-            }
-          };
+    if (!b.isEmpty()) {
+      map.fitBounds(b, { padding: 40, maxzoom: 15, duration: 600 });
+    }
+  }
+}
 
-          feats.forEach(f => {
-            const geom = f.geometry;
-            if (geom && geom.coordinates) {
-               addCoords(geom.coordinates);
-            }
-          });
-          
-          if (b.isEmpty()) {
-              console.warn("AOC 搜尋：計算出的邊界框為空。");
-              return;
-          }
-          
-          map.fitBounds(b, { padding: 40, maxzoom: 15, duration: 600 });
-        }
-      }
       
       // ************ 酒莊搜尋邏輯：通過程式碼過濾然後更新 Source Data ************
       function applyWinerySearch(qRaw){
