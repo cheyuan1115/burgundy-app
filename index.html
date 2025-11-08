@@ -1351,75 +1351,69 @@ map.on('move', () => { if (map.getZoom() > ZMAX) map.setZoom(ZMAX); });
 
 
     // 放在外面，讓每次搜尋都能清掉舊的高亮
+// 放在外面
 let lastHighlightedIds = [];
 
-// ====== AOC 搜尋（全部顯示，只高亮命中的）======
+// 全部顯示，只把搜尋到的設 feature-state: {highlight: true}
 async function applySearch(qRaw) {
   const q = _norm(qRaw || '');
 
-  // 1) 把上一次高亮的先還原
+  // 先還原上一次的高亮
   lastHighlightedIds.forEach(id => {
     map.setFeatureState({ source: 'aoc', id }, { highlight: false });
   });
   lastHighlightedIds = [];
 
-  // 2) 如果輸入是空的，就把整包資料塞回去，然後結束
-  if (!q) {
-    // 確保 source 還是完整的 masterAOC
-    map.getSource('aoc').setData(masterAOC);
-    return;
-  }
+  // ✅ 不管有沒有搜尋字，都先把 source 換回完整的 masterAOC
+  //   這是你剛剛沒看到高亮的主要原因：source 還停在被你「篩過」的版本
+  map.getSource('aoc').setData(masterAOC);
 
-  // 3) 尋找符合的 feature，幫它們設 highlight
-  const matchedFeatures = [];
+  // 如果沒輸入就結束（全部顯示、也沒高亮）
+  if (!q) return;
 
-  (masterAOC.features || []).forEach(f => {
-    const denom = f.properties?.denom || '';
-    const names = denom.split(',').map(s => s.trim()).filter(Boolean);
+  // 等上一行 setData 生效後再設 state，簡單做法：下一個 event loop 再跑
+  setTimeout(() => {
+    const matched = [];
 
-    // 沿用你原本的打分邏輯
-    const score = Math.max(
-      ...names.map(n => {
-        const nn = _norm(n);
-        if (nn === q) return 100;
-        if (nn.startsWith(q)) return 50;
-        if (nn.includes(q)) return 10;
-        return 0;
-      }),
-      0
-    );
+    (masterAOC.features || []).forEach(f => {
+      const denom = f.properties?.denom || '';
+      const names = denom.split(',').map(s => s.trim()).filter(Boolean);
 
-    if (score > 0) {
-      matchedFeatures.push(f);
+      const score = Math.max(
+        ...names.map(n => {
+          const nn = _norm(n);
+          if (nn === q) return 100;
+          if (nn.startsWith(q)) return 50;
+          if (nn.includes(q)) return 10;
+          return 0;
+        }),
+        0
+      );
 
-      // 設高亮，圖層 paint 要能讀 feature-state.highlight
-      map.setFeatureState({ source: 'aoc', id: f.id }, { highlight: true });
-      lastHighlightedIds.push(f.id);
-    }
-  });
-
-  // 4) 依然可以幫使用者 zoom 到這些命中的地塊
-  if (matchedFeatures.length) {
-    const b = new maplibregl.LngLatBounds();
-
-    const addCoords = coords => {
-      if (Array.isArray(coords) && typeof coords[0] === 'number') {
-        b.extend(coords);
-      } else if (Array.isArray(coords)) {
-        coords.forEach(addCoords);
+      if (score > 0) {
+        matched.push(f);
+        map.setFeatureState({ source: 'aoc', id: f.id }, { highlight: true });
+        lastHighlightedIds.push(f.id);
       }
-    };
-
-    matchedFeatures.forEach(f => {
-      const geom = f.geometry;
-      if (geom && geom.coordinates) addCoords(geom.coordinates);
     });
 
-    if (!b.isEmpty()) {
-      map.fitBounds(b, { padding: 40, maxzoom: 15, duration: 600 });
+    // 有找到就縮放過去
+    if (matched.length) {
+      const b = new maplibregl.LngLatBounds();
+      const addCoords = coords => {
+        if (Array.isArray(coords) && typeof coords[0] === 'number') b.extend(coords);
+        else if (Array.isArray(coords)) coords.forEach(addCoords);
+      };
+      matched.forEach(f => {
+        if (f.geometry?.coordinates) addCoords(f.geometry.coordinates);
+      });
+      if (!b.isEmpty()) {
+        map.fitBounds(b, { padding: 40, maxzoom: 15, duration: 600 });
+      }
     }
-  }
+  }, 0);
 }
+
 
       
       // ************ 酒莊搜尋邏輯：通過程式碼過濾然後更新 Source Data ************
