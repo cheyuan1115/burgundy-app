@@ -1375,20 +1375,25 @@ map.on('move', () => { if (map.getZoom() > ZMAX) map.setZoom(ZMAX); });
 
 
 // 放在外面，當成全域變數，記錄上一次被搜尋高亮的 id
+// 記錄上一輪搜尋到的 id（這裡其實可有可無，主要是給你 debug 用）
 let lastSearchIds = [];
 
 function applySearch(qRaw) {
   const q = _norm(qRaw || '');
+  // 這一份是地圖現在在用的那個 dedup 版本
   const base = window.__AOC_BASE_FC__;
-  if (!base || !masterAOC) return;
+  if (!base) return;
 
-  // 沒輸入 → 清掉所有標記
+  // 1) 沒輸入 → 全部清掉 __searched
   if (!q) {
     const cleared = {
       type: 'FeatureCollection',
       features: base.features.map(f => ({
         ...f,
-        properties: { ...f.properties, __searched: 0 }
+        properties: {
+          ...f.properties,
+          __searched: 0
+        }
       }))
     };
     map.getSource('aoc').setData(cleared);
@@ -1396,42 +1401,39 @@ function applySearch(qRaw) {
     return;
   }
 
-  // 這裡就是「你原本就有的」那種比對方式：等於 / 開頭 / 包含
-  const matchedIds = [];
+  // 2) 先用你原本的 masterAOC 去找有哪些 feature 符合（因為 masterAOC 有完整 denom）
+  const hitIds = [];
   (masterAOC.features || []).forEach(f => {
     const denom = f.properties?.denom || '';
     const names = denom.split(',').map(s => s.trim()).filter(Boolean);
-
     const hit = names.some(n => {
       const nn = _norm(n);
-      return (
-        nn === q ||        // 完全一樣
-        nn.startsWith(q) ||// 開頭一樣
-        nn.includes(q)     // 有包含
-      );
+      return nn === q || nn.startsWith(q) || nn.includes(q);
     });
-
     if (hit) {
-      matchedIds.push(f.id);
+      hitIds.push(f.id);   // ← 用 id 對應回 dedup 這一份
     }
   });
 
-  // 把這些 match 回寫到地圖這份 data 裡
-  const idSet = new Set(matchedIds);
+  // 3) 用這個命中的 id 去「重新組一份」給地圖
+  const idSet = new Set(hitIds);
   const updated = {
     type: 'FeatureCollection',
     features: base.features.map(f => ({
       ...f,
       properties: {
         ...f.properties,
-        __searched: idSet.has(f.id) ? 1 : 0   // 只有這裡加標記
+        __searched: idSet.has(f.id) ? 1 : 0
       }
     }))
   };
-  map.getSource('aoc').setData(updated);
 
-  // 鏡頭飛過去（也是飛這些 match 到的地塊）
-  if (matchedIds.length) {
+  // 4) 丟回地圖
+  map.getSource('aoc').setData(updated);
+  lastSearchIds = hitIds;
+
+  // 5) 鏡頭飛過去（用命中的 masterAOC 那些）
+  if (hitIds.length) {
     const b = new maplibregl.LngLatBounds();
     const add = (coords) => {
       if (Array.isArray(coords) && typeof coords[0] === 'number') b.extend(coords);
@@ -1446,6 +1448,8 @@ function applySearch(qRaw) {
     }
   }
 }
+
+
 
       // ************ 酒莊搜尋邏輯：通過程式碼過濾然後更新 Source Data ************
       function applyWinerySearch(qRaw){
