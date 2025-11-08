@@ -478,7 +478,6 @@ window.drawCellarMarkers = function(summary = {}) {
         emojiHTML += `<div style="font-size:10px; color:#222;">${consumedCount}</div>`;
       }
     }
-
     // 建立 marker 元素
  const el = document.createElement('div');
 el.className = 'cellar-marker';
@@ -488,14 +487,26 @@ el.style.borderRadius = '50%';                      // ✅ 圓形
 el.style.boxShadow = '0 0 6px rgba(0,0,0,0.4)';     // ✅ 陰影
 el.style.width = '32px';
 el.style.height = '32px';
-el.style.display = 'flex';
-el.style.flexDirection = 'column';
-el.style.alignItems = 'center';
-el.style.justifyContent = 'center';
-el.style.backdropFilter = 'blur(2px)';              // ✅ 背景模糊，質感加分
-el.innerHTML = `<span style="font-size:30px;">${emojiHTML}</span>`;
+el.style.borderRadius = '50%';
+el.style.position = 'relative';           // ⭐ 當成定位容器
+el.style.overflow = 'hidden';             // 超出去的不要
+// 這三行可以不用了：display / flexDirection / alignItems
+// el.style.display = 'flex';
+// el.style.flexDirection = 'column';
+// el.style.alignItems = 'center';
 
-
+el.innerHTML = `
+  <span style="
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 28px;
+    line-height: 1;
+  ">
+    ${emojiHTML}
+  </span>
+`;
     const marker = new maplibregl.Marker({ element: el, anchor: 'center' })
       .setLngLat(center)
       .setPopup(
