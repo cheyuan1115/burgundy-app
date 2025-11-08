@@ -1354,32 +1354,33 @@ map.on('move', () => { if (map.getZoom() > ZMAX) map.setZoom(ZMAX); });
 // 放在外面
 // 放在外面，記得保留
 // 放在外面那個還是要保留
+// 放外面，記錄上一次亮過的
 let lastHighlightedIds = [];
 
-// ✅ 這是新的版本：會「篩選」+「高亮」
 function applySearch(qRaw) {
   const q = _norm(qRaw || '');
   const src = map.getSource('aoc');
   if (!src || !masterAOC) return;
 
-  // 1) 把上一次的高亮清掉
+  // 1) 把上一輪的高亮關掉
   lastHighlightedIds.forEach(id => {
     map.setFeatureState({ source: 'aoc', id }, { highlight: false });
   });
   lastHighlightedIds = [];
 
-  // 2) 如果沒有輸入 → 顯示全部、不高亮
+  // 2) 如果沒輸入，就只是全顯示、不高亮
   if (!q) {
-    src.setData(masterAOC);
+    // 注意：這裡不要再 setData 了，保持現在這份（你 load 時加進去的那份 dedupAOC）
     return;
   }
 
-  // 3) 有輸入的情況：先從 masterAOC 篩掉不符合的
-  const matchedFeatures = (masterAOC.features || []).filter(f => {
+  const matched = [];
+
+  // 3) 從「完整那份 masterAOC」裡面找有 match 的 id，然後去對目前 map 上的 source 設 state
+  (masterAOC.features || []).forEach(f => {
     const denom = f.properties?.denom || '';
     const names = denom.split(',').map(s => s.trim()).filter(Boolean);
 
-    // 跟你原本一樣的打分法
     const score = Math.max(
       ...names.map(n => {
         const nn = _norm(n);
@@ -1391,39 +1392,28 @@ function applySearch(qRaw) {
       0
     );
 
-    return score > 0;
-  });
-
-  // 4) 先把「只有這些有符合的 feature」塞回去 → 這一步就是「篩選」
-  const filteredFC = {
-    type: 'FeatureCollection',
-    features: matchedFeatures
-  };
-  src.setData(filteredFC);
-
-  // 5) 等地圖吃完這個新的 data，再來設高亮 & zoom
-  map.once('idle', () => {
-    // 高亮這些有留下來的
-    matchedFeatures.forEach(f => {
+    if (score > 0) {
+      matched.push(f);
+      // 這裡很重要：直接對 map 上的 source 設 highlight
       map.setFeatureState({ source: 'aoc', id: f.id }, { highlight: true });
       lastHighlightedIds.push(f.id);
-    });
-
-    // 飛過去讓你看到
-    if (matchedFeatures.length) {
-      const b = new maplibregl.LngLatBounds();
-      const addCoords = (coords) => {
-        if (Array.isArray(coords) && typeof coords[0] === 'number') b.extend(coords);
-        else if (Array.isArray(coords)) coords.forEach(addCoords);
-      };
-      matchedFeatures.forEach(f => {
-        if (f.geometry?.coordinates) addCoords(f.geometry.coordinates);
-      });
-      if (!b.isEmpty()) {
-        map.fitBounds(b, { padding: 40, maxzoom: 15, duration: 600 });
-      }
     }
   });
+
+  // 4) 有找到就飛過去，但還是保持「全部顯示」
+  if (matched.length) {
+    const b = new maplibregl.LngLatBounds();
+    const addCoords = (coords) => {
+      if (Array.isArray(coords) && typeof coords[0] === 'number') b.extend(coords);
+      else if (Array.isArray(coords)) coords.forEach(addCoords);
+    };
+    matched.forEach(f => {
+      if (f.geometry?.coordinates) addCoords(f.geometry.coordinates);
+    });
+    if (!b.isEmpty()) {
+      map.fitBounds(b, { padding: 40, maxzoom: 15, duration: 600 });
+    }
+  }
 }
 
       
