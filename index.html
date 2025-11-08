@@ -933,7 +933,8 @@ map.addSource('aoc', {
   data: dedupAOC,
   promoteId: 'id'
 });
-
+// 這一份就是「地圖正在用的版本」，等一下搜尋要拿它來改
+window.__AOC_BASE_FC__ = dedupAOC;
 // 再回存一份，給 drawCellarMarkers 用
 masterAOC = enrichedAOC;
 
@@ -943,11 +944,11 @@ map.addLayer({
   type: 'fill',
   source: 'aoc',
   paint: {
-    // ← 有被 highlight 的，一律亮黃
     'fill-color': [
       'case',
-      ['boolean', ['feature-state', 'highlight'], false],
-      '#ffff00',   // 高亮時的顏色，超級明顯
+      // 有被搜尋到 → 黃色
+      ['==', ['get', '__searched'], 1], '#ffff00',
+      // 其他照原本等級
       [
         'match', ['get', 'lvl'],
         'GC', '#cc0033',
@@ -958,9 +959,8 @@ map.addLayer({
     ],
     'fill-opacity': [
       'case',
-      ['boolean', ['feature-state', 'highlight'], false],
-      0.9,   // 高亮時幾乎不透明
-      0.35   // 原來的透明度
+      ['==', ['get', '__searched'], 1], 0.85,   // 搜到的比較實
+      0.35
     ]
   }
 });
@@ -1379,24 +1379,34 @@ map.on('move', () => { if (map.getZoom() > ZMAX) map.setZoom(ZMAX); });
 
 
 // 放在外面，當成全域變數，記錄上一次被搜尋高亮的 id
-// 全域記錄上一輪被亮的 id
-let searchHighlightIds = [];
+// 記錄上一輪搜尋到的 id（這裡其實可有可無，主要是給你 debug 用）
+let lastSearchIds = [];
 
 function applySearch(qRaw) {
   const q = _norm(qRaw || '');
-  if (!masterAOC) return;
+  // 這一份是地圖現在在用的那個 dedup 版本
+  const base = window.__AOC_BASE_FC__;
+  if (!base) return;
 
-  // 1. 先把上一輪的高亮關掉
-  searchHighlightIds.forEach(id => {
-    map.setFeatureState({ source: 'aoc', id: Number(id) }, { highlight: false });
-  });
-  searchHighlightIds = [];
+  // 1) 沒輸入 → 全部清掉 __searched
+  if (!q) {
+    const cleared = {
+      type: 'FeatureCollection',
+      features: base.features.map(f => ({
+        ...f,
+        properties: {
+          ...f.properties,
+          __searched: 0
+        }
+      }))
+    };
+    map.getSource('aoc').setData(cleared);
+    lastSearchIds = [];
+    return;
+  }
 
-  // 2. 沒輸入就結束
-  if (!q) return;
-
-  // 3. 用你現在的 masterAOC 去找名字
-  const matched = [];
+  // 2) 先用你原本的 masterAOC 去找有哪些 feature 符合（因為 masterAOC 有完整 denom）
+  const hitIds = [];
   (masterAOC.features || []).forEach(f => {
     const denom = f.properties?.denom || '';
     const names = denom.split(',').map(s => s.trim()).filter(Boolean);
@@ -1404,31 +1414,45 @@ function applySearch(qRaw) {
       const nn = _norm(n);
       return nn === q || nn.startsWith(q) || nn.includes(q);
     });
-    if (hit) matched.push(f);
+    if (hit) {
+      hitIds.push(f.id);   // ← 用 id 對應回 dedup 這一份
+    }
   });
 
-  // 4. 有找到 → 設 highlight
-  if (matched.length) {
-    const ids = matched.map(f => f.id);
+  // 3) 用這個命中的 id 去「重新組一份」給地圖
+  const idSet = new Set(hitIds);
+  const updated = {
+    type: 'FeatureCollection',
+    features: base.features.map(f => ({
+      ...f,
+      properties: {
+        ...f.properties,
+        __searched: idSet.has(f.id) ? 1 : 0
+      }
+    }))
+  };
 
-    ids.forEach(id => {
-      map.setFeatureState({ source: 'aoc', id: Number(id) }, { highlight: true });
-    });
+  // 4) 丟回地圖
+  map.getSource('aoc').setData(updated);
+  lastSearchIds = hitIds;
 
-    searchHighlightIds = ids;
-
-    // 5. 飛過去
+  // 5) 鏡頭飛過去（用命中的 masterAOC 那些）
+  if (hitIds.length) {
     const b = new maplibregl.LngLatBounds();
     const add = (coords) => {
       if (Array.isArray(coords) && typeof coords[0] === 'number') b.extend(coords);
       else if (Array.isArray(coords)) coords.forEach(add);
     };
-    matched.forEach(f => f.geometry?.coordinates && add(f.geometry.coordinates));
+    (masterAOC.features || []).forEach(f => {
+      if (!idSet.has(f.id)) return;
+      if (f.geometry?.coordinates) add(f.geometry.coordinates);
+    });
     if (!b.isEmpty()) {
       map.fitBounds(b, { padding: 40, maxzoom: 15, duration: 600 });
     }
   }
 }
+
 
       // ************ 酒莊搜尋邏輯：通過程式碼過濾然後更新 Source Data ************
       function applyWinerySearch(qRaw){
