@@ -1353,60 +1353,70 @@ map.on('move', () => { if (map.getZoom() > ZMAX) map.setZoom(ZMAX); });
     // 放在外面，讓每次搜尋都能清掉舊的高亮
 // 放在外面
 // 放在外面，記得保留
+// 放在外面那個還是要保留
 let lastHighlightedIds = [];
 
-// ✅ 只有這段要換
-async function applySearch(qRaw) {
+// ✅ 這是新的版本：會「篩選」+「高亮」
+function applySearch(qRaw) {
   const q = _norm(qRaw || '');
   const src = map.getSource('aoc');
   if (!src || !masterAOC) return;
 
-  // 1. 先把上一次的高亮關掉
+  // 1) 把上一次的高亮清掉
   lastHighlightedIds.forEach(id => {
     map.setFeatureState({ source: 'aoc', id }, { highlight: false });
   });
   lastHighlightedIds = [];
 
-  // 2. 把資料換回完整的 masterAOC（你想要的就是「不要再真的篩選掉 feature，只是高亮」）
-  src.setData(masterAOC);
+  // 2) 如果沒有輸入 → 顯示全部、不高亮
+  if (!q) {
+    src.setData(masterAOC);
+    return;
+  }
 
-  // ⭐ 重點：等這次資料換好再做後面的事
+  // 3) 有輸入的情況：先從 masterAOC 篩掉不符合的
+  const matchedFeatures = (masterAOC.features || []).filter(f => {
+    const denom = f.properties?.denom || '';
+    const names = denom.split(',').map(s => s.trim()).filter(Boolean);
+
+    // 跟你原本一樣的打分法
+    const score = Math.max(
+      ...names.map(n => {
+        const nn = _norm(n);
+        if (nn === q) return 100;
+        if (nn.startsWith(q)) return 50;
+        if (nn.includes(q)) return 10;
+        return 0;
+      }),
+      0
+    );
+
+    return score > 0;
+  });
+
+  // 4) 先把「只有這些有符合的 feature」塞回去 → 這一步就是「篩選」
+  const filteredFC = {
+    type: 'FeatureCollection',
+    features: matchedFeatures
+  };
+  src.setData(filteredFC);
+
+  // 5) 等地圖吃完這個新的 data，再來設高亮 & zoom
   map.once('idle', () => {
-    // 沒打字就只是全部顯示
-    if (!q) return;
-
-    const matched = [];
-
-    (masterAOC.features || []).forEach(f => {
-      const denom = f.properties?.denom || '';
-      const names = denom.split(',').map(s => s.trim()).filter(Boolean);
-
-      const score = Math.max(
-        ...names.map(n => {
-          const nn = _norm(n);
-          if (nn === q) return 100;
-          if (nn.startsWith(q)) return 50;
-          if (nn.includes(q)) return 10;
-          return 0;
-        }),
-        0
-      );
-
-      if (score > 0) {
-        matched.push(f);
-        map.setFeatureState({ source: 'aoc', id: f.id }, { highlight: true });
-        lastHighlightedIds.push(f.id);
-      }
+    // 高亮這些有留下來的
+    matchedFeatures.forEach(f => {
+      map.setFeatureState({ source: 'aoc', id: f.id }, { highlight: true });
+      lastHighlightedIds.push(f.id);
     });
 
-    // 有找到就飛過去
-    if (matched.length) {
+    // 飛過去讓你看到
+    if (matchedFeatures.length) {
       const b = new maplibregl.LngLatBounds();
       const addCoords = (coords) => {
         if (Array.isArray(coords) && typeof coords[0] === 'number') b.extend(coords);
         else if (Array.isArray(coords)) coords.forEach(addCoords);
       };
-      matched.forEach(f => {
+      matchedFeatures.forEach(f => {
         if (f.geometry?.coordinates) addCoords(f.geometry.coordinates);
       });
       if (!b.isEmpty()) {
