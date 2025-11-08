@@ -1024,7 +1024,19 @@ masterAOC = enrichedAOC;
     ['==', ['get', '_show_label'], 1]  // 只畫第一個
   ]
 }, 'aoc-line');
-
+// 🔍 專門給搜尋用的高亮層（蓋在線的上面）
+map.addLayer({
+  id: 'aoc-search-hl',
+  type: 'line',
+  source: 'aoc',
+  paint: {
+    'line-color': '#ffcc00',     // 金黃色一點，明顯
+    'line-width': 4,             // 比原本 1.5 / 3 都粗
+    'line-opacity': 0.95
+  },
+  // 一開始不要顯示任何東西
+  filter: ['in', 'id', -1]
+}, 'aoc-labels'); // 放在標籤下面/上面都可，你要最上面也行
 
       // Hover 高亮
       map.addLayer({
@@ -1355,64 +1367,64 @@ map.on('move', () => { if (map.getZoom() > ZMAX) map.setZoom(ZMAX); });
 // 放在外面，記得保留
 // 放在外面那個還是要保留
 // 放外面，記錄上一次亮過的
-let lastHighlightedIds = [];
+// 這個可以保留，之後要用得到
+let lastMatchedIds = [];
 
 function applySearch(qRaw) {
   const q = _norm(qRaw || '');
   const src = map.getSource('aoc');
   if (!src || !masterAOC) return;
 
-  // 1) 把上一輪的高亮關掉
-  lastHighlightedIds.forEach(id => {
-    map.setFeatureState({ source: 'aoc', id }, { highlight: false });
-  });
-  lastHighlightedIds = [];
-
-  // 2) 如果沒輸入，就只是全顯示、不高亮
+  // 1. 沒輸入就把高亮清掉
   if (!q) {
-    // 注意：這裡不要再 setData 了，保持現在這份（你 load 時加進去的那份 dedupAOC）
+    map.setFilter('aoc-search-hl', ['in', 'id', -1]); // 清空
+    lastMatchedIds = [];
     return;
   }
 
-  const matched = [];
-
-  // 3) 從「完整那份 masterAOC」裡面找有 match 的 id，然後去對目前 map 上的 source 設 state
+  // 2. 找到有符合的 feature id
+  const matchedFeatures = [];
   (masterAOC.features || []).forEach(f => {
     const denom = f.properties?.denom || '';
     const names = denom.split(',').map(s => s.trim()).filter(Boolean);
 
-    const score = Math.max(
-      ...names.map(n => {
-        const nn = _norm(n);
-        if (nn === q) return 100;
-        if (nn.startsWith(q)) return 50;
-        if (nn.includes(q)) return 10;
-        return 0;
-      }),
-      0
-    );
+    const hit = names.some(n => {
+      const nn = _norm(n);
+      return (
+        nn === q ||
+        nn.startsWith(q) ||
+        nn.includes(q)
+      );
+    });
 
-    if (score > 0) {
-      matched.push(f);
-      // 這裡很重要：直接對 map 上的 source 設 highlight
-      map.setFeatureState({ source: 'aoc', id: f.id }, { highlight: true });
-      lastHighlightedIds.push(f.id);
+    if (hit) {
+      matchedFeatures.push(f);
     }
   });
 
-  // 4) 有找到就飛過去，但還是保持「全部顯示」
-  if (matched.length) {
+  // 3. 把這些 id 塞給高亮層
+  if (matchedFeatures.length) {
+    const idList = matchedFeatures.map(f => f.id);
+    // ['in', 'id', ...ids]
+    map.setFilter('aoc-search-hl', ['in', 'id', ...idList]);
+    lastMatchedIds = idList;
+
+    // 4. 飛過去
     const b = new maplibregl.LngLatBounds();
     const addCoords = (coords) => {
       if (Array.isArray(coords) && typeof coords[0] === 'number') b.extend(coords);
       else if (Array.isArray(coords)) coords.forEach(addCoords);
     };
-    matched.forEach(f => {
+    matchedFeatures.forEach(f => {
       if (f.geometry?.coordinates) addCoords(f.geometry.coordinates);
     });
     if (!b.isEmpty()) {
       map.fitBounds(b, { padding: 40, maxzoom: 15, duration: 600 });
     }
+  } else {
+    // 沒找到就清掉高亮
+    map.setFilter('aoc-search-hl', ['in', 'id', -1]);
+    lastMatchedIds = [];
   }
 }
 
