@@ -937,12 +937,12 @@ map.addSource('aoc', {
 // 再回存一份，給 drawCellarMarkers 用
 masterAOC = enrichedAOC;
 
-      // Fill 著色
+// Fill 著色
       map.addLayer({
   id: 'aoc-fill',
   type: 'fill',
   source: 'aoc',
-  maxzoom: 15,
+  // 移除 maxzoom: 15，讓它在地圖允許的最大縮放級別下始終可見
   paint: {
     'fill-color': [
       'match', ['get', 'lvl'],
@@ -967,7 +967,7 @@ masterAOC = enrichedAOC;
   id: 'aoc-line',
   type: 'line',
   source: 'aoc',
-  maxzoom: 15,
+  // 移除 maxzoom: 15
   paint: {
     'line-color': [
       'match', ['get', 'lvl'],
@@ -984,8 +984,6 @@ masterAOC = enrichedAOC;
     ]
   }
 });
-
-
       // ➤ 新增：地塊名稱標籤圖層
       map.addLayer({
   id: 'aoc-labels',
