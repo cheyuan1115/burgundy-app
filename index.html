@@ -1361,6 +1361,7 @@ map.on('move', () => { if (map.getZoom() > ZMAX) map.setZoom(ZMAX); });
 
 
 // 放在外面，記錄上一次亮過的
+// 放在外面，記錄上一次亮過的
 let lastMatchedIds = [];
 
 function applySearch(qRaw) {
@@ -1372,7 +1373,8 @@ function applySearch(qRaw) {
   lastMatchedIds.forEach(id => {
     // 確保只對有效的 id 執行操作，並將 highlight 設為 false
     if (id !== undefined && id !== null) {
-        map.setFeatureState({ source: 'aoc', id: id }, { highlight: false });
+        // ★★★ 核心修改：使用 Number(id) 確保 id 是數字類型 ★★★
+        map.setFeatureState({ source: 'aoc', id: Number(id) }, { highlight: false });
     }
   });
   lastMatchedIds = []; // 清空記錄
@@ -1385,7 +1387,6 @@ function applySearch(qRaw) {
 
   // 3. 找到有符合的 feature id
   const matchedFeatures = [];
-  // 由於 masterAOC 已經被 enrichWithKey 處理過，f.properties.denom 存在
   (masterAOC.features || []).forEach(f => {
     const denom = f.properties?.denom || '';
     const names = denom.split(',').map(s => s.trim()).filter(Boolean);
@@ -1411,7 +1412,8 @@ function applySearch(qRaw) {
     // 【關鍵修復】為所有匹配地塊設定 feature-state: highlight = true
     idList.forEach(id => {
         if (id !== undefined && id !== null) {
-            map.setFeatureState({ source: 'aoc', id: id }, { highlight: true });
+            // ★★★ 核心修改：使用 Number(id) 確保 id 是數字類型 ★★★
+            map.setFeatureState({ source: 'aoc', id: Number(id) }, { highlight: true });
         }
     });
     
@@ -1429,7 +1431,6 @@ function applySearch(qRaw) {
     matchedFeatures.forEach(f => {
       if (f.geometry?.coordinates) addCoords(f.geometry.coordinates);
     });
-    // 確保 b 不為空，以避免錯誤
     if (!b.isEmpty()) {
       map.fitBounds(b, { padding: 40, maxzoom: 15, duration: 600 });
     }
