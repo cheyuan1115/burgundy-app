@@ -1362,12 +1362,7 @@ map.on('move', () => { if (map.getZoom() > ZMAX) map.setZoom(ZMAX); });
       });
 
 
-    // 放在外面，讓每次搜尋都能清掉舊的高亮
-// 放在外面
-// 放在外面，記得保留
-// 放在外面那個還是要保留
-// 放外面，記錄上一次亮過的
-// 這個可以保留，之後要用得到
+// 放在外面，記錄上一次亮過的
 let lastMatchedIds = [];
 
 function applySearch(qRaw) {
@@ -1375,15 +1370,24 @@ function applySearch(qRaw) {
   const src = map.getSource('aoc');
   if (!src || !masterAOC) return;
 
-  // 1. 沒輸入就把高亮清掉
+  // 1. 【關鍵修復】清除上一次所有匹配地塊的高亮狀態
+  lastMatchedIds.forEach(id => {
+    // 確保只對有效的 id 執行操作，並將 highlight 設為 false
+    if (id !== undefined && id !== null) {
+        map.setFeatureState({ source: 'aoc', id: id }, { highlight: false });
+    }
+  });
+  lastMatchedIds = []; // 清空記錄
+
+  // 2. 沒輸入就清掉高亮層並結束
   if (!q) {
-    map.setFilter('aoc-search-hl', ['in', 'id', -1]); // 清空
-    lastMatchedIds = [];
+    map.setFilter('aoc-search-hl', ['in', 'id', -1]); // 清空黃色邊線
     return;
   }
 
-  // 2. 找到有符合的 feature id
+  // 3. 找到有符合的 feature id
   const matchedFeatures = [];
+  // 由於 masterAOC 已經被 enrichWithKey 處理過，f.properties.denom 存在
   (masterAOC.features || []).forEach(f => {
     const denom = f.properties?.denom || '';
     const names = denom.split(',').map(s => s.trim()).filter(Boolean);
@@ -1402,14 +1406,23 @@ function applySearch(qRaw) {
     }
   });
 
-  // 3. 把這些 id 塞給高亮層
+  // 4. 設定新的高亮狀態並更新篩選層
   if (matchedFeatures.length) {
     const idList = matchedFeatures.map(f => f.id);
-    // ['in', 'id', ...ids]
+    
+    // 【關鍵修復】為所有匹配地塊設定 feature-state: highlight = true
+    idList.forEach(id => {
+        if (id !== undefined && id !== null) {
+            map.setFeatureState({ source: 'aoc', id: id }, { highlight: true });
+        }
+    });
+    
+    // 設定黃色邊線層的 filter（可選，但讓高亮更明顯）
     map.setFilter('aoc-search-hl', ['in', 'id', ...idList]);
-    lastMatchedIds = idList;
+    
+    lastMatchedIds = idList; // 記錄新的 ID 列表
 
-    // 4. 飛過去
+    // 5. 飛過去
     const b = new maplibregl.LngLatBounds();
     const addCoords = (coords) => {
       if (Array.isArray(coords) && typeof coords[0] === 'number') b.extend(coords);
@@ -1418,6 +1431,7 @@ function applySearch(qRaw) {
     matchedFeatures.forEach(f => {
       if (f.geometry?.coordinates) addCoords(f.geometry.coordinates);
     });
+    // 確保 b 不為空，以避免錯誤
     if (!b.isEmpty()) {
       map.fitBounds(b, { padding: 40, maxzoom: 15, duration: 600 });
     }
@@ -1427,8 +1441,6 @@ function applySearch(qRaw) {
     lastMatchedIds = [];
   }
 }
-
-      
       // ************ 酒莊搜尋邏輯：通過程式碼過濾然後更新 Source Data ************
       function applyWinerySearch(qRaw){
         const qNorm = _norm(qRaw || ''); 
