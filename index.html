@@ -1548,15 +1548,28 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
   });
   // ===== 酒窖顯示切換 =====
 const cellarBtn = document.getElementById('toggleCellarBtn');
-cellarVisible = true; // 預設顯示狀態（藍色）
+let cellarVisible = true; // 預設顯示（藍色）
 
-// 👉 初始化顏色（載入時就藍）
+// 初始化顏色（載入時藍）
 cellarBtn.style.background = '#007bff';
 cellarBtn.style.color = '#fff';
 cellarBtn.style.border = 'none';
 
-// 綁定點擊事件
 cellarBtn.addEventListener('click', () => {
+  // 先判斷現在的狀態，決定下一步（這裡反轉邏輯）
+  if (cellarVisible) {
+    // 現在是「顯示中」→ 要關掉 → 改成白
+    cellarBtn.style.background = '#f8f8f8';
+    cellarBtn.style.color = '#333';
+    cellarBtn.style.border = '1px solid #ccc';
+  } else {
+    // 現在是「關掉中」→ 要開啟 → 改成藍
+    cellarBtn.style.background = '#007bff';
+    cellarBtn.style.color = '#fff';
+    cellarBtn.style.border = 'none';
+  }
+
+  // 再切換狀態（⚠️ 注意：這行放在後面）
   cellarVisible = !cellarVisible;
 
   // 控制旗子顯示 / 隱藏
@@ -1567,19 +1580,9 @@ cellarBtn.addEventListener('click', () => {
     });
   }
 
-  // ✅ 立即切換顏色
-  if (cellarVisible) {
-    cellarBtn.style.background = '#007bff'; // 藍
-    cellarBtn.style.color = '#fff';
-    cellarBtn.style.border = 'none';
-  } else {
-    cellarBtn.style.background = '#f8f8f8'; // 白
-    cellarBtn.style.color = '#333';
-    cellarBtn.style.border = '1px solid #ccc';
-  }
-
-  cellarBtn.blur(); // 避免 focus 卡住
+  cellarBtn.blur(); // 防止 focus 卡住
 });
+
 
 });
 // 控制地窖標記顯示（這段你原本的可以留著）
