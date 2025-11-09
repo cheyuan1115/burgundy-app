@@ -1506,9 +1506,8 @@ function applySearch(qRaw) {
 }
 // ===== 篩選控制 =====
 const activeLevels = new Set(['GC', 'PC', 'VI', 'RE']); // 預設全部顯示
-let cellarVisible = true; // 預設顯示旗子
+let cellarVisible = true;
 
-// 更新地圖圖層可見性
 function updateAocVisibility() {
   map.setFilter('aoc-fill', ['in', ['get', 'lvl'], ['literal', Array.from(activeLevels)]]);
   map.setFilter('aoc-line', ['in', ['get', 'lvl'], ['literal', Array.from(activeLevels)]]);
@@ -1519,39 +1518,35 @@ function updateAocVisibility() {
   ]);
 }
 
-// ✅ 正確的按鈕切換邏輯
 document.querySelectorAll('.filter-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();   // 防止奇怪的 focus 行為
     const level = btn.dataset.level;
 
     if (activeLevels.has(level)) {
-      // 現在是「有顯示」→ 按下去要關掉 → 從集合移除 → 變白
+      // 關掉 → 變白
       activeLevels.delete(level);
-      btn.classList.add('inactive');      // ← 關掉要加 inactive，變白
+      btn.classList.add('inactive');
+      // 強制立即套色
+      btn.style.background = '#f8f8f8';
+      btn.style.color = '#333';
+      btn.style.border = '1px solid #ccc';
     } else {
-      // 現在是「沒顯示」→ 按下去要打開 → 加回集合 → 變藍
+      // 打開 → 變藍
       activeLevels.add(level);
-      btn.classList.remove('inactive');   // ← 打開要移除 inactive，變藍
+      btn.classList.remove('inactive');
+      // 強制立即套色
+      btn.style.background = '#007bff';
+      btn.style.color = '#fff';
+      btn.style.border = 'none';
     }
+
+    // 拿掉焦點，不要讓它保持被按住
+    btn.blur();
 
     updateAocVisibility();
   });
 });
-
-// 控制地窖標記顯示（這段你原本的可以留著）
-document.getElementById('toggleCellarBtn').addEventListener('click', () => {
-  cellarVisible = !cellarVisible;
-
-  if (window.inventoryMarkers) {
-    window.inventoryMarkers.forEach(m => {
-      if (cellarVisible) m.addTo(map);
-      else m.remove();
-    });
-  }
-});
-
-
-
 
       // ************ 酒莊搜尋邏輯：通過程式碼過濾然後更新 Source Data ************
       function applyWinerySearch(qRaw){
