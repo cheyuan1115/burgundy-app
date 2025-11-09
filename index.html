@@ -1546,6 +1546,41 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
 
     updateAocVisibility();
   });
+  // ===== 酒窖顯示切換 =====
+const cellarBtn = document.getElementById('toggleCellarBtn');
+cellarVisible = true; // 預設顯示狀態（藍色）
+
+// 👉 初始化顏色（載入時就藍）
+cellarBtn.style.background = '#007bff';
+cellarBtn.style.color = '#fff';
+cellarBtn.style.border = 'none';
+
+// 綁定點擊事件
+cellarBtn.addEventListener('click', () => {
+  cellarVisible = !cellarVisible;
+
+  // 控制旗子顯示 / 隱藏
+  if (window.inventoryMarkers) {
+    window.inventoryMarkers.forEach(m => {
+      if (cellarVisible) m.addTo(map);
+      else m.remove();
+    });
+  }
+
+  // ✅ 立即切換顏色
+  if (cellarVisible) {
+    cellarBtn.style.background = '#007bff'; // 藍
+    cellarBtn.style.color = '#fff';
+    cellarBtn.style.border = 'none';
+  } else {
+    cellarBtn.style.background = '#f8f8f8'; // 白
+    cellarBtn.style.color = '#333';
+    cellarBtn.style.border = '1px solid #ccc';
+  }
+
+  cellarBtn.blur(); // 避免 focus 卡住
+});
+
 });
 // 控制地窖標記顯示（這段你原本的可以留著）
 document.getElementById('toggleCellarBtn').addEventListener('click', () => {
