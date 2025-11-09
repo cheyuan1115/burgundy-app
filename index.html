@@ -1547,7 +1547,17 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
     updateAocVisibility();
   });
 });
+// 控制地窖標記顯示（這段你原本的可以留著）
+document.getElementById('toggleCellarBtn').addEventListener('click', () => {
+  cellarVisible = !cellarVisible;
 
+  if (window.inventoryMarkers) {
+    window.inventoryMarkers.forEach(m => {
+      if (cellarVisible) m.addTo(map);
+      else m.remove();
+    });
+  }
+});
       // ************ 酒莊搜尋邏輯：通過程式碼過濾然後更新 Source Data ************
       function applyWinerySearch(qRaw){
         const qNorm = _norm(qRaw || ''); 
