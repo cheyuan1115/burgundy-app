@@ -131,6 +131,30 @@
 .cellar-marker span {
     font-size: 18px; /* 確保數字或符號清晰 */
 }
+#filter-panel {
+  right: 12px;
+  bottom: 12px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.18);
+  font: 13px system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+  padding: 10px;
+  width: 150px;
+}
+#filter-panel .btn {
+  width: 100%;
+  margin-bottom: 4px;
+  padding: 6px 8px;
+  font-size: 13px;
+  text-align: center;
+  cursor: pointer;
+  background: #f8f8f8;
+}
+#filter-panel .btn.active {
+  background: #007bff;
+  color: white;
+}
+
   </style>
   <script>
     // 阻止 iOS 的全頁 pinch-zoom（不影響地圖手勢）
@@ -171,15 +195,25 @@
   </div>
 
 
-  <div class="legend">
-    <div class="item"><span class="swatch gc"></span> Grand Cru</div>
-    <div class="item"><span class="swatch pc"></span> Premier Cru</div>
-    <div class="item"><span class="swatch vi"></span> Village</div>
-    <div class="item"><span class="swatch re"></span> Régionale / 其他</div>
-    <!-- 【新增】庫存地塊圖例 -->
-<div class="item"><span class="swatch" style="background:#800000; border-color:#800000; border-width: 0;"></span> 庫存地塊</div>
-<div class="item"><span class="swatch" style="background:#007bff; border-color:#007bff; border-width: 0;"></span> 已飲用地塊</div>
+  <div class="legend" id="filter-panel">
+  <div style="font-weight:bold; margin-bottom:6px;">篩選顯示</div>
+  <div class="item">
+    <button class="btn filter-btn" data-level="GC">🍷 Grand Cru</button>
   </div>
+  <div class="item">
+    <button class="btn filter-btn" data-level="PC">🧡 Premier Cru</button>
+  </div>
+  <div class="item">
+    <button class="btn filter-btn" data-level="VI">💙 Village</button>
+  </div>
+  <div class="item">
+    <button class="btn filter-btn" data-level="RE">💚 Régionale</button>
+  </div>
+  <div class="item">
+    <button class="btn toggle-cellar" id="toggleCellarBtn">🏁 顯示地窖標記</button>
+  </div>
+</div>
+
 
   <!-- ************ 新增底部資訊面板 HTML ************ -->
   <div id="info-panel">
@@ -1043,7 +1077,7 @@ map.addLayer({
   source: 'aoc',
   paint: {
     'line-color': '#ffcc00',     // 金黃色一點，明顯
-    'line-width': 2,             // 比原本 1.5 / 3 都粗
+    'line-width': 4,             // 比原本 1.5 / 3 都粗
     'line-opacity': 0.95
   },
   // 一開始不要顯示任何東西
@@ -1448,6 +1482,48 @@ function applySearch(qRaw) {
     }
   }
 }
+// ===== 篩選控制 =====
+const activeLevels = new Set(['GC','PC','VI','RE']); // 預設全部顯示
+let cellarVisible = true; // 預設顯示旗子
+
+// 更新地圖圖層可見性
+function updateAocVisibility() {
+  map.setFilter('aoc-fill', ['in', ['get', 'lvl'], ['literal', Array.from(activeLevels)]]);
+  map.setFilter('aoc-line', ['in', ['get', 'lvl'], ['literal', Array.from(activeLevels)]]);
+  map.setFilter('aoc-labels', [
+    'all',
+    ['in', ['get', 'lvl'], ['literal', Array.from(activeLevels)]],
+    ['==', ['get', '_show_label'], 1]
+  ]);
+}
+
+// 綁定每個按鈕
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const level = btn.dataset.level;
+    if (activeLevels.has(level)) {
+      activeLevels.delete(level);
+      btn.classList.remove('active');
+    } else {
+      activeLevels.add(level);
+      btn.classList.add('active');
+    }
+    updateAocVisibility();
+  });
+});
+
+// 控制地窖標記顯示
+document.getElementById('toggleCellarBtn').addEventListener('click', () => {
+  cellarVisible = !cellarVisible;
+  document.getElementById('toggleCellarBtn').textContent = cellarVisible ? '🏁 隱藏地窖標記' : '🏁 顯示地窖標記';
+
+  if (window.inventoryMarkers) {
+    window.inventoryMarkers.forEach(m => {
+      if (cellarVisible) m.addTo(map);
+      else m.remove();
+    });
+  }
+});
 
 
 
