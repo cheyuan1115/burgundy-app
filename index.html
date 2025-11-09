@@ -153,28 +153,37 @@
   bottom: 10px;
   background: #fff;
   border-radius: 10px;
-  box-shadow: 0 5px 14px rgba(0,0,0,.18);
-  font: 12px system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-  padding: 8px;                 /* 原本 10 → 8 */
-  width: 120px;                 /* 原本 150 → 120 */
+  box-shadow: 0 4px 12px rgba(0,0,0,.18);
+  font: 12px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  padding: 8px;
+  width: 130px;
 }
 
 #filter-panel .btn {
   width: 100%;
-  margin-bottom: 4px;           /* 原本 6 → 4 */
-  padding: 4px 6px;             /* 原本 6x8 → 更緊湊 */
-  font-size: 12px;              /* 原本 13 → 12 */
-  text-align: center;
+  margin-bottom: 5px;
+  padding: 5px 8px;
+  font-size: 12px;
+  text-align: left;              /* ✅ 靠左對齊 */
   cursor: pointer;
-  background: #f8f8f8;
+  background: #007bff;           /* ✅ 預設藍底＝顯示狀態 */
+  color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
 }
 
-#filter-panel .btn.active {
-  background: #007bff;
+#filter-panel .btn.inactive {
+  background: #f8f8f8;           /* ✅ 關閉時白底 */
+  color: #333;
+  border: 1px solid #ccc;
+}
+
+#filter-panel .btn:hover {
+  background: #3399ff;
   color: white;
 }
+
 
 
   </style>
@@ -215,24 +224,15 @@
 
 
 
-  <div class="legend" id="filter-panel">
+<div class="legend" id="filter-panel">
   <div style="font-weight:bold; margin-bottom:6px;">篩選顯示</div>
-  <div class="item">
-    <button class="btn filter-btn" data-level="GC">🍷 Grand Cru</button>
-  </div>
-  <div class="item">
-    <button class="btn filter-btn" data-level="PC">🧡 Premier Cru</button>
-  </div>
-  <div class="item">
-    <button class="btn filter-btn" data-level="VI">💙 Village</button>
-  </div>
-  <div class="item">
-    <button class="btn filter-btn" data-level="RE">💚 Régionale</button>
-  </div>
-  <div class="item">
-    <button class="btn toggle-cellar" id="toggleCellarBtn">🏁 顯示地窖標記</button>
-  </div>
+  <div><button class="btn filter-btn" data-level="GC">Grand Cru</button></div>
+  <div><button class="btn filter-btn" data-level="PC">Premier Cru</button></div>
+  <div><button class="btn filter-btn" data-level="VI">Village</button></div>
+  <div><button class="btn filter-btn" data-level="RE">Régionale</button></div>
+  <div><button class="btn" id="toggleCellarBtn">我的酒窖</button></div>
 </div>
+
 
 
   <!-- ************ 新增底部資訊面板 HTML ************ -->
@@ -1525,10 +1525,10 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
     const level = btn.dataset.level;
     if (activeLevels.has(level)) {
       activeLevels.delete(level);
-      btn.classList.remove('active');
+      btn.classList.remove('inactive');
     } else {
       activeLevels.add(level);
-      btn.classList.add('active');
+      btn.classList.add('inactive');
     }
     updateAocVisibility();
   });
@@ -1537,7 +1537,7 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
 // 控制地窖標記顯示
 document.getElementById('toggleCellarBtn').addEventListener('click', () => {
   cellarVisible = !cellarVisible;
-  document.getElementById('toggleCellarBtn').textContent = cellarVisible ? '🏁 隱藏地窖標記' : '🏁 顯示地窖標記';
+  document.getElementById('toggleCellarBtn').textContent = cellarVisible ? '我的酒窖' : '我的酒窖';
 
   if (window.inventoryMarkers) {
     window.inventoryMarkers.forEach(m => {
