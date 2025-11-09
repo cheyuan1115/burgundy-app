@@ -677,49 +677,41 @@
       masterAOC = enrichedAOC;
 
       // AOC 填色
-      map.addLayer({
-        id: 'aoc-fill',
-        type: 'fill',
-        source: 'aoc',
-        paint: {
-          'fill-color': [
-            'match', ['get', 'lvl'],
-            'GC', '#cc0033',
-            'PC', '#ff7f0e',
-            'VI', '#1f77b4',
-            /* RE */ '#2ca02c'
-          ],
-          'fill-opacity': 0.35
-        }
-      });
+    // ① 底色：所有 AOC
+map.addLayer({
+  id: 'aoc-fill',
+  type: 'fill',
+  source: 'aoc',
+  paint: {
+    'fill-color': [
+      'match', ['get', 'lvl'],
+      'GC', '#cc0033',
+      'PC', '#ff7f0e',
+      'VI', '#1f77b4',
+      /* RE */ '#2ca02c'
+    ],
+    'fill-opacity': 0.35
+  }
+});
 
-      // AOC 邊線
-      map.addLayer({
-        id: 'aoc-line',
-        type: 'line',
-        source: 'aoc',
-        paint: {
-          'line-color': [
-            'case',
-            ['==', ['get', '__searched'], 1], '#ffff00',
-            [
-              'match', ['get', 'lvl'],
-              'GC', '#cc0033',
-              'PC', '#ff7f0e',
-              'VI', '#1f77b4',
-              '#2ca02c'
-            ]
-          ],
-          'line-width': [
-            'case',
-            ['==', ['get', '__searched'], 1], 4,
-            1.5
-          ]
-        }
-      });
+// ② 底線：永遠用原色，不要黃邊
+map.addLayer({
+  id: 'aoc-line',
+  type: 'line',
+  source: 'aoc',
+  paint: {
+    'line-color': [
+      'match', ['get', 'lvl'],
+      'GC', '#cc0033',
+      'PC', '#ff7f0e',
+      'VI', '#1f77b4',
+      /* RE */ '#2ca02c'
+    ],
+    'line-width': 1.5
+  }
+});
 
-      // 1) 搜尋到的填色：用原本等級的色，但更實一點
-// 1) 搜尋到的填色：用原本等級色，但比較實
+// ③ 搜尋到的「比較實的面」
 map.addLayer({
   id: 'aoc-fill-search-hl',
   type: 'fill',
@@ -732,14 +724,13 @@ map.addLayer({
       'VI', '#1f77b4',
       /* RE */ '#2ca02c'
     ],
-    'fill-opacity': 0.78
+    'fill-opacity': 0.78     // 比 0.35 厚，表示「被找到」
   },
-  // ✅ 用你資料裡的 __searched
+  // 看你資料裡的 __searched
   filter: ['==', ['get', '__searched'], 1]
 }, 'aoc-line');
 
-
-// 2) label（跟你原本的差不多，主要是位置）
+// ④ 標籤（跟之前一樣）
 map.addLayer({
   id: 'aoc-labels',
   type: 'symbol',
@@ -777,8 +768,7 @@ map.addLayer({
   ]
 }, 'aoc-line');
 
-
-// 3) 搜尋的白色 halo 線
+// ⑤ 搜尋到的白色 halo 線（先畫）
 map.addLayer({
   id: 'aoc-search-halo',
   type: 'line',
@@ -788,12 +778,10 @@ map.addLayer({
     'line-width': 5,
     'line-opacity': 0.9
   },
-  // ✅ 同樣看 __searched
   filter: ['==', ['get', '__searched'], 1]
 }, 'aoc-labels');
 
-
-// 4) 搜尋的原色線，蓋在白 halo 上
+// ⑥ 搜尋到的原色高亮線（蓋在白色上面）
 map.addLayer({
   id: 'aoc-search-hl',
   type: 'line',
@@ -809,12 +797,30 @@ map.addLayer({
     'line-width': 3,
     'line-opacity': 1
   },
-  // ✅ 也看 __searched
   filter: ['==', ['get', '__searched'], 1]
 }, 'aoc-search-halo');
 
+// ⑦ 讓搜尋到的那幾塊「浮起來」
+map.addLayer({
+  id: 'aoc-search-extrude',
+  type: 'fill-extrusion',
+  source: 'aoc',
+  paint: {
+    'fill-extrusion-color': [
+      'match', ['get', 'lvl'],
+      'GC', '#cc0033',
+      'PC', '#ff7f0e',
+      'VI', '#1f77b4',
+      /* RE */ '#2ca02c'
+    ],
+    'fill-extrusion-height': 80,   // 可以調高
+    'fill-extrusion-base': 0,
+    'fill-extrusion-opacity': 0.9
+  },
+  filter: ['==', ['get', '__searched'], 1]
+}, 'aoc-search-hl');
 
-// 5) Hover 高亮：照原本保留
+// ⑧ Hover 線——照你原本的
 map.addLayer({
   id: 'aoc-line-hl',
   type: 'line',
@@ -828,14 +834,10 @@ map.addLayer({
       'VI', '#1f77b4',
       '#2ca02c'
     ],
-    'line-width': [
-      'case',
-      ['boolean', ['feature-state', 'hover'], false],
-      2.4,
-      0
-    ]
+    'line-width': ['case', ['boolean', ['feature-state', 'hover'], false], 2.4, 0]
   }
 });
+
 
       const aocHoverPopup = new maplibregl.Popup({
         closeButton: false,
