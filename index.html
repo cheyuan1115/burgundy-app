@@ -1126,16 +1126,72 @@ map.addLayer({
           }
         }
       }
+            // 用 aoc_key 直接篩選（給 App 傳進來的一級園用）
+      function applySearchByKey(keyRaw) {
+        const k = (keyRaw || '')
+          .toLowerCase()
+          .replace(/[\s_\-]/g, ''); // 把空白、底線、dash 都拿掉，比較寬鬆
+
+        const base = window.__AOC_BASE_FC__;
+        if (!base) return;
+
+        const hitIds = [];
+        (masterAOC.features || []).forEach(f => {
+          const ak = (f.properties?.aoc_key || '')
+            .toLowerCase()
+            .replace(/[\s_\-]/g, '');
+          if (ak === k) {
+            hitIds.push(f.id);
+          }
+        });
+
+        const idSet = new Set(hitIds);
+        const updated = {
+          type: 'FeatureCollection',
+          features: base.features.map(f => ({
+            ...f,
+            properties: {
+              ...f.properties,
+              __searched: idSet.has(f.id) ? 1 : 0
+            }
+          }))
+        };
+        map.getSource('aoc').setData(updated);
+
+        // 跟 applySearch 一樣，找到就 zoom
+        if (hitIds.length) {
+          const b = new maplibregl.LngLatBounds();
+          const add = (coords) => {
+            if (Array.isArray(coords) && typeof coords[0] === 'number') b.extend(coords);
+            else if (Array.isArray(coords)) coords.forEach(add);
+          };
+          (masterAOC.features || []).forEach(f => {
+            if (!idSet.has(f.id)) return;
+            if (f.geometry?.coordinates) add(f.geometry.coordinates);
+          });
+          if (!b.isEmpty()) {
+            map.fitBounds(b, { padding: 40, maxzoom: 15, duration: 600 });
+          }
+        }
+      }
+
       // ✅ 給 React Native WebView 用的「鎖定這個 AOC」
-      window.addEventListener('message', async function (event) {
+            window.addEventListener('message', async function (event) {
         const data = event.data || {};
         if (data.type === 'focusAOC') {
-          const q = data.aocKey || data.aocName;
-          if (q) {
+          // 1. 有 key 的話，用 key 找（這就是為了一級園）
+          if (data.aocKey && typeof applySearchByKey === 'function') {
+            await applySearchByKey(data.aocKey);
+            return;
+          }
+          // 2. 沒 key 再用名稱找（GC / 村莊）
+          const q = data.aocName || data.aocKey;
+          if (q && typeof applySearch === 'function') {
             await applySearch(q);
           }
         }
       });
+
 
       // ================== 酒莊搜尋 ==================
       function applyWinerySearch(qRaw){
