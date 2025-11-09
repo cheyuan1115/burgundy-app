@@ -718,83 +718,123 @@
         }
       });
 
-      // 搜尋用亮填色 (一開始不顯示)
-      map.addLayer({
-        id: 'aoc-fill-search-hl',
-        type: 'fill',
-        source: 'aoc',
-        paint: { 'fill-color': '#ffff00', 'fill-opacity': 0.55 },
-        filter: ['in', 'id', -1]
-      }, 'aoc-line');
+      // 1) 搜尋到的填色：用原本等級的色，但更實一點
+map.addLayer({
+  id: 'aoc-fill-search-hl',
+  type: 'fill',
+  source: 'aoc',
+  paint: {
+    // 跟一般 AOC 一樣的色系
+    'fill-color': [
+      'match', ['get', 'lvl'],
+      'GC', '#cc0033',
+      'PC', '#ff7f0e',
+      'VI', '#1f77b4',
+      /* RE */ '#2ca02c'
+    ],
+    // 比平常的 0.35 再實一點
+    'fill-opacity': 0.78
+  },
+  // 一開始不顯示
+  filter: ['in', 'id', -1]
+}, 'aoc-line');
 
-      // label
-      map.addLayer({
-        id: 'aoc-labels',
-        type: 'symbol',
-        source: 'aoc',
-        minzoom: 13,
-        layout: {
-          'text-field': ['get', 'label'],
-          'text-font': ['Open Sans Regular', 'Arial Unicode MS Regular'],
-          'text-size': [
-            'interpolate', ['linear'], ['zoom'],
-            14, 12,
-            16, 14,
-            18, 16
-          ],
-          'symbol-placement': 'point',
-          'text-pitch-alignment': 'map',
-          'text-rotation-alignment': 'map',
-          'text-allow-overlap': false
-        },
-        paint: {
-          'text-color': '#222',
-          'text-halo-color': '#fff',
-          'text-halo-width': 1.2,
-          'text-opacity': [
-            'case',
-            ['==', ['get', 'lvl'], 'RE'], 0,
-            1
-          ]
-        },
-        filter: [
-          'all',
-          ['has', 'label'],
-          ['!=', ['get', 'label'], ''],
-          ['==', ['get', '_show_label'], 1]
-        ]
-      }, 'aoc-line');
 
-      // 搜尋高亮線
-      map.addLayer({
-        id: 'aoc-search-hl',
-        type: 'line',
-        source: 'aoc',
-        paint: {
-          'line-color': '#ffcc00',
-          'line-width': 4,
-          'line-opacity': 0.95
-        },
-        filter: ['in', 'id', -1]
-      }, 'aoc-labels');
+// 2) label（這段幾乎照你的，只是位置放在上面那層之後）
+map.addLayer({
+  id: 'aoc-labels',
+  type: 'symbol',
+  source: 'aoc',
+  minzoom: 13,
+  layout: {
+    'text-field': ['get', 'label'],
+    'text-font': ['Open Sans Regular', 'Arial Unicode MS Regular'],
+    'text-size': [
+      'interpolate', ['linear'], ['zoom'],
+      14, 12,
+      16, 14,
+      18, 16
+    ],
+    'symbol-placement': 'point',
+    'text-pitch-alignment': 'map',
+    'text-rotation-alignment': 'map',
+    'text-allow-overlap': false
+  },
+  paint: {
+    'text-color': '#222',
+    'text-halo-color': '#fff',
+    'text-halo-width': 1.2,
+    'text-opacity': [
+      'case',
+      ['==', ['get', 'lvl'], 'RE'], 0,
+      1
+    ]
+  },
+  filter: [
+    'all',
+    ['has', 'label'],
+    ['!=', ['get', 'label'], ''],
+    ['==', ['get', '_show_label'], 1]
+  ]
+}, 'aoc-line');
 
-      // Hover 高亮
-      map.addLayer({
-        id: 'aoc-line-hl',
-        type: 'line',
-        source: 'aoc',
-        maxzoom: 15,
-        paint: {
-          'line-color': [
-            'match', ['get', 'lvl'],
-            'GC', '#cc0033',
-            'PC', '#ff7f0e',
-            'VI', '#1f77b4',
-            '#2ca02c'
-          ],
-          'line-width': ['case', ['boolean', ['feature-state', 'hover'], false], 2.4, 0]
-        }
-      });
+
+// 3) 搜尋外框的「白色 halo」：讓邊線更有質感
+map.addLayer({
+  id: 'aoc-search-halo',
+  type: 'line',
+  source: 'aoc',
+  paint: {
+    'line-color': '#ffffff',
+    'line-width': 5,
+    'line-opacity': 0.9
+  },
+  filter: ['in', 'id', -1]
+}, 'aoc-labels');
+
+
+// 4) 搜尋外框的「原色線」：蓋在白色 halo 上面
+map.addLayer({
+  id: 'aoc-search-hl',
+  type: 'line',
+  source: 'aoc',
+  paint: {
+    'line-color': [
+      'match', ['get', 'lvl'],
+      'GC', '#cc0033',
+      'PC', '#ff7f0e',
+      'VI', '#1f77b4',
+      /* RE */ '#2ca02c'
+    ],
+    'line-width': 3,
+    'line-opacity': 1
+  },
+  filter: ['in', 'id', -1]
+}, 'aoc-search-halo');
+
+
+// 5) Hover 高亮：照原本保留
+map.addLayer({
+  id: 'aoc-line-hl',
+  type: 'line',
+  source: 'aoc',
+  maxzoom: 15,
+  paint: {
+    'line-color': [
+      'match', ['get', 'lvl'],
+      'GC', '#cc0033',
+      'PC', '#ff7f0e',
+      'VI', '#1f77b4',
+      '#2ca02c'
+    ],
+    'line-width': [
+      'case',
+      ['boolean', ['feature-state', 'hover'], false],
+      2.4,
+      0
+    ]
+  }
+});
 
       const aocHoverPopup = new maplibregl.Popup({
         closeButton: false,
