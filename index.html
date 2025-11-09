@@ -1126,6 +1126,16 @@ map.addLayer({
           }
         }
       }
+      // ✅ 給 React Native WebView 用的「鎖定這個 AOC」
+      window.addEventListener('message', async function (event) {
+        const data = event.data || {};
+        if (data.type === 'focusAOC') {
+          const q = data.aocKey || data.aocName;
+          if (q) {
+            await applySearch(q);
+          }
+        }
+      });
 
       // ================== 酒莊搜尋 ==================
       function applyWinerySearch(qRaw){
