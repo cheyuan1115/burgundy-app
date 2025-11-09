@@ -17,41 +17,58 @@
 
 /* 縮小輸入框寬度與高度 */
 .ui{
-      position: absolute; z-index: 10; 
-      top: 8px; 
-      left: 8px; 
-      max-height: 90vh; 
-      background: #fff; padding: 10px; border-radius: 10px;
-      box-shadow: 0 6px 20px rgba(0,0,0,.18);
-      width: min(88vw, 305px); /* 縮小寬度以避免遮擋地圖控制 */
-      font: 14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-    }
-    .row{ display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap; }
-    /* 確保 AOC 輸入欄的寬度 */
-    .ui #q{ 
-      flex-grow: 1; 
-      max-width: 240px;
-    }
-    .ui input[type="text"]{ 
-      flex-grow: 1; 
-      padding:8px 10px; 
-      border:1px solid #ddd; 
-      border-radius:8px; 
-      font:inherit; 
-    }
-    .btn{ padding:6px 10px; border:1px solid #ddd; border-radius:8px; background:#f8f8f8; cursor:pointer; font:12px; white-space:nowrap; }
-    .btn:hover{ background:#eee; }
-    label.small{ font-size:12px; color:#666; }
-    /* 新增的 UI 樣式 */
-    .slider-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 13px; }
-    .slider-row input[type="range"] { flex-grow: 1; }
-    
-    .winery-search-box{ 
-      margin-top: 10px; 
-      border-top: 1px solid #eee; 
-      padding-top: 10px; 
-      display: none; /* 預設隱藏 */
-    }
+  position: absolute;
+  z-index: 10;
+  top: 8px;
+  left: 8px;
+  max-height: 90vh;
+  background: #fff;
+  padding: 8px 10px 10px;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.18);
+  width: 260px;    /* 比原本 305 窄，避免去撞右上角地圖鈕 */
+  font: 13px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+}
+.ui .title-row{
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.row{ 
+  display:flex; 
+  align-items:center; 
+  gap:6px; 
+  margin-bottom:6px; 
+  flex-wrap:wrap; 
+}
+.row-input input{
+  width: 100%;
+}
+.row-actions{
+  justify-content: flex-start;
+}
+.ui input[type="text"]{ 
+  padding:6px 8px; 
+  border:1px solid #ddd; 
+  border-radius:8px; 
+  font:inherit; 
+}
+.btn{ 
+  padding:4px 8px; 
+  border:1px solid #ddd; 
+  border-radius:8px; 
+  background:#f8f8f8; 
+  cursor:pointer; 
+  font-size:12px; 
+  white-space:nowrap;
+}
+.btn:hover{ background:#eee; }
+
+.winery-search-box{ 
+  margin-top: 4px; 
+  border-top: 1px solid #eee; 
+  padding-top: 6px; 
+  display: none; 
+}
 
     /* ************ 手機資訊面板 CSS ************ */
     #info-panel {
@@ -175,29 +192,27 @@
   <div id="map"></div>
 
   <div class="ui">
-    <div class="row"><b>AOC 篩選</b></div>
-    <div class="row">
-      <input id="q" type="text" placeholder="例如：La Romanee">
-      <button class="btn" id="showAll">全部</button>
-      <button class="btn" id="toggleWineries" title="顯示酒莊">🚫🍷</button>
-      <!-- ************ 新增：掃描按鈕 ************ -->
-    <!-- **************************************** -->
-     <!-- ************ 新增：主選單按鈕 ************ -->
-<button class="btn" id="goHomeBtn">主選單</button>
-<!-- **************************************** -->
-  </div>
+  <div class="title-row">AOC 篩選</div>
   
+  <div class="row row-input">
+    <input id="q" type="text" placeholder="例如：La Romanee">
+  </div>
+
+  <div class="row row-actions">
+    <button class="btn" id="showAll">全部</button>
+    <button class="btn" id="toggleWineries" title="顯示酒莊">🚫🍷</button>
+    <button class="btn" id="goHomeBtn">主選單</button>
+  </div>
+
   <div class="winery-search-box" id="winery-search-container">
-    </div>
-    
-    <div class="winery-search-box" id="winery-search-container">
-      <div class="row"><b>酒莊搜尋</b></div>
-      <div class="row">
-        <input id="winery-q" type="text" placeholder="例如：DRC / Romanée-Conti">
-        <button class="btn" id="clear-winery">清除</button>
-      </div>
+    <div class="row"><b>酒莊搜尋</b></div>
+    <div class="row">
+      <input id="winery-q" type="text" placeholder="例如：DRC / Romanée-Conti">
+      <button class="btn" id="clear-winery">清除</button>
     </div>
   </div>
+</div>
+
 
 
   <div class="legend" id="filter-panel">
@@ -544,7 +559,7 @@ window.drawCellarMarkers = function(summary = {}) {
 
     window.inventoryMarkers.push(marker);
   });
-
+/*
   // 右上角小計
   let dbg = document.getElementById('cellar-debug');
   if (!dbg) {
@@ -561,8 +576,10 @@ window.drawCellarMarkers = function(summary = {}) {
     document.body.appendChild(dbg);
   }
   dbg.textContent = `Cellar markers: ${matched}`;
+  */
 };
 
+AOC_DATA_FILE
 //**********************************************顯示旗子段尾//
 // --- 查詢狀態函數：由 AOC 點擊事件觸發 ---
 function checkCellarStatus(aocName, featureId) {
