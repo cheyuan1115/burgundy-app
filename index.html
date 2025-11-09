@@ -1505,7 +1505,7 @@ function applySearch(qRaw) {
   }
 }
 // ===== 篩選控制 =====
-const activeLevels = new Set(['GC','PC','VI','RE']); // 預設全部顯示
+const activeLevels = new Set(['GC', 'PC', 'VI', 'RE']); // 預設全部顯示
 let cellarVisible = true; // 預設顯示旗子
 
 // 更新地圖圖層可見性
@@ -1519,25 +1519,28 @@ function updateAocVisibility() {
   ]);
 }
 
-// 綁定每個按鈕
+// ✅ 正確的按鈕切換邏輯
 document.querySelectorAll('.filter-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const level = btn.dataset.level;
+
     if (activeLevels.has(level)) {
+      // 現在是「有顯示」→ 按下去要關掉 → 從集合移除 → 變白
       activeLevels.delete(level);
-      btn.classList.remove('inactive');
+      btn.classList.add('inactive');      // ← 關掉要加 inactive，變白
     } else {
+      // 現在是「沒顯示」→ 按下去要打開 → 加回集合 → 變藍
       activeLevels.add(level);
-      btn.classList.add('inactive');
+      btn.classList.remove('inactive');   // ← 打開要移除 inactive，變藍
     }
+
     updateAocVisibility();
   });
 });
 
-// 控制地窖標記顯示
+// 控制地窖標記顯示（這段你原本的可以留著）
 document.getElementById('toggleCellarBtn').addEventListener('click', () => {
   cellarVisible = !cellarVisible;
-  document.getElementById('toggleCellarBtn').textContent = cellarVisible ? '我的酒窖' : '我的酒窖';
 
   if (window.inventoryMarkers) {
     window.inventoryMarkers.forEach(m => {
@@ -1546,6 +1549,7 @@ document.getElementById('toggleCellarBtn').addEventListener('click', () => {
     });
   }
 });
+
 
 
 
