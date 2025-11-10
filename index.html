@@ -317,10 +317,23 @@
             }
           }
 
-          return { level:'GC', title: gcCanon, subtitle: home.length ? `地點：${home.join(' / ')}` : '', climats };
+      
+// 🟤 Corton 特例：Corton Les Bressandes, Corton Clos du Roi, Corton Renardes ...
+if (gcCanon === 'Corton') {
+  // 找出以 "Corton " 開頭的完整名稱（例如 Corton Les Bressandes）
+  const climatPartRaw = parts.find(p => p.startsWith('Corton ') && p.length > 'Corton'.length + 1);
+  if (climatPartRaw) {
+    const specificClimat = climatPartRaw.replace('Corton', '').trim();
+    if (specificClimat) {
+      climats = [specificClimat];
+      // Corton 涵蓋三個村莊，這裡可指定主要村莊 Aloxe-Corton 或都列
+      return { level: 'GC', title: gcCanon, subtitle: `地點：Aloxe-Corton / ${specificClimat}`, climats };
+    }
+  }
+}
+    return { level:'GC', title: gcCanon, subtitle: home.length ? `地點：${home.join(' / ')}` : '', climats };
         }
       }
-
       // PC
       const pcParts = parts.filter(p => /(premier|1er)\s*cru/i.test(p));
       if (pcParts.length){
