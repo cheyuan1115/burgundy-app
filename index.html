@@ -1063,8 +1063,8 @@ map.addLayer({
         const addr  = (m && m.address)  || p.address  || '';
         const phone = (m && m.phone)    || p.phone    || '';
         const site  = (m && m.website)  || p.website  || '';
-        const note  = (m && (m.note || m.notes)) || '';
-
+// p 就是從 wineries.json 讀到的屬性
+const note  = (m && (m.note || m.notes)) || p.note || p.notes || p.description || '';
         const html = `
           <div style="min-width:240px">
             <div style="font-weight:700">${name}</div>
