@@ -8,7 +8,12 @@
   <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@3.6.1/dist/maplibre-gl.js"></script>
   <style>
     html, body, #map { height: 100%; margin: 0; }
-
+/* 限制 Popup 最大高度，超過就捲動 */
+.maplibregl-popup-content {
+  max-height: 300px; /* 或者 50vh */
+  overflow-y: auto;
+  border-radius: 8px; /* 圓角好看一點 */
+}
     .ui{
       position: absolute;
       z-index: 10;
