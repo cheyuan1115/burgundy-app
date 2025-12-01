@@ -1058,36 +1058,32 @@ map.addLayer({
       map.on('mouseenter', 'wineries', () => { map.getCanvas().style.cursor = 'pointer'; });
       map.on('mouseleave', 'wineries', () => { map.getCanvas().style.cursor = ''; });
 
-      map.on('click', 'wineries', (e) => {
-        // 阻止地圖預設行為
-        e.preventDefault();
-
+     map.on('click', 'wineries', (e) => {
         const f = e.features && e.features[0];
         if (!f) return;
         const p = f.properties || {};
 
-        // 產生 Key (保持不變)
+        // --- 這邊是你原本的邏輯，完全不動 ---
         const key = (p.id && String(p.id)) || (p.place_id && String(p.place_id)) || _norm(p.name || '');
         const m = (META.wineries && (META.wineries[key] || META.wineries[_norm(p.name || '')])) || null;
-        
+
         const name  = (m && (m.display_name || m.name)) || p.name || 'Winery';
         const addr  = (m && m.address)  || p.address  || '';
         const phone = (m && m.phone)    || p.phone    || '';
         const site  = (m && m.website)  || p.website  || '';
         const note  = (m && (m.note || m.notes)) || p.note || p.notes || p.description || '';
 
-        // 🟢 建議：這裡不需要 map.moveLayer('wineries')，因為圖層順序在載入時決定就好
-
-        // 移動視角
+        // --- 👇 只改這裡：移動地圖，讓點不要被面板擋住 ---
+        // (如果不想要自動移動，這段 map.flyTo 可以拿掉)
         const coords = e.geometry.coordinates.slice();
         map.flyTo({ 
             center: coords, 
             zoom: 14.5, 
-            padding: { bottom: 300 }, 
+            padding: { bottom: 300 }, // 預留底部空間給面板
             duration: 600 
         });
 
-        // 組合 HTML
+        // --- 👇 只改這裡：把 HTML 樣式放大，並塞到底部面板 ---
         const html = `
           <div style="font-weight:700; font-size:18px; margin-bottom:8px;">${name}</div>
           
@@ -1109,7 +1105,7 @@ map.addLayer({
           }
         `;
 
-        // 呼叫底部面板
+        // 不用 Popup，改用 Panel
         const infoPanel = document.getElementById('info-panel');
         const panelContent = document.getElementById('panel-content');
         
