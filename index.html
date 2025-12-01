@@ -917,15 +917,6 @@ map.addLayer({
 
       // 點 AOC 顯示 panel
       map.on('click', 'aoc-fill', (e) => {
-        
-        // 🔥【這段是關鍵】🔥
-        // 檢查滑鼠點的位置，如果已經點到了酒莊，AOC 就閉嘴 (return)
-        const wineryHits = map.queryRenderedFeatures(e.point, { layers: ['wineries'] });
-        if (wineryHits.length > 0) {
-          return; 
-        }
-        // 👆 加上這段，AOC 就不會去覆蓋酒莊的面板了
-
         const f = e.features && e.features[0];
         if (!f) return;
 
@@ -1061,61 +1052,49 @@ map.addLayer({
       map.on('mouseenter', 'wineries', () => { map.getCanvas().style.cursor = 'pointer'; });
       map.on('mouseleave', 'wineries', () => { map.getCanvas().style.cursor = ''; });
       map.on('click', 'wineries', (e) => {
-        // 這行保險起見留著
-        e.preventDefault(); 
-
         const f = e.features && e.features[0];
         if (!f) return;
         const p = f.properties || {};
+        const key =
+          (p.id && String(p.id)) ||
+          (p.place_id && String(p.place_id)) ||
+          _norm(p.name || '');
 
-        // --- 以下資料讀取邏輯完全不動 ---
-        const key = (p.id && String(p.id)) || (p.place_id && String(p.place_id)) || _norm(p.name || '');
-        const m = (META.wineries && (META.wineries[key] || META.wineries[_norm(p.name || '')])) || null;
+        const m =
+          (META.wineries && (META.wineries[key] || META.wineries[_norm(p.name || '')])) ||
+          null;
 
         const name  = (m && (m.display_name || m.name)) || p.name || 'Winery';
         const addr  = (m && m.address)  || p.address  || '';
         const phone = (m && m.phone)    || p.phone    || '';
         const site  = (m && m.website)  || p.website  || '';
-        // 記得保留讀取 note 的邏輯
-        const note  = (m && (m.note || m.notes)) || p.note || p.notes || p.description || '';
-
-        // --- 視角移動 (選用，讓點不要被面板擋住) ---
-        const coords = e.geometry.coordinates.slice();
-        map.flyTo({ 
-            center: coords, 
-            zoom: 14.5, 
-            padding: { bottom: 300 }, 
-            duration: 600 
-        });
-
-        // --- 組合 HTML (放大字體，適合面板) ---
+// p 就是從 wineries.json 讀到的屬性
+const note  = (m && (m.note || m.notes)) || p.note || p.notes || p.description || '';
         const html = `
-          <div style="font-weight:700; font-size:18px; margin-bottom:8px;">${name}</div>
-          
-          ${addr  ? `<div style="margin-bottom:4px; font-size:14px; color:#333;">📍 ${addr}</div>` : ''}
-          ${phone ? `<div style="margin-bottom:4px; font-size:14px; color:#333;">☎ ${phone}</div>` : ''}
-          ${site  ? `<div style="margin-bottom:10px; font-size:14px;"><a href="${site}" target="_blank" rel="noopener">🌐 官方網站</a></div>` : ''}
-          
-          ${note  ? `
-            <div style="
-                margin-top:12px; 
-                padding-top:12px; 
-                border-top:1px solid #eee; 
-                color:#444; 
-                font-size:15px; 
-                line-height:1.6;
-            ">
-              ${note}
-            </div>` : ''
-          }
+          <div style="min-width:240px">
+            <div style="font-weight:700">${name}</div>
+            ${addr  ? `<div class="small" style="color:#555">${addr}</div>` : ''}
+            ${phone ? `<div class="small" style="color:#555">☎ ${phone}</div>` : ''}
+            ${site  ? `<div class="small"><a href="${site}" target="_blank" rel="noopener">網站</a></div>` : ''}
+            ${note  ? `
+  <div class="small" style="
+      color:#555;
+      margin-top:6px; 
+      border-top:1px solid #eee; 
+      padding-top:4px; 
+      /* 👇 新增這兩行：限制高度為 120px (約 5-6 行)，超過就出現捲軸 */
+      max-height: 120px; 
+      overflow-y: auto;
+  ">
+    ${note}
+  </div>` : ''
+}
+          </div>
         `;
-
-        // 🔥【這裡改成面板顯示】🔥
-        const infoPanel = document.getElementById('info-panel');
-        const panelContent = document.getElementById('panel-content');
-        
-        panelContent.innerHTML = html;
-        infoPanel.classList.add('visible');
+        new maplibregl.Popup({ closeOnClick: true })
+          .setLngLat(e.lngLat)
+          .setHTML(html)
+          .addTo(map);
       });
 
       // ================== 搜尋函數 ==================
