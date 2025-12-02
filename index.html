@@ -993,14 +993,10 @@ map.addLayer({
       const closePanelBtn = document.getElementById('close-panel');
       closePanelBtn.onclick = () => infoPanel.classList.remove('visible');
 
-    // 點 AOC 顯示 panel
+      // 點 AOC 顯示 panel
       map.on('click', 'aoc-fill', (e) => {
         const f = e.features && e.features[0];
         if (!f) return;
-
-        // --- 新增：取得原始 denom ---
-        const rawDenom = f.properties.denom || '(無資料)';
-        // ---------------------------
 
         const summary = window.CELLAR_DATA_TO_DRAW || window.__INVENTORY_SUMMARY__ || {};
         const aoc_key = f.properties.aoc_key || '';
@@ -1040,6 +1036,7 @@ map.addLayer({
           subText = info.subtitle ? `地點：${info.subtitle.replace('地點：', '')}` : '';
         }
         const subRow = subText ? `<div class="small" style="color:#666;margin-top:2px">${subText}</div>` : '';
+
         // 擁有者
         const ownerKey = foundKey;
         const owners = META.climat_owners && META.climat_owners[ownerKey] || null;
@@ -1096,17 +1093,10 @@ map.addLayer({
         const cellarStatusHTML = `<div id="cellar-status-${f.id}" style="font-weight: bold; font-size: 14px; margin-bottom: 8px;">${statusText}</div>`;
 
         const finalHTML = `
-          <div style="font-weight:700; font-size:16px;">${info.title}</div>
-          
-          <!-- ★★★ 新增這一段：顯示原始 Denom 供除錯用 ★★★ -->
-          <div style="background:#eee; color:#555; font-size:11px; padding:4px; margin:4px 0; border-radius:4px; word-break: break-all;">
-            <b>原始資料 (Denom):</b><br>${rawDenom}
-          </div>
-          <!-- ★★★ 結束 ★★★ -->
-
+          <div style="font-weight:700">${info.title}</div>
           <div class="small" style="color:#666;margin-top:6px">等級：${levelText}</div>
           ${subRow}
-          ${extra} 
+          ${extra}
           <div style="margin-top:10px; border-top: 1px solid #eee; padding-top: 8px;">
             ${cellarStatusHTML}
             <button class="btn" style="width: 100%; display: flex; align-items: center; justify-content: center; background: #f0f0f0;"
