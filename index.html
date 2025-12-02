@@ -717,7 +717,13 @@ const VILLAGES = [
       const rawAOC = await aocRes.json();
 
       const makeLabel = (p) => {
-        return p.denom || ''; 
+        const info = parseAOC(p);
+        if (info.level === 'GC' || info.level === 'PC') {
+          const climat = info.climats && info.climats.length ? info.climats[0] : '';
+          return climat || info.title || '';
+        }
+        if (info.level === 'VI') return info.title || '';
+        return '';
       };
 
       const enrichWithKey = (fc) => ({
@@ -825,23 +831,30 @@ map.addLayer({
   id: 'aoc-labels',
   type: 'symbol',
   source: 'aoc',
-  minzoom: 12, // 可以稍微拉遠一點就讓它顯示
+  minzoom: 13,
   layout: {
-    'text-field': ['get', 'label'], // 因為上面的 makeLabel 已經把 denom 塞給 label 了，這裡不用動
+    'text-field': ['get', 'label'],
     'text-font': ['Open Sans Regular', 'Arial Unicode MS Regular'],
-    // [修改] 因為 denom 很長，字體設小一點，且允許重疊以免太擠時消失
-    'text-size': 12, 
+    'text-size': [
+      'interpolate', ['linear'], ['zoom'],
+      18, 16,
+      20, 18,
+      22, 20
+    ],
     'symbol-placement': 'point',
     'text-pitch-alignment': 'map',
     'text-rotation-alignment': 'map',
-    'text-allow-overlap': false // 若想看到所有重疊的字，可改成 true，但會很亂
+    'text-allow-overlap': false
   },
   paint: {
     'text-color': '#222',
     'text-halo-color': '#fff',
-    'text-halo-width': 1.5,
-    // [修改] 移除原本「隱藏地區級 (RE)」的邏輯，全部顯示 (opacity: 1)
-    'text-opacity': 1
+    'text-halo-width': 1.0,
+    'text-opacity': [
+      'case',
+      ['==', ['get', 'lvl'], 'RE'], 0,
+      1
+    ]
   },
   filter: [
     'all',
