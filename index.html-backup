@@ -283,7 +283,7 @@ const VILLAGES = [
       "Vougeot", 
       "Vosne-Romanée", 
       "Nuits-Saint-Georges", 
-      "Côte de Nuits-Villages ou Vins fins de la Côte de Nuits",
+      "Côte de Nuits-Villages",
 
       // --- Côte de Beaune (伯恩丘) ---
       "Ladoix-Serrigny", 
@@ -343,12 +343,13 @@ const VILLAGES = [
     }
 
     // 解析 AOC
+// 解析 AOC
     function parseAOC(props){
       const raw = String(props?.denom || '');
       const parts = raw.split(',').map(s=>s.trim()).filter(Boolean);
       const partsNorm = parts.map(_norm);
 
-      // GC
+      // GC (特級園)
       for (let i=0;i<parts.length;i++){
         const pn = partsNorm[i];
         let gcCanon = GC_ALIASES.get(pn) ?? null;
@@ -370,25 +371,22 @@ const VILLAGES = [
               }
             }
           }
-
-      
-// 🟤 Corton 特例：Corton Les Bressandes, Corton Clos du Roi, Corton Renardes ...
-if (gcCanon === 'Corton') {
-  // 找出以 "Corton " 開頭的完整名稱（例如 Corton Les Bressandes）
-  const climatPartRaw = parts.find(p => p.startsWith('Corton ') && p.length > 'Corton'.length + 1);
-  if (climatPartRaw) {
-    const specificClimat = climatPartRaw.replace('Corton', '').trim();
-    if (specificClimat) {
-      climats = [specificClimat];
-      // Corton 涵蓋三個村莊，這裡可指定主要村莊 Aloxe-Corton 或都列
-      return { level: 'GC', title: gcCanon, subtitle: `地點：Aloxe-Corton / ${specificClimat}`, climats };
-    }
-  }
-}
-    return { level:'GC', title: gcCanon, subtitle: home.length ? `地點：${home.join(' / ')}` : '', climats };
+          
+          if (gcCanon === 'Corton') {
+            const climatPartRaw = parts.find(p => p.startsWith('Corton ') && p.length > 'Corton'.length + 1);
+            if (climatPartRaw) {
+              const specificClimat = climatPartRaw.replace('Corton', '').trim();
+              if (specificClimat) {
+                climats = [specificClimat];
+                return { level: 'GC', title: gcCanon, subtitle: `地點：Aloxe-Corton / ${specificClimat}`, climats };
+              }
+            }
+          }
+          return { level:'GC', title: gcCanon, subtitle: home.length ? `地點：${home.join(' / ')}` : '', climats };
         }
       }
-      // PC
+
+      // PC (一級園)
       const pcParts = parts.filter(p => /(premier|1er)\s*cru/i.test(p));
       if (pcParts.length){
         let titleAOC = 'Premier Cru';
@@ -418,17 +416,48 @@ if (gcCanon === 'Corton') {
         return { level:'PC', title: titleAOC, subtitle, village: villagePartRaw, climats: allClimats };
       }
 
-      // Village
-      for (let i=0;i<parts.length;i++){
-        const idx = VILL_NORM.indexOf(partsNorm[i]);
-        if (idx !== -1){
-          return { level:'VI', title: VILLAGES[idx], subtitle:'Village', climats: [] };
+      // ==========================================
+      // Village (村莊級) - 修改後的邏輯
+      // ==========================================
+      
+      // 定義要「禮讓」的低優先權村莊
+      const LOW_PRIORITY_VILLAGES = [
+  
+        "Côte de Nuits-Villages",
+        "Côte de Beaune",
+        "Côte de Beaune-Villages"
+      ].map(_norm);
+
+      let fallbackVillage = null; // 用來暫存低優先權的結果
+
+      for (let i = 0; i < parts.length; i++) {
+        const pNorm = partsNorm[i];
+        const idx = VILL_NORM.indexOf(pNorm);
+        
+        if (idx !== -1) {
+          const foundName = VILLAGES[idx];
+
+          // 檢查是否為低優先權清單中的村莊
+          if (LOW_PRIORITY_VILLAGES.includes(pNorm)) {
+            // 是低優先權：暫存起來，繼續往後找看有沒有更特定的村莊
+            if (!fallbackVillage) {
+              fallbackVillage = { level: 'VI', title: foundName, subtitle: 'Village', climats: [] };
+            }
+          } else {
+            // 不是低優先權（例如 Pommard, Meursault）：直接鎖定，回傳！
+            return { level: 'VI', title: foundName, subtitle: 'Village', climats: [] };
+          }
         }
       }
 
+      // 迴圈跑完了，如果沒有找到「高優先權」的，但有暫存「低優先權」的，就回傳暫存值
+      if (fallbackVillage) {
+        return fallbackVillage;
+      }
+
+      // Régionale (地區級)
       return { level:'RE', title: parts[0] || 'AOC', subtitle: 'Régionale / 其他', climats: [] };
     }
-
     function makeAocKeyFromInfo(info){
       if (info.level === 'GC') {
         const climat = (info.climats && info.climats[0]) ? info.climats[0] : info.title;
