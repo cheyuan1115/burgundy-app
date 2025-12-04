@@ -1485,5 +1485,77 @@ map.addLayer({
     });
  
   </script>
+  <!-- ======================================================= -->
+  <!-- 新增：接收 React Native 指令的監聽器 (AOC 與 酒莊通用) -->
+  <!-- ======================================================= -->
+  <script>
+    window.addEventListener('message', function(e) {
+      var data = {};
+      try {
+        data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+      } catch (err) { return; }
+
+      // -----------------------------
+      // 1. 處理酒莊搜尋 (focusWinery)
+      // -----------------------------
+      if (data.type === 'focusWinery') {
+        var name = data.name;
+        
+        // 定義重試函式：網頁自己等資料，不用 App 等
+        var runWinerySearch = function() {
+          // 檢查：地圖、酒莊資料、搜尋函式 是否都好了
+          if (!window.map || !window.masterWineries || typeof window.applyWinerySearch !== 'function') {
+            setTimeout(runWinerySearch, 500); // 沒好就半秒後再來
+            return;
+          }
+
+          try {
+            // A. 強制打開圖層
+            if (map.getLayer('wineries') && map.getLayoutProperty('wineries', 'visibility') !== 'visible') {
+              map.setLayoutProperty('wineries', 'visibility', 'visible');
+              
+              var btnW = document.getElementById('toggleWineries');
+              var boxW = document.getElementById('winery-search-container');
+              if(btnW) { btnW.textContent = '🍷'; btnW.title = '隱藏酒莊'; }
+              if(boxW) { boxW.style.display = 'block'; }
+            }
+
+            // B. 填入輸入框
+            var wInput = document.getElementById('winery-q');
+            if (wInput) wInput.value = name;
+
+            // C. 執行搜尋
+            window.applyWinerySearch(name);
+
+          } catch (err) { console.error(err); }
+        };
+        
+        runWinerySearch(); // 啟動
+      }
+
+      // -----------------------------
+      // 2. 處理 AOC 搜尋 (focusAOC) - 恢復舊有功能
+      // -----------------------------
+      if (data.type === 'focusAOC') {
+        var runAocSearch = function() {
+          // 檢查：地圖、AOC資料 是否好了
+          if (!window.map || !window.__AOC_BASE_FC__) {
+             setTimeout(runAocSearch, 500);
+             return;
+          }
+          try {
+            if (data.aocKey && window.applySearchByKey) {
+              window.applySearchByKey(data.aocKey);
+            } else if (data.aocName && window.applySearch) {
+              window.applySearch(data.aocName);
+            }
+          } catch(err) { console.error(err); }
+        };
+        runAocSearch();
+      }
+    });
+  </script>
+</body>
+</html>
 </body>
 </html>
