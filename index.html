@@ -567,7 +567,26 @@ var masterWineries = null;
         window.inventoryMarkers.push(marker);
       });
     };
-
+if (window.__LARGE_FONT_MODE__) {
+  const style = document.createElement('style');
+  style.innerHTML = `
+    /* 讓所有 popup 內容文字變大 */
+    .maplibregl-popup-content, 
+    .maplibregl-popup-content .small,
+    .ui, 
+    .legend,
+    #info-panel { 
+      font-size: 18px !important; 
+      line-height: 1.6 !important;
+    }
+    /* 特別針對原本是小字的 class */
+    .small { font-size: 16px !important; }
+    
+    /* 調整按鈕大小 */
+    .btn { font-size: 16px !important; padding: 8px 12px !important; }
+  `;
+  document.head.appendChild(style);
+}
     // 地圖初始化
     map = new maplibregl.Map({
       container: 'map',
