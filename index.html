@@ -1486,7 +1486,7 @@ map.addLayer({
       // ==========================================
     // 【新增】接收 React Native 的酒莊搜尋指令
     // ==========================================
-    window.addEventListener('message', function(e) {
+   window.addEventListener('message', function(e) {
       // 1. 解析資料
       var data = {};
       try {
@@ -1496,23 +1496,21 @@ map.addLayer({
       // 2. 只處理 focusWinery 指令
       if (data && data.type === 'focusWinery') {
         var targetName = data.name || '';
-        console.log('收到酒莊搜尋指令:', targetName);
-
-        // 定義一個重試函數，因為收到指令時，酒莊資料可能還沒下載完
+        
+        // 定義一個重試函數，確保資料載入後才搜尋
         var attemptSearch = function() {
-          // 檢查變數是否都準備好了
+          // 檢查地圖物件(map)和酒莊資料(masterWineries)是否已存在
           if (!window.map || !window.masterWineries) {
-            console.log('地圖或資料尚未準備好，500ms 後重試...');
-            setTimeout(attemptSearch, 500);
+            setTimeout(attemptSearch, 500); // 沒好就等 0.5 秒
             return;
           }
 
           try {
-            // A. 強制開啟酒莊圖層 (如果原本是關閉的)
-            if (map.getLayoutProperty('wineries', 'visibility') !== 'visible') {
+            // A. 強制開啟酒莊圖層 (如果原本是隱藏的)
+            if (map.getLayer('wineries') && map.getLayoutProperty('wineries', 'visibility') !== 'visible') {
               map.setLayoutProperty('wineries', 'visibility', 'visible');
               
-              // 同步更新 UI 按鈕
+              // 同步更新 UI 按鈕文字 (如果有找到按鈕)
               var btnW = document.getElementById('toggleWineries');
               var boxW = document.getElementById('winery-search-container');
               if(btnW) { btnW.textContent = '🍷'; btnW.title = '隱藏酒莊'; }
@@ -1528,7 +1526,7 @@ map.addLayer({
               window.applyWinerySearch(targetName);
             }
           } catch (err) {
-            console.error('執行酒莊搜尋失敗:', err);
+            console.error('酒莊搜尋執行錯誤:', err);
           }
         };
 
