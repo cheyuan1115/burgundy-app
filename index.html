@@ -1485,62 +1485,64 @@ map.addLayer({
     });
  
 
-  <!-- ======================================================= -->
-  <!-- 新增：接收 React Native 指令的監聽器 (AOC 與 酒莊通用) -->
-  <!-- ======================================================= -->
-
+   // ============================================================
+    //  通用訊息監聽器：接收 React Native 的 AOC 與 酒莊搜尋指令
+    // ============================================================
     window.addEventListener('message', function(e) {
+      // 1. 解析資料
       var data = {};
       try {
         data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
       } catch (err) { return; }
 
-      // -----------------------------
-      // 1. 處理酒莊搜尋 (focusWinery)
-      // -----------------------------
+      // ---------------------------------------------------
+      // A. 收到「搜尋酒莊」指令 (focusWinery)
+      // ---------------------------------------------------
       if (data.type === 'focusWinery') {
-        var name = data.name;
-        
-        // 定義重試函式：網頁自己等資料，不用 App 等
-        var runWinerySearch = function() {
-          // 檢查：地圖、酒莊資料、搜尋函式 是否都好了
+        var targetName = data.name;
+        console.log("收到酒莊搜尋:", targetName);
+
+        // 定義重試函式：每 0.5 秒檢查一次，直到地圖和資料準備好
+        var runWinery = function() {
+          // 檢查：地圖是否存在？酒莊資料(masterWineries)下載完了嗎？搜尋函式有了嗎？
           if (!window.map || !window.masterWineries || typeof window.applyWinerySearch !== 'function') {
-            setTimeout(runWinerySearch, 500); // 沒好就半秒後再來
+            setTimeout(runWinery, 500); // 沒好就等一下
             return;
           }
 
           try {
-            // A. 強制打開圖層
+            // 1. 強制開啟酒莊圖層
             if (map.getLayer('wineries') && map.getLayoutProperty('wineries', 'visibility') !== 'visible') {
               map.setLayoutProperty('wineries', 'visibility', 'visible');
               
-              var btnW = document.getElementById('toggleWineries');
-              var boxW = document.getElementById('winery-search-container');
-              if(btnW) { btnW.textContent = '🍷'; btnW.title = '隱藏酒莊'; }
-              if(boxW) { boxW.style.display = 'block'; }
+              // UI 同步
+              var btn = document.getElementById('toggleWineries');
+              var box = document.getElementById('winery-search-container');
+              if(btn) { btn.textContent = '🍷'; btn.title = '隱藏酒莊'; }
+              if(box) { box.style.display = 'block'; }
             }
 
-            // B. 填入輸入框
-            var wInput = document.getElementById('winery-q');
-            if (wInput) wInput.value = name;
+            // 2. 填入搜尋框
+            var input = document.getElementById('winery-q');
+            if (input) input.value = targetName;
 
-            // C. 執行搜尋
-            window.applyWinerySearch(name);
+            // 3. 執行搜尋 (這是 index.html 原本就有的函式)
+            window.applyWinerySearch(targetName);
 
           } catch (err) { console.error(err); }
         };
-        
-        runWinerySearch(); // 啟動
+        // 開始執行
+        runWinery();
       }
 
-      // -----------------------------
-      // 2. 處理 AOC 搜尋 (focusAOC) - 恢復舊有功能
-      // -----------------------------
+      // ---------------------------------------------------
+      // B. 收到「搜尋 AOC」指令 (focusAOC) - 恢復舊功能
+      // ---------------------------------------------------
       if (data.type === 'focusAOC') {
-        var runAocSearch = function() {
-          // 檢查：地圖、AOC資料 是否好了
+        var runAoc = function() {
+          // 檢查：地圖和 AOC 資料是否準備好
           if (!window.map || !window.__AOC_BASE_FC__) {
-             setTimeout(runAocSearch, 500);
+             setTimeout(runAoc, 500);
              return;
           }
           try {
@@ -1551,7 +1553,7 @@ map.addLayer({
             }
           } catch(err) { console.error(err); }
         };
-        runAocSearch();
+        runAoc();
       }
     });
   </script>
