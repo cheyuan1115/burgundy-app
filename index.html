@@ -1115,6 +1115,7 @@ map.addLayer({
       masterWineries = await wRes.json();
       window.masterWineries = masterWineries;
       map.addSource('wineries', { type: 'geojson', data: masterWineries });
+      window.masterWineries = masterWineries; 
       map.addLayer({
         id: 'wineries',
         type: 'circle',
@@ -1285,7 +1286,8 @@ map.addLayer({
           }
         }
       }
-
+window.applySearch = applySearch;
+window.applySearchByKey = applySearchByKey;
       // ✅ 給 React Native WebView 用的「鎖定這個 AOC」
             window.addEventListener('message', async function (event) {
         const data = event.data || {};
@@ -1327,7 +1329,7 @@ map.addLayer({
           }
         }
       }
-
+window.applyWinerySearch = applyWinerySearch;
       // ================== UI 綁定 ==================
       const qInput = document.getElementById('q');
       const btnAll = document.getElementById('showAll');
