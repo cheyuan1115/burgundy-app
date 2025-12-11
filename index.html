@@ -158,6 +158,102 @@
       background: #3399ff;
       color: white;
     }
+/* 右下篩選面板 */
+    #filter-panel {
+      right: 10px;
+      bottom: 10px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.18);
+      font: 12px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      padding: 8px;
+      width: 130px;
+    }
+    #filter-panel .btn {
+      width: 100%;
+      margin-bottom: 5px;
+      padding: 5px 8px;
+      font-size: 12px;
+      text-align: left;
+      cursor: pointer;
+      background: #007bff; /* 預設藍底 */
+      color: white;
+      border: none;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+    #filter-panel .btn.inactive {
+      background: #333; /* 沒選中時黑色 */
+      color: white;
+      border: 1px solid #555;
+    }
+    #filter-panel .btn:hover {
+      background: #3399ff;
+      color: white;
+    }
+    /* Dark Mode Styles */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #121212; /* Dark background for the document itself */
+        color: #e0e0e0;
+      }
+      .ui,
+      #info-panel,
+      .legend,
+      .maplibregl-popup-content {
+        background-color: #1e1e1e; /* Darker background for UI elements */
+        color: #e0e0e0;
+        box-shadow: 0 6px 20px rgba(255, 255, 255, 0.1);
+      }
+      .ui input[type="text"] {
+        background-color: #333;
+        border: 1px solid #555;
+        color: #e0e0e0;
+      }
+      .btn {
+        background: #444;
+        color: #e0e0e0;
+        border: 1px solid #666;
+      }
+      .btn:hover {
+        background: #555;
+      }
+      .close-btn {
+        color: #ccc;
+      }
+      .winery-search-box {
+        border-top: 1px solid #444;
+      }
+      /* Specific dark mode adjustments for filter panel buttons */
+      #filter-panel .btn {
+        background: #007bff; /* Active blue */
+        color: white;
+        border: none;
+      }
+      #filter-panel .btn.inactive {
+        background: #333; /* Inactive dark gray */
+        color: white;
+        border: 1px solid #555;
+      }
+      #filter-panel .btn:hover {
+        background: #3399ff;
+        color: white;
+      }
+       /* Text colors within content */
+      #panel-content .small {
+        color: #b0b0b0 !important;
+      }
+      #panel-content a {
+        color: #8ab4f8 !important; /* Lighter blue for links */
+      }
+      #panel-content a:visited {
+        color: #c58af9 !important; /* Purple for visited links */
+      }
+      #panel-content div[style*="color:#2c7d2c"] { /* Style note color */
+        color: #6ed16e !important; /* A lighter green for dark mode */
+      }
+    }
+    
   </style>
   <script>
     // 阻止 iOS 全頁 pinch-zoom
