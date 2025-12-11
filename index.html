@@ -6,7 +6,7 @@
   <title>Burgundy AOC — 3D 可傾斜版（MapLibre GL）</title>
   <link href="https://cdn.jsdelivr.net/npm/maplibre-gl@3.6.1/dist/maplibre-gl.css" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@3.6.1/dist/maplibre-gl.js"></script>
-<style>
+  <style>
     html, body, #map { height: 100%; margin: 0; }
 /* 限制 Popup 最大高度，超過就捲動 */
 .maplibregl-popup-content {
@@ -41,8 +41,7 @@
       padding:4px 8px;
       border:1px solid #ddd;
       border-radius:8px;
-      background:#f8f8f8; /* 預設亮色模式下的非活躍按鈕 */
-      color:#333;
+      background:#f8f8f8;
       cursor:pointer;
       font-size:12px;
       white-space:nowrap;
@@ -144,23 +143,56 @@
       font-size: 12px;
       text-align: left;
       cursor: pointer;
-      background: #007bff; /* 篩選按鈕活躍時的藍底 */
+      background: #007bff;
       color: white;
       border: none;
       border-radius: 8px;
       transition: all 0.2s ease;
     }
     #filter-panel .btn.inactive {
-      background: #f8f8f8; /* 篩選按鈕非活躍時的亮色背景 */
+      background: #f8f8f8;
       color: #333;
       border: 1px solid #ccc;
     }
     #filter-panel .btn:hover {
-      background: #3399ff; /* 篩選按鈕懸停時的藍色 */
+      background: #3399ff;
       color: white;
     }
 
-    /* Dark Mode Styles - 使用 !important 強化覆蓋 */
+    /* 右下篩選面板 */
+    #filter-panel {
+      right: 10px;
+      bottom: 10px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.18);
+      font: 12px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      padding: 8px;
+      width: 130px;
+    }
+    #filter-panel .btn {
+      width: 100%;
+      margin-bottom: 5px;
+      padding: 5px 8px;
+      font-size: 12px;
+      text-align: left;
+      cursor: pointer;
+      background: #007bff; /* 預設藍底 */
+      color: white;
+      border: none;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+    #filter-panel .btn.inactive {
+      background: #333; /* 沒選中時黑色 */
+      color: white;
+      border: 1px solid #555;
+    }
+    #filter-panel .btn:hover {
+      background: #3399ff;
+      color: white;
+    }
+    /* Dark Mode Styles */
     @media (prefers-color-scheme: dark) {
       body {
         background-color: #121212; /* Dark background for the document itself */
@@ -179,37 +211,35 @@
         border: 1px solid #555;
         color: #e0e0e0;
       }
-      .btn { /* 暗模式下一般按鈕 */
-        background: #444 !important;
-        color: #e0e0e0 !important;
-        border: 1px solid #666 !important;
+      .btn {
+        background: #444;
+        color: #e0e0e0;
+        border: 1px solid #666;
       }
       .btn:hover {
-        background: #555 !important;
+        background: #555;
       }
       .close-btn {
-        color: #ccc !important;
+        color: #ccc;
       }
       .winery-search-box {
-        border-top: 1px solid #444 !important;
+        border-top: 1px solid #444;
       }
-
-      /* 暗模式下篩選面板按鈕 */
-      #filter-panel .btn { /* 活躍時的藍色 */
-        background: #007bff !important;
-        color: white !important;
-        border: none !important;
+      /* Specific dark mode adjustments for filter panel buttons */
+      #filter-panel .btn {
+        background: #007bff; /* Active blue */
+        color: white;
+        border: none;
       }
-      #filter-panel .btn.inactive { /* 非活躍時的黑色 */
-        background: #333 !important;
-        color: white !important;
-        border: 1px solid #555 !important;
+      #filter-panel .btn.inactive {
+        background: #333; /* Inactive dark gray */
+        color: white;
+        border: 1px solid #555;
       }
-      #filter-panel .btn:hover { /* 懸停時的藍色 */
-        background: #3399ff !important;
-        color: white !important;
+      #filter-panel .btn:hover {
+        background: #3399ff;
+        color: white;
       }
-
        /* Text colors within content */
       #panel-content .small {
         color: #b0b0b0 !important;
@@ -224,7 +254,7 @@
         color: #6ed16e !important; /* A lighter green for dark mode */
       }
     }
-</style>
+  </style>
   <script>
     // 阻止 iOS 全頁 pinch-zoom
     (function () {
@@ -1466,89 +1496,73 @@ window.applyWinerySearch = applyWinerySearch;
       };
 
       // 篩選按鈕
-// 篩選按鈕
-   // 篩選按鈕
      function updateAocVisibility() {
-        const levelsArray = Array.from(activeLevels);
-        const baseFilter = ['in', ['get', 'lvl'], ['literal', levelsArray]];
+  const levelsArray = Array.from(activeLevels);
+  const baseFilter = ['in', ['get', 'lvl'], ['literal', levelsArray]];
 
-        // ① 一般面
-        map.setFilter('aoc-fill', baseFilter);
+  // ① 一般面
+  map.setFilter('aoc-fill', baseFilter);
 
-        // ② 一般線
-        map.setFilter('aoc-line', baseFilter);
+  // ② 一般線
+  map.setFilter('aoc-line', baseFilter);
 
-        // ③ 標籤（原本就還要再多一層 _show_label = 1）
-        map.setFilter('aoc-labels', [
-          'all',
-          baseFilter,
-          ['==', ['get', '_show_label'], 1]
-        ]);
+  // ③ 標籤（原本就還要再多一層 _show_label = 1）
+  map.setFilter('aoc-labels', [
+    'all',
+    baseFilter,
+    ['==', ['get', '_show_label'], 1]
+  ]);
 
-        // ④ 搜尋到的比較實的面：要同時「是被搜尋的」+「這個等級目前有開」
-        map.setFilter('aoc-fill-search-hl', [
-          'all',
-          ['==', ['get', '__searched'], 1],
-          baseFilter
-        ]);
+  // ④ 搜尋到的比較實的面：要同時「是被搜尋的」+「這個等級目前有開」
+  map.setFilter('aoc-fill-search-hl', [
+    'all',
+    ['==', ['get', '__searched'], 1],
+    baseFilter
+  ]);
 
-        // ⑤ 搜尋白色 halo 線
-        map.setFilter('aoc-search-halo', [
-          'all',
-          ['==', ['get', '__searched'], 1],
-          baseFilter
-        ]);
+  // ⑤ 搜尋白色 halo 線
+  map.setFilter('aoc-search-halo', [
+    'all',
+    ['==', ['get', '__searched'], 1],
+    baseFilter
+  ]);
 
-        // ⑥ 搜尋有色粗線
-        map.setFilter('aoc-search-hl', [
-          'all',
-          ['==', ['get', '__searched'], 1],
-          baseFilter
-        ]);
+  // ⑥ 搜尋有色粗線
+  map.setFilter('aoc-search-hl', [
+    'all',
+    ['==', ['get', '__searched'], 1],
+    baseFilter
+  ]);
 
-        // ⑦ 搜尋的立體層
-        map.setFilter('aoc-search-extrude', [
-          'all',
-          ['==', ['get', '__searched'], 1],
-          baseFilter
-        ]);
-      }
+  // ⑦ 搜尋的立體層
+  map.setFilter('aoc-search-extrude', [
+    'all',
+    ['==', ['get', '__searched'], 1],
+    baseFilter
+  ]);
+}
 
-      // 初始化篩選按鈕狀態和事件監聽
       document.querySelectorAll('.filter-btn').forEach(btn => {
-        const level = btn.dataset.level;
-        // 確保所有按鈕一開始都是活躍（藍色）的，因為 activeLevels 預設包含所有級別
-        if (activeLevels.has(level)) {
-          btn.classList.remove('inactive'); // 確保沒有 inactive class
-        } else {
-          btn.classList.add('inactive'); // 如果 activeLevels 預設不包含，則加上 inactive class
-        }
-
         btn.addEventListener('click', (e) => {
-          e.preventDefault(); // 阻止預設行為
+          e.preventDefault();
           const level = btn.dataset.level;
           if (activeLevels.has(level)) {
             activeLevels.delete(level);
-            btn.classList.add('inactive'); // 只添加 inactive class
+            btn.classList.add('inactive');
+            btn.style.background = '#f8f8f8';
+            btn.style.color = '#333';
+            btn.style.border = '1px solid #ccc';
           } else {
             activeLevels.add(level);
-            btn.classList.remove('inactive'); // 只移除 inactive class
+            btn.classList.remove('inactive');
+            btn.style.background = '#007bff';
+            btn.style.color = '#fff';
+            btn.style.border = 'none';
           }
-          btn.blur(); // 移除焦點
-          updateAocVisibility(); // 更新地圖可見性
+          btn.blur();
+          updateAocVisibility();
         });
       });
-
-      // 初始化酒窖顯示切換按鈕的樣式
-      const cellarBtn = document.getElementById('toggleCellarBtn');
-      // 確保一開始就是藍色活躍狀態
-      cellarBtn.classList.remove('inactive');
-      cellarBtn.style.background = '#007bff'; // 這裡保留行內樣式以明確控制
-      cellarBtn.style.color = '#fff';
-      cellarBtn.style.border = 'none';
-
-      // 在地圖加載完成後，確保所有篩選邏輯都初始化一次
-      updateAocVisibility();
 
       // 酒窖顯示切換
       const cellarBtn = document.getElementById('toggleCellarBtn');
