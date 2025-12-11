@@ -6,7 +6,7 @@
   <title>Burgundy AOC — 3D 可傾斜版（MapLibre GL）</title>
   <link href="https://cdn.jsdelivr.net/npm/maplibre-gl@3.6.1/dist/maplibre-gl.css" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@3.6.1/dist/maplibre-gl.js"></script>
-  <style>
+ <style>
     html, body, #map { height: 100%; margin: 0; }
 /* 限制 Popup 最大高度，超過就捲動 */
 .maplibregl-popup-content {
@@ -125,8 +125,7 @@
     }
     .cellar-marker span { font-size: 18px; }
 
-   
-/* 右下篩選面板 */
+    /* 右下篩選面板 */
     #filter-panel {
       right: 10px;
       bottom: 10px;
@@ -159,6 +158,7 @@
       background: #3399ff;
       color: white;
     }
+
     /* Dark Mode Styles */
     @media (prefers-color-scheme: dark) {
       body {
@@ -193,11 +193,7 @@
         border-top: 1px solid #444;
       }
       /* Specific dark mode adjustments for filter panel buttons */
-      #filter-panel .btn {
-        background: #007bff; /* Active blue */
-        color: white;
-        border: none;
-      }
+      /* active 狀態由 .btn 本身定義，這裡只需確保 inactive 的覆蓋 */
       #filter-panel .btn.inactive {
         background: #333; /* Inactive dark gray */
         color: white;
@@ -221,8 +217,7 @@
         color: #6ed16e !important; /* A lighter green for dark mode */
       }
     }
-    
-  </style>
+</style>
   <script>
     // 阻止 iOS 全頁 pinch-zoom
     (function () {
