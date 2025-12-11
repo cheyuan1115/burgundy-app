@@ -6,7 +6,7 @@
   <title>Burgundy AOC — 3D 可傾斜版（MapLibre GL）</title>
   <link href="https://cdn.jsdelivr.net/npm/maplibre-gl@3.6.1/dist/maplibre-gl.css" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@3.6.1/dist/maplibre-gl.js"></script>
- <style>
+<style>
     html, body, #map { height: 100%; margin: 0; }
 /* 限制 Popup 最大高度，超過就捲動 */
 .maplibregl-popup-content {
@@ -41,7 +41,8 @@
       padding:4px 8px;
       border:1px solid #ddd;
       border-radius:8px;
-      background:#f8f8f8;
+      background:#f8f8f8; /* 預設亮色模式下的非活躍按鈕 */
+      color:#333;
       cursor:pointer;
       font-size:12px;
       white-space:nowrap;
@@ -143,23 +144,23 @@
       font-size: 12px;
       text-align: left;
       cursor: pointer;
-      background: #007bff; /* 預設藍底 */
+      background: #007bff; /* 篩選按鈕活躍時的藍底 */
       color: white;
       border: none;
       border-radius: 8px;
       transition: all 0.2s ease;
     }
     #filter-panel .btn.inactive {
-      background: #333; /* 沒選中時黑色 */
-      color: white;
-      border: 1px solid #555;
+      background: #f8f8f8; /* 篩選按鈕非活躍時的亮色背景 */
+      color: #333;
+      border: 1px solid #ccc;
     }
     #filter-panel .btn:hover {
-      background: #3399ff;
+      background: #3399ff; /* 篩選按鈕懸停時的藍色 */
       color: white;
     }
 
-    /* Dark Mode Styles */
+    /* Dark Mode Styles - 使用 !important 強化覆蓋 */
     @media (prefers-color-scheme: dark) {
       body {
         background-color: #121212; /* Dark background for the document itself */
@@ -178,31 +179,37 @@
         border: 1px solid #555;
         color: #e0e0e0;
       }
-      .btn {
-        background: #444;
-        color: #e0e0e0;
-        border: 1px solid #666;
+      .btn { /* 暗模式下一般按鈕 */
+        background: #444 !important;
+        color: #e0e0e0 !important;
+        border: 1px solid #666 !important;
       }
       .btn:hover {
-        background: #555;
+        background: #555 !important;
       }
       .close-btn {
-        color: #ccc;
+        color: #ccc !important;
       }
       .winery-search-box {
-        border-top: 1px solid #444;
+        border-top: 1px solid #444 !important;
       }
-      /* Specific dark mode adjustments for filter panel buttons */
-      /* active 狀態由 .btn 本身定義，這裡只需確保 inactive 的覆蓋 */
-      #filter-panel .btn.inactive {
-        background: #333; /* Inactive dark gray */
-        color: white;
-        border: 1px solid #555;
+
+      /* 暗模式下篩選面板按鈕 */
+      #filter-panel .btn { /* 活躍時的藍色 */
+        background: #007bff !important;
+        color: white !important;
+        border: none !important;
       }
-      #filter-panel .btn:hover {
-        background: #3399ff;
-        color: white;
+      #filter-panel .btn.inactive { /* 非活躍時的黑色 */
+        background: #333 !important;
+        color: white !important;
+        border: 1px solid #555 !important;
       }
+      #filter-panel .btn:hover { /* 懸停時的藍色 */
+        background: #3399ff !important;
+        color: white !important;
+      }
+
        /* Text colors within content */
       #panel-content .small {
         color: #b0b0b0 !important;
