@@ -1460,6 +1460,7 @@ window.applyWinerySearch = applyWinerySearch;
 
       // 篩選按鈕
 // 篩選按鈕
+   // 篩選按鈕
      function updateAocVisibility() {
         const levelsArray = Array.from(activeLevels);
         const baseFilter = ['in', ['get', 'lvl'], ['literal', levelsArray]];
@@ -1506,33 +1507,41 @@ window.applyWinerySearch = applyWinerySearch;
         ]);
       }
 
-      // 初始化篩選按鈕狀態
+      // 初始化篩選按鈕狀態和事件監聽
       document.querySelectorAll('.filter-btn').forEach(btn => {
         const level = btn.dataset.level;
-        // 確保所有按鈕一開始都是藍色 (活躍狀態)
+        // 確保所有按鈕一開始都是活躍（藍色）的，因為 activeLevels 預設包含所有級別
         if (activeLevels.has(level)) {
-          btn.classList.remove('inactive');
-          // 這裡不需要設定 style，因為 CSS 預設 active 是藍色
+          btn.classList.remove('inactive'); // 確保沒有 inactive class
         } else {
-          // 如果 activeLevels 預設是空的，或者某個 level 不在裡面，就設定為 inactive
-          btn.classList.add('inactive');
+          btn.classList.add('inactive'); // 如果 activeLevels 預設不包含，則加上 inactive class
         }
 
         btn.addEventListener('click', (e) => {
-          e.preventDefault();
+          e.preventDefault(); // 阻止預設行為
           const level = btn.dataset.level;
           if (activeLevels.has(level)) {
             activeLevels.delete(level);
-            btn.classList.add('inactive'); // 添加 inactive class
+            btn.classList.add('inactive'); // 只添加 inactive class
           } else {
             activeLevels.add(level);
-            btn.classList.remove('inactive'); // 移除 inactive class
+            btn.classList.remove('inactive'); // 只移除 inactive class
           }
-          btn.blur();
-          updateAocVisibility();
-  
+          btn.blur(); // 移除焦點
+          updateAocVisibility(); // 更新地圖可見性
         });
       });
+
+      // 初始化酒窖顯示切換按鈕的樣式
+      const cellarBtn = document.getElementById('toggleCellarBtn');
+      // 確保一開始就是藍色活躍狀態
+      cellarBtn.classList.remove('inactive');
+      cellarBtn.style.background = '#007bff'; // 這裡保留行內樣式以明確控制
+      cellarBtn.style.color = '#fff';
+      cellarBtn.style.border = 'none';
+
+      // 在地圖加載完成後，確保所有篩選邏輯都初始化一次
+      updateAocVisibility();
 
       // 酒窖顯示切換
       const cellarBtn = document.getElementById('toggleCellarBtn');
