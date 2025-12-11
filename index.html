@@ -1464,71 +1464,78 @@ window.applyWinerySearch = applyWinerySearch;
       };
 
       // 篩選按鈕
+// 篩選按鈕
      function updateAocVisibility() {
-  const levelsArray = Array.from(activeLevels);
-  const baseFilter = ['in', ['get', 'lvl'], ['literal', levelsArray]];
+        const levelsArray = Array.from(activeLevels);
+        const baseFilter = ['in', ['get', 'lvl'], ['literal', levelsArray]];
 
-  // ① 一般面
-  map.setFilter('aoc-fill', baseFilter);
+        // ① 一般面
+        map.setFilter('aoc-fill', baseFilter);
 
-  // ② 一般線
-  map.setFilter('aoc-line', baseFilter);
+        // ② 一般線
+        map.setFilter('aoc-line', baseFilter);
 
-  // ③ 標籤（原本就還要再多一層 _show_label = 1）
-  map.setFilter('aoc-labels', [
-    'all',
-    baseFilter,
-    ['==', ['get', '_show_label'], 1]
-  ]);
+        // ③ 標籤（原本就還要再多一層 _show_label = 1）
+        map.setFilter('aoc-labels', [
+          'all',
+          baseFilter,
+          ['==', ['get', '_show_label'], 1]
+        ]);
 
-  // ④ 搜尋到的比較實的面：要同時「是被搜尋的」+「這個等級目前有開」
-  map.setFilter('aoc-fill-search-hl', [
-    'all',
-    ['==', ['get', '__searched'], 1],
-    baseFilter
-  ]);
+        // ④ 搜尋到的比較實的面：要同時「是被搜尋的」+「這個等級目前有開」
+        map.setFilter('aoc-fill-search-hl', [
+          'all',
+          ['==', ['get', '__searched'], 1],
+          baseFilter
+        ]);
 
-  // ⑤ 搜尋白色 halo 線
-  map.setFilter('aoc-search-halo', [
-    'all',
-    ['==', ['get', '__searched'], 1],
-    baseFilter
-  ]);
+        // ⑤ 搜尋白色 halo 線
+        map.setFilter('aoc-search-halo', [
+          'all',
+          ['==', ['get', '__searched'], 1],
+          baseFilter
+        ]);
 
-  // ⑥ 搜尋有色粗線
-  map.setFilter('aoc-search-hl', [
-    'all',
-    ['==', ['get', '__searched'], 1],
-    baseFilter
-  ]);
+        // ⑥ 搜尋有色粗線
+        map.setFilter('aoc-search-hl', [
+          'all',
+          ['==', ['get', '__searched'], 1],
+          baseFilter
+        ]);
 
-  // ⑦ 搜尋的立體層
-  map.setFilter('aoc-search-extrude', [
-    'all',
-    ['==', ['get', '__searched'], 1],
-    baseFilter
-  ]);
-}
+        // ⑦ 搜尋的立體層
+        map.setFilter('aoc-search-extrude', [
+          'all',
+          ['==', ['get', '__searched'], 1],
+          baseFilter
+        ]);
+      }
 
+      // 初始化篩選按鈕狀態
       document.querySelectorAll('.filter-btn').forEach(btn => {
+        const level = btn.dataset.level;
+        // 確保所有按鈕一開始都是藍色 (活躍狀態)
+        if (activeLevels.has(level)) {
+          btn.classList.remove('inactive');
+          // 這裡不需要設定 style，因為 CSS 預設 active 是藍色
+        } else {
+          // 如果 activeLevels 預設是空的，或者某個 level 不在裡面，就設定為 inactive
+          btn.classList.add('inactive');
+        }
+
         btn.addEventListener('click', (e) => {
           e.preventDefault();
           const level = btn.dataset.level;
           if (activeLevels.has(level)) {
             activeLevels.delete(level);
-            btn.classList.add('inactive');
-            btn.style.background = '#f8f8f8';
-            btn.style.color = '#333';
-            btn.style.border = '1px solid #ccc';
+            btn.classList.add('inactive'); // 添加 inactive class
           } else {
             activeLevels.add(level);
-            btn.classList.remove('inactive');
-            btn.style.background = '#007bff';
-            btn.style.color = '#fff';
-            btn.style.border = 'none';
+            btn.classList.remove('inactive'); // 移除 inactive class
           }
           btn.blur();
           updateAocVisibility();
+  
         });
       });
 
