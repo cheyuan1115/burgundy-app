@@ -225,22 +225,19 @@
       .winery-search-box {
         border-top: 1px solid #444;
       }
-      /* Specific dark mode adjustments for filter panel buttons */
       #filter-panel .btn {
-        background: #007bff; /* Active blue */
-        color: white;
-        border: none;
-      }
-      #filter-panel .btn.inactive {
-        background: #333; /* Inactive dark gray */
-        color: white;
-        border: 1px solid #555;
-      }
-      #filter-panel .btn:hover {
-        background: #3399ff;
-        color: white;
-      }
-       /* Text colors within content */
+    background: #0d6efd !important;   /* 標準 Bootstrap 藍，更亮一點在暗模式好看 */
+    color: white !important;
+    border: none !important;
+  }
+  #filter-panel .btn.inactive {
+    background: #343a40 !important;   /* 深灰黑，比 #333 更協調 */
+    color: #adb5bd !important;        /* 稍暗的白，避免太刺眼 */
+    border: 1px solid #495057 !important;
+  }
+  #filter-panel .btn:hover {
+    background: #0b5ed7 !important;   /* hover 時更深的藍 */
+  }
       #panel-content .small {
         color: #b0b0b0 !important;
       }
