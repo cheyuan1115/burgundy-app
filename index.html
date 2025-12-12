@@ -1513,9 +1513,17 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
 function syncFilterButtons() {
   document.querySelectorAll('.filter-btn').forEach(btn => {
     const level = btn.dataset.level;
+
+    // ✅ 強制清掉舊 inline style（不然暗模式會一直被寫死）
+    btn.style.background = '';
+    btn.style.color = '';
+    btn.style.border = '';
+
+    // ✅ 只用 class 控制狀態
     btn.classList.toggle('inactive', !activeLevels.has(level));
   });
 }
+
 
 // 地圖 load 完後跑一次
 syncFilterButtons();
