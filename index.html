@@ -183,85 +183,84 @@
 }
 
 
-/* Dark Mode Styles */
-@media (prefers-color-scheme: dark) {
-  body {
-    background-color: #000000 !important; /* 強制為黑色 */
-    color: #e0e0e0 !important;
-  }
-  .ui,
-  #info-panel,
-  .legend,
-  .maplibregl-popup-content {
-    background-color: #000000 !important; /* 強制為黑色 */
-    color: #e0e0e0 !important;
-    box-shadow: 0 6px 20px rgba(255, 255, 255, 0.1) !important;
-  }
-  .ui input[type="text"] {
-    background-color: #333;
-    border: 1px solid #555;
-    color: #e0e0e0;
-  }
-  .btn { /* 通常的按鈕，如「全部」、「主選單」 */
-    background: #444 !important;
-    color: #e0e0e0 !important;
-    border: 1px solid #666 !important;
-  }
-  .btn:hover {
-    background: #555 !important;
-  }
-  .close-btn {
-    color: #ccc !important;
-  }
-  .winery-search-box {
-    border-top: 1px solid #444 !important;
-  }
+/* Dark Mode Styles - 暴力測試版 */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #FF00FF !important; /* 強制亮粉紅色 */
+        color: #00FF00 !important; /* 強制鮮綠色文字 */
+      }
+      .ui,
+      #info-panel,
+      .legend,
+      .maplibregl-popup-content {
+        background-color: #FF00FF !important; /* 強制亮粉紅色 */
+        color: #00FF00 !important; /* 強制鮮綠色文字 */
+        box-shadow: 0 6px 20px rgba(255, 255, 255, 0.5) !important; /* 增加陰影可見度 */
+        border: 2px solid #FFFF00 !important; /* 加個亮黃色邊框 */
+      }
+      .ui input[type="text"] {
+        background-color: #55FF55 !important; /* 輸入框綠色 */
+        border: 2px solid #FF00FF !important; /* 輸入框粉紅邊框 */
+        color: #000000 !important; /* 輸入框黑色文字 */
+      }
+      .btn { /* 通常的按鈕，如「全部」、「主選單」 */
+        background: #FFFF00 !important; /* 強制亮黃色 */
+        color: #FF00FF !important; /* 強制粉紅色文字 */
+        border: 2px solid #0000FF !important; /* 藍色邊框 */
+      }
+      .btn:hover {
+        background: #FFD700 !important; /* 點擊黃金色 */
+      }
+      .close-btn {
+        color: #FF0000 !important; /* 關閉按鈕紅色 */
+      }
+      .winery-search-box {
+        border-top: 2px solid #FF00FF !important; /* 粉紅分隔線 */
+      }
 
-  /* filter-panel 中的按鈕的暗模式樣式 */
-  #filter-panel .btn {
-    background: #0d6efd !important;   /* 暗模式 active 藍色 */
-    color: white !important;
-    border: none !important;
-  }
-  #filter-panel .btn.inactive {
-    background: #343a40 !important;   /* 暗模式 inactive 深灰黑 */
-    color: #adb5bd !important;
-    border: 1px solid #495057 !important;
-  }
-  #filter-panel .btn:hover {
-    background: #0b5ed7 !important;   /* hover 時更深的藍 */
-  }
+      /* filter-panel 中的按鈕的暗模式樣式 */
+      #filter-panel .btn {
+        background: #FFFF00 !important;   /* 強制亮黃色 */
+        color: #FF00FF !important; /* 強制粉紅色文字 */
+        border: 2px solid #0000FF !important; /* 藍色邊框 */
+      }
+      #filter-panel .btn.inactive {
+        background: #00FFFF !important;   /* inactive 狀態改為青色 */
+        color: #FF00FF !important;        /* 粉紅色文字 */
+        border: 2px solid #FF0000 !important; /* 紅色邊框 */
+      }
+      #filter-panel .btn:hover {
+        background: #FFD700 !important;   /* hover 時黃金色 */
+      }
 
-  /* 酒窖按鈕的暗模式樣式 (需要像 filter-panel .btn 一樣處理) */
-  #toggleCellarBtn {
-    background: #0d6efd !important; /* 暗模式預設藍色 */
-    color: white !important;
-    border: none !important;
-  }
-  #toggleCellarBtn.inactive {
-    background: #343a40 !important; /* 暗模式 inactive 深灰黑 */
-    color: #adb5bd !important;
-    border: 1px solid #495057 !important;
-  }
-  #toggleCellarBtn:hover {
-    background: #0b5ed7 !important; /* hover 時更深的藍 */
-  }
+      /* 酒窖按鈕的暗模式樣式 */
+      #toggleCellarBtn {
+        background: #FFFF00 !important; /* 強制亮黃色 */
+        color: #FF00FF !important; /* 強制粉紅色文字 */
+        border: 2px solid #0000FF !important; /* 藍色邊框 */
+      }
+      #toggleCellarBtn.inactive {
+        background: #00FFFF !important; /* inactive 狀態改為青色 */
+        color: #FF00FF !important; /* 粉紅色文字 */
+        border: 2px solid #FF0000 !important; /* 紅色邊框 */
+      }
+      #toggleCellarBtn:hover {
+        background: #FFD700 !important; /* hover 時黃金色 */
+      }
 
-
-  #panel-content .small {
-    color: #b0b0b0 !important;
-  }
-  #panel-content a {
-    color: #8ab4f8 !important;
-  }
-  #panel-content a:visited {
-    color: #c58af9 !important;
-  }
-  #panel-content div[style*="color:#2c7d2c"] {
-    color: #6ed16e !important;
-  }
-}
-    
+      #panel-content .small {
+        color: #00FF00 !important; /* 鮮綠色 */
+      }
+      #panel-content a {
+        color: #FFFF00 !important; /* 連結改亮黃色 */
+      }
+      #panel-content a:visited {
+        color: #FF00FF !important; /* 訪問過的連結改亮粉紅色 */
+      }
+      #panel-content div[style*="color:#2c7d2c"] {
+        color: #00FFFF !important; /* 筆記顏色改青色 */
+      }
+    }
    
     }
   </style>
