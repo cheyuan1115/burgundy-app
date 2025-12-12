@@ -6,210 +6,256 @@
   <title>Burgundy AOC — 3D 可傾斜版（MapLibre GL）</title>
   <link href="https://cdn.jsdelivr.net/npm/maplibre-gl@3.6.1/dist/maplibre-gl.css" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@3.6.1/dist/maplibre-gl.js"></script>
-<style>
-  html, body, #map { height: 100%; margin: 0; }
+  <style>
+    html, body, #map { height: 100%; margin: 0; }
+/* 限制 Popup 最大高度，超過就捲動 */
+.maplibregl-popup-content {
+  max-height: 300px; /* 或者 50vh */
+  overflow-y: auto;
+  border-radius: 8px; /* 圓角好看一點 */
+}
+    .ui{
+      position: absolute;
+      z-index: 10;
+      top: 8px;
+      left: 8px;
+      max-height: 90vh;
+      background: #fff;
+      padding: 8px 10px 10px;
+      border-radius: 10px;
+      box-shadow: 0 6px 20px rgba(0,0,0,.18);
+      width: 260px;
+      font: 13px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+    }
+    .ui .title-row{ font-weight: 700; margin-bottom: 4px; }
+    .row{ display:flex; align-items:center; gap:6px; margin-bottom:6px; flex-wrap:wrap; }
+    .row-input input{ width: 100%; }
+    .row-actions{ justify-content: flex-start; }
+    .ui input[type="text"]{
+      padding:6px 8px;
+      border:1px solid #ddd;
+      border-radius:8px;
+      font:inherit;
+    }
+    .btn{
+      padding:4px 8px;
+      border:1px solid #ddd;
+      border-radius:8px;
+      background:#f8f8f8;
+      cursor:pointer;
+      font-size:12px;
+      white-space:nowrap;
+    }
+    .btn:hover{ background:#eee; }
 
-  /* Popup 最大高度可滾動 */
-  .maplibregl-popup-content {
-    max-height: 300px;
-    overflow-y: auto;
-    border-radius: 8px;
-  }
-
-  /* 左上搜尋面板 */
-  .ui {
-    position: absolute;
-    z-index: 10;
-    top: 8px;
-    left: 8px;
-    max-height: 90vh;
-    background: #fff;
-    padding: 8px 10px 10px;
-    border-radius: 10px;
-    box-shadow: 0 6px 20px rgba(0,0,0,.18);
-    width: 260px;
-    font: 13px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-  }
-  .ui .title-row { font-weight: 700; margin-bottom: 4px; }
-  .row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; flex-wrap: wrap; }
-  .row-input input { width: 100%; }
-  .row-actions { justify-content: flex-start; }
-  .ui input[type="text"] {
-    padding: 6px 8px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font: inherit;
-  }
-
-  /* 通用按鈕（左上 UI / 面板裡的按鈕） */
-  .btn {
-    padding: 4px 8px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background: #f8f8f8;
-    cursor: pointer;
-    font-size: 12px;
-    white-space: nowrap;
-    color: #222;
-  }
-  .btn:hover { background: #eee; }
-  .btn:active { transform: translateY(0.5px); }
-  .btn:focus { outline: none; }
-  .btn:focus-visible { outline: 2px solid rgba(0,123,255,.35); outline-offset: 2px; }
-
-  .winery-search-box {
-    margin-top: 4px;
-    border-top: 1px solid #eee;
-    padding-top: 6px;
-    display: none;
-  }
-
-  /* 底部資訊面板 */
-  #info-panel {
-    position: fixed;
-    bottom: 0; left: 0; width: 100%;
-    max-height: 80vh;
-    background: #fff;
-    z-index: 100;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
-    transform: translateY(100%);
-    transition: transform 0.3s ease-out;
-    padding: 16px;
-    box-sizing: border-box;
-    overflow-y: auto;
-    font-size: 14px;
-    line-height: 1.6;
-    touch-action: pan-y;
-  }
-  #info-panel.visible { transform: translateY(0); }
-  .close-btn {
-    position: absolute;
-    top: 8px; right: 12px;
-    font-size: 18px; font-weight: bold;
-    background: none; border: none;
-    cursor: pointer; color: #999;
-    z-index: 101;
-  }
-  #panel-content * { word-wrap: break-word; word-break: break-word; }
-
-  /* 地窖標記 */
-  .cellar-marker {
-    width: 32px; height: 32px;
-    border-radius: 16px;
-    background-color: #800000;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: bold; color: white; font-size: 14px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    border: 2px solid white;
-  }
-  .cellar-marker.consumed { background-color: #007bff; }
-  .cellar-marker span { font-size: 18px; }
-
-  /* ==================== 右下篩選面板 ==================== */
-  #filter-panel {
-    position: absolute;
-    z-index: 10;
-    right: 10px;
-    bottom: 10px;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,.18);
-    font: 12px system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-    padding: 8px;
-    width: 130px;
-  }
-
-  /* 篩選等級按鈕：預設=開啟（藍） */
-  #filter-panel .filter-btn {
-    width: 100%;
-    margin-bottom: 5px;
-    padding: 5px 8px;
-    font-size: 12px;
-    text-align: left;
-    cursor: pointer;
-    border-radius: 8px;
-    border: none;
-    background: #007bff;
-    color: #fff;
-    transition: background 0.2s ease, color .2s ease, border-color .2s ease;
-  }
-  #filter-panel .filter-btn:hover { background: #3399ff; }
-
-  /* 篩選等級按鈕：關閉（灰） */
-  #filter-panel .filter-btn.inactive {
-    background: #f8f8f8;
-    color: #333;
-    border: 1px solid #ccc;
-  }
-  #filter-panel .filter-btn.inactive:hover { background: #eee; }
-
-  /* 我的酒窖按鈕：沿用 .btn 外觀，這裡只補寬度 */
-  #filter-panel #toggleCellarBtn {
-    width: 100%;
-    margin-top: 2px;
-  }
-
-  /* ==================== 暗模式 ==================== */
-  @media (prefers-color-scheme: dark) {
-    body {
-      background-color: #121212;
-      color: #e0e0e0;
+    .winery-search-box{
+      margin-top: 4px;
+      border-top: 1px solid #eee;
+      padding-top: 6px;
+      display: none;
     }
 
-    .ui,
-    #info-panel,
-    .maplibregl-popup-content {
-      background-color: #1e1e1e;
-      color: #e0e0e0;
-      box-shadow: 0 6px 20px rgba(255,255,255,0.08);
+    /* ************ 手機資訊面板 CSS ************ */
+    #info-panel {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      max-height: 80vh;
+      background: #fff;
+      z-index: 100;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+      transform: translateY(100%);
+      transition: transform 0.3s ease-out;
+      padding: 16px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      font-size: 14px;
+      line-height: 1.6;
+      touch-action: pan-y;
+    }
+    #info-panel.visible { transform: translateY(0); }
+    .close-btn {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      font-size: 18px;
+      font-weight: bold;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #999;
+      z-index: 101;
+    }
+    #panel-content * {
+      word-wrap: break-word;
+      word-break: break-word;
     }
 
-    .ui input[type="text"] {
-      background-color: #2b2b2b;
-      border: 1px solid #555;
-      color: #e0e0e0;
+    .legend{
+      position:absolute;
+      z-index:10;
+      right:12px;
+      bottom:12px;
+      background:#fff;
+      padding:10px;
+      border-radius:10px;
+      box-shadow:0 6px 20px rgba(0,0,0,.18);
+      font:13px system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
     }
+    .legend .item{ display:flex; align-items:center; gap:8px; margin:4px 0; }
 
-    /* 通用按鈕暗模式 */
-    .btn {
-      background: #2c2c2c;
-      color: #e0e0e0;
-      border: 1px solid #555;
+    /* 地窖標記 */
+    .cellar-marker {
+      width: 32px;
+      height: 32px;
+      border-radius: 16px;
+      background-color: #800000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: white;
+      font-size: 14px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      border: 2px solid white;
     }
-    .btn:hover { background: #3a3a3a; }
-    .close-btn { color: #ccc; }
-    .winery-search-box { border-top: 1px solid #444; }
+    .cellar-marker.consumed {
+      background-color: #007bff;
+    }
+    .cellar-marker span { font-size: 18px; }
 
-    /* 右下篩選面板暗模式 */
+    /* 右下篩選面板 */
     #filter-panel {
-      background: #1e1e1e;
-      box-shadow: 0 4px 12px rgba(0,0,0,.5);
+      right: 10px;
+      bottom: 10px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.18);
+      font: 12px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      padding: 8px;
+      width: 130px;
+    }
+    #filter-panel .btn {
+      width: 100%;
+      margin-bottom: 5px;
+      padding: 5px 8px;
+      font-size: 12px;
+      text-align: left;
+      cursor: pointer;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+    #filter-panel .btn.inactive {
+      background: #f8f8f8;
+      color: #333;
+      border: 1px solid #ccc;
+    }
+    #filter-panel .btn:hover {
+      background: #3399ff;
+      color: white;
     }
 
-    /* 篩選等級按鈕暗模式：開啟＝藍 */
-    #filter-panel .filter-btn {
-      background: #0d6efd;
-      color: #fff;
+    /* 右下篩選面板 */
+    #filter-panel {
+      right: 10px;
+      bottom: 10px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.18);
+      font: 12px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      padding: 8px;
+      width: 130px;
+    }
+    #filter-panel .btn {
+      width: 100%;
+      margin-bottom: 5px;
+      padding: 5px 8px;
+      font-size: 12px;
+      text-align: left;
+      cursor: pointer;
+      background: #007bff; /* 預設藍底 */
+      color: white;
+      border: none;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+    #filter-panel .btn.inactive {
+      background: #333; /* 沒選中時黑色 */
+      color: white;
+      border: 1px solid #555;
+    }
+    #filter-panel .btn:hover {
+      background: #3399ff;
+      color: white;
+    }
+    /* Dark Mode Styles */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #121212; /* Dark background for the document itself */
+        color: #e0e0e0;
+      }
+      .ui,
+      #info-panel,
+      .legend,
+      .maplibregl-popup-content {
+        background-color: #1e1e1e; /* Darker background for UI elements */
+        color: #e0e0e0;
+        box-shadow: 0 6px 20px rgba(255, 255, 255, 0.1);
+      }
+      .ui input[type="text"] {
+        background-color: #333;
+        border: 1px solid #555;
+        color: #e0e0e0;
+      }
+      .btn {
+        background: #444;
+        color: #e0e0e0;
+        border: 1px solid #666;
+      }
+      .btn:hover {
+        background: #555;
+      }
+      .close-btn {
+        color: #ccc;
+      }
+      .winery-search-box {
+        border-top: 1px solid #444;
+      }
+    #filter-panel .btn {
+      /* 移除 !important，讓 .btn.inactive 能覆蓋 */
+      background: #0d6efd; /* 暗模式活躍按鈕顏色，稍微明亮 */
+      color: white;
       border: none;
     }
-    #filter-panel .filter-btn:hover { background: #0b5ed7; }
-
-    /* 篩選等級按鈕暗模式：關閉＝深灰 */
-    #filter-panel .filter-btn.inactive {
-      background: #343a40;
-      color: #adb5bd;
+    #filter-panel .btn.inactive {
+      /* 暗模式非活躍按鈕顏色 */
+      background: #343a40; /* 深灰黑 */
+      color: #adb5bd; /* 稍暗的白 */
       border: 1px solid #495057;
     }
-    #filter-panel .filter-btn.inactive:hover { background: #3b424a; }
-
-    /* 其他文字顏色微調 */
-    #panel-content .small { color: #b0b0b0; }
-    #panel-content a { color: #8ab4f8; }
-    #panel-content a:visited { color: #c58af9; }
-    #panel-content div[style*="color:#2c7d2c"] { color: #6ed16e; }
-  }
-</style>
-
+    #filter-panel .btn:hover {
+      /* 暗模式 hover 顏色 */
+      background: #0b5ed7;
+      color: white;
+    }
+      #panel-content .small {
+        color: #b0b0b0 !important;
+      }
+      #panel-content a {
+        color: #8ab4f8 !important; /* Lighter blue for links */
+      }
+      #panel-content a:visited {
+        color: #c58af9 !important; /* Purple for visited links */
+      }
+      #panel-content div[style*="color:#2c7d2c"] { /* Style note color */
+        color: #6ed16e !important; /* A lighter green for dark mode */
+      }
+    }
+  </style>
   <script>
     // 阻止 iOS 全頁 pinch-zoom
     (function () {
@@ -225,7 +271,7 @@
 
   <!-- 左上 UI -->
   <div class="ui">
-    <div class="title-row">AOC 篩選</div>
+    <div class="title-row">AOC 篩選test</div>
     <div class="row row-input">
       <input id="q" type="text" placeholder="例如：La Romanee">
     </div>
@@ -1451,38 +1497,45 @@ window.applyWinerySearch = applyWinerySearch;
       };
 
       // 篩選按鈕
-// ================== 篩選按鈕（只用 class 控制狀態） ==================
-function updateAocVisibility() {
+     function updateAocVisibility() {
   const levelsArray = Array.from(activeLevels);
   const baseFilter = ['in', ['get', 'lvl'], ['literal', levelsArray]];
 
+  // ① 一般面
   map.setFilter('aoc-fill', baseFilter);
+
+  // ② 一般線
   map.setFilter('aoc-line', baseFilter);
 
+  // ③ 標籤（原本就還要再多一層 _show_label = 1）
   map.setFilter('aoc-labels', [
     'all',
     baseFilter,
     ['==', ['get', '_show_label'], 1]
   ]);
 
+  // ④ 搜尋到的比較實的面：要同時「是被搜尋的」+「這個等級目前有開」
   map.setFilter('aoc-fill-search-hl', [
     'all',
     ['==', ['get', '__searched'], 1],
     baseFilter
   ]);
 
+  // ⑤ 搜尋白色 halo 線
   map.setFilter('aoc-search-halo', [
     'all',
     ['==', ['get', '__searched'], 1],
     baseFilter
   ]);
 
+  // ⑥ 搜尋有色粗線
   map.setFilter('aoc-search-hl', [
     'all',
     ['==', ['get', '__searched'], 1],
     baseFilter
   ]);
 
+  // ⑦ 搜尋的立體層
   map.setFilter('aoc-search-extrude', [
     'all',
     ['==', ['get', '__searched'], 1],
@@ -1490,44 +1543,28 @@ function updateAocVisibility() {
   ]);
 }
 
-// 綁定按鈕（⚠️ 不要再寫 btn.style.xxx）
-document.querySelectorAll('.filter-btn').forEach(btn => {
-  btn.addEventListener('click', (e) => {
-    e.preventDefault();
-    const level = btn.dataset.level;
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const level = btn.dataset.level;
+          if (activeLevels.has(level)) {
+            activeLevels.delete(level);
+            btn.classList.add('inactive');
+            btn.style.background = '#f8f8f8';
+            btn.style.color = '#333';
+            btn.style.border = '1px solid #ccc';
+          } else {
+            activeLevels.add(level);
+            btn.classList.remove('inactive');
+            btn.style.background = '#007bff';
+            btn.style.color = '#fff';
+            btn.style.border = 'none';
+          }
+          btn.blur();
+          updateAocVisibility();
+        });
+      });
 
-    if (activeLevels.has(level)) {
-      activeLevels.delete(level);
-      btn.classList.add('inactive');
-    } else {
-      activeLevels.add(level);
-      btn.classList.remove('inactive');
-    }
-
-    btn.blur();
-    updateAocVisibility();
-  });
-});
-
-// ⭐ 初始化同步（非常重要）
-function syncFilterButtons() {
-  document.querySelectorAll('.filter-btn').forEach(btn => {
-    const level = btn.dataset.level;
-
-    // ✅ 強制清掉舊 inline style（不然暗模式會一直被寫死）
-    btn.style.background = '';
-    btn.style.color = '';
-    btn.style.border = '';
-
-    // ✅ 只用 class 控制狀態
-    btn.classList.toggle('inactive', !activeLevels.has(level));
-  });
-}
-
-
-// 地圖 load 完後跑一次
-syncFilterButtons();
-/*
       // 酒窖顯示切換
       const cellarBtn = document.getElementById('toggleCellarBtn');
       cellarBtn.style.background = '#007bff';
@@ -1553,7 +1590,7 @@ syncFilterButtons();
         }
         cellarBtn.blur();
       });
-*/
+
       // 限制放大
       const ZMAX = 14.5;
       map.setMaxZoom(ZMAX);
