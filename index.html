@@ -668,6 +668,19 @@ if (window.__LARGE_FONT_MODE__) {
   `;
   document.head.appendChild(style);
 }
+    function isDarkMode() {
+  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
+// 根據主題設定地圖背景色
+function setMapBackgroundColor() {
+  if (map && map.isStyleLoaded()) {
+    const bgColor = isDarkMode() ? '#000000' : '#F2F2F2'; // 暗模式黑色，亮模式淺灰
+    if (map.getLayer('background')) { // 確保背景層存在
+      map.setPaintProperty('background', 'background-color', bgColor);
+    }
+  }
+}
     // 地圖初始化
     map = new maplibregl.Map({
       container: 'map',
