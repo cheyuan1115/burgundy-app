@@ -1457,9 +1457,7 @@ window.applyWinerySearch = applyWinerySearch;
           if (activeLevels.has(level)) {
             activeLevels.delete(level);
             btn.classList.add('inactive');
-            btn.style.background = '#f8f8f8';
-            btn.style.color = '#333';
-            btn.style.border = '1px solid #ccc';
+
           } else {
             activeLevels.add(level);
             btn.classList.remove('inactive');
