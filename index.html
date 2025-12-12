@@ -279,7 +279,7 @@
 
   <!-- 左上 UI -->
   <div class="ui">
-    <div class="title-row">AOC 篩選</div>
+    <div class="title-row">AOC 篩選t</div>
     <div class="row row-input">
       <input id="q" type="text" placeholder="例如：La Romanee">
     </div>
@@ -1571,23 +1571,17 @@ window.applyWinerySearch = applyWinerySearch;
 
       // 酒窖顯示切換
       const cellarBtn = document.getElementById('toggleCellarBtn');
-      cellarBtn.style.background = '#007bff';
-      cellarBtn.style.color = '#fff';
-      cellarBtn.style.border = 'none';
+
       cellarBtn.addEventListener('click', () => {
         // 這裡直接反轉
         cellarVisible = !cellarVisible;
         if (cellarVisible) {
-          cellarBtn.style.background = '#007bff';
-          cellarBtn.style.color = '#fff';
-          cellarBtn.style.border = 'none';
+
           if (window.inventoryMarkers) {
             window.inventoryMarkers.forEach(m => m.addTo(map));
           }
         } else {
-          cellarBtn.style.background = '#f8f8f8';
-          cellarBtn.style.color = '#333';
-          cellarBtn.style.border = '1px solid #ccc';
+
           if (window.inventoryMarkers) {
             window.inventoryMarkers.forEach(m => m.remove());
           }
