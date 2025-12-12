@@ -159,85 +159,97 @@
       color: white;
     }
 
-/* Dark Mode Styles - 暴力測試版 */
+    /* 右下篩選面板 */
+    #filter-panel {
+      right: 10px;
+      bottom: 10px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.18);
+      font: 12px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      padding: 8px;
+      width: 130px;
+    }
+    #filter-panel .btn {
+      width: 100%;
+      margin-bottom: 5px;
+      padding: 5px 8px;
+      font-size: 12px;
+      text-align: left;
+      cursor: pointer;
+      background: #007bff; /* 預設藍底 */
+      color: white;
+      border: none;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+    #filter-panel .btn.inactive {
+      background: #333; /* 沒選中時黑色 */
+      color: white;
+      border: 1px solid #555;
+    }
+    #filter-panel .btn:hover {
+      background: #3399ff;
+      color: white;
+    }
+    /* Dark Mode Styles */
     @media (prefers-color-scheme: dark) {
       body {
-        background-color: #FF00FF !important; /* 強制亮粉紅色 */
-        color: #00FF00 !important; /* 強制鮮綠色文字 */
+        background-color: #121212; /* Dark background for the document itself */
+        color: #e0e0e0;
       }
       .ui,
       #info-panel,
       .legend,
       .maplibregl-popup-content {
-        background-color: #FF00FF !important; /* 強制亮粉紅色 */
-        color: #00FF00 !important; /* 強制鮮綠色文字 */
-        box-shadow: 0 6px 20px rgba(255, 255, 255, 0.5) !important; /* 增加陰影可見度 */
-        border: 2px solid #FFFF00 !important; /* 加個亮黃色邊框 */
+        background-color: #1e1e1e; /* Darker background for UI elements */
+        color: #e0e0e0;
+        box-shadow: 0 6px 20px rgba(255, 255, 255, 0.1);
       }
       .ui input[type="text"] {
-        background-color: #55FF55 !important; /* 輸入框綠色 */
-        border: 2px solid #FF00FF !important; /* 輸入框粉紅邊框 */
-        color: #000000 !important; /* 輸入框黑色文字 */
+        background-color: #333;
+        border: 1px solid #555;
+        color: #e0e0e0;
       }
-      .btn { /* 通常的按鈕，如「全部」、「主選單」 */
-        background: #FFFF00 !important; /* 強制亮黃色 */
-        color: #FF00FF !important; /* 強制粉紅色文字 */
-        border: 2px solid #0000FF !important; /* 藍色邊框 */
+      .btn {
+        background: #444;
+        color: #e0e0e0;
+        border: 1px solid #666;
       }
       .btn:hover {
-        background: #FFD700 !important; /* 點擊黃金色 */
+        background: #555;
       }
       .close-btn {
-        color: #FF0000 !important; /* 關閉按鈕紅色 */
+        color: #ccc;
       }
       .winery-search-box {
-        border-top: 2px solid #FF00FF !important; /* 粉紅分隔線 */
+        border-top: 1px solid #444;
       }
-
-      /* filter-panel 中的按鈕的暗模式樣式 */
       #filter-panel .btn {
-        background: #FFFF00 !important;   /* 強制亮黃色 */
-        color: #FF00FF !important; /* 強制粉紅色文字 */
-        border: 2px solid #0000FF !important; /* 藍色邊框 */
-      }
-      #filter-panel .btn.inactive {
-        background: #00FFFF !important;   /* inactive 狀態改為青色 */
-        color: #FF00FF !important;        /* 粉紅色文字 */
-        border: 2px solid #FF0000 !important; /* 紅色邊框 */
-      }
-      #filter-panel .btn:hover {
-        background: #FFD700 !important;   /* hover 時黃金色 */
-      }
-
-      /* 酒窖按鈕的暗模式樣式 */
-      #toggleCellarBtn {
-        background: #FFFF00 !important; /* 強制亮黃色 */
-        color: #FF00FF !important; /* 強制粉紅色文字 */
-        border: 2px solid #0000FF !important; /* 藍色邊框 */
-      }
-      #toggleCellarBtn.inactive {
-        background: #00FFFF !important; /* inactive 狀態改為青色 */
-        color: #FF00FF !important; /* 粉紅色文字 */
-        border: 2px solid #FF0000 !important; /* 紅色邊框 */
-      }
-      #toggleCellarBtn:hover {
-        background: #FFD700 !important; /* hover 時黃金色 */
-      }
-
+    background: #0d6efd !important;   /* 標準 Bootstrap 藍，更亮一點在暗模式好看 */
+    color: white !important;
+    border: none !important;
+  }
+  #filter-panel .btn.inactive {
+    background: #343a40 !important;   /* 深灰黑，比 #333 更協調 */
+    color: #adb5bd !important;        /* 稍暗的白，避免太刺眼 */
+    border: 1px solid #495057 !important;
+  }
+  #filter-panel .btn:hover {
+    background: #0b5ed7 !important;   /* hover 時更深的藍 */
+  }
       #panel-content .small {
-        color: #00FF00 !important; /* 鮮綠色 */
+        color: #b0b0b0 !important;
       }
       #panel-content a {
-        color: #FFFF00 !important; /* 連結改亮黃色 */
+        color: #8ab4f8 !important; /* Lighter blue for links */
       }
       #panel-content a:visited {
-        color: #FF00FF !important; /* 訪問過的連結改亮粉紅色 */
+        color: #c58af9 !important; /* Purple for visited links */
       }
-      #panel-content div[style*="color:#2c7d2c"] {
-        color: #00FFFF !important; /* 筆記顏色改青色 */
+      #panel-content div[style*="color:#2c7d2c"] { /* Style note color */
+        color: #6ed16e !important; /* A lighter green for dark mode */
       }
-    }
-   
     }
   </style>
   <script>
@@ -255,7 +267,7 @@
 
   <!-- 左上 UI -->
   <div class="ui">
-    <div class="title-row">AOC 篩選t</div>
+    <div class="title-row">AOC 篩選</div>
     <div class="row row-input">
       <input id="q" type="text" placeholder="例如：La Romanee">
     </div>
@@ -276,7 +288,7 @@
 
   <!-- 右下篩選 -->
   <div class="legend" id="filter-panel">
-    <div style="font-weight:bold; margin-bottom:6px;">篩選顯示t</div>
+    <div style="font-weight:bold; margin-bottom:6px;">篩選顯示</div>
     <div><button class="btn filter-btn" data-level="GC">Grand Cru</button></div>
     <div><button class="btn filter-btn" data-level="PC">Premier Cru</button></div>
     <div><button class="btn filter-btn" data-level="VI">Village</button></div>
@@ -667,19 +679,6 @@ if (window.__LARGE_FONT_MODE__) {
     .btn { font-size: 16px !important; padding: 8px 12px !important; }
   `;
   document.head.appendChild(style);
-}
-    function isDarkMode() {
-  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-}
-
-// 根據主題設定地圖背景色
-function setMapBackgroundColor() {
-  if (map && map.isStyleLoaded()) {
-    const bgColor = isDarkMode() ? '#000000' : '#F2F2F2'; // 暗模式黑色，亮模式淺灰
-    if (map.getLayer('background')) { // 確保背景層存在
-      map.setPaintProperty('background', 'background-color', bgColor);
-    }
-  }
 }
     // 地圖初始化
     map = new maplibregl.Map({
@@ -1547,11 +1546,15 @@ window.applyWinerySearch = applyWinerySearch;
           if (activeLevels.has(level)) {
             activeLevels.delete(level);
             btn.classList.add('inactive');
-
+            btn.style.background = '#f8f8f8';
+            btn.style.color = '#333';
+            btn.style.border = '1px solid #ccc';
           } else {
             activeLevels.add(level);
             btn.classList.remove('inactive');
-
+            btn.style.background = '#007bff';
+            btn.style.color = '#fff';
+            btn.style.border = 'none';
           }
           btn.blur();
           updateAocVisibility();
@@ -1560,17 +1563,23 @@ window.applyWinerySearch = applyWinerySearch;
 
       // 酒窖顯示切換
       const cellarBtn = document.getElementById('toggleCellarBtn');
-
+      cellarBtn.style.background = '#007bff';
+      cellarBtn.style.color = '#fff';
+      cellarBtn.style.border = 'none';
       cellarBtn.addEventListener('click', () => {
         // 這裡直接反轉
         cellarVisible = !cellarVisible;
         if (cellarVisible) {
-
+          cellarBtn.style.background = '#007bff';
+          cellarBtn.style.color = '#fff';
+          cellarBtn.style.border = 'none';
           if (window.inventoryMarkers) {
             window.inventoryMarkers.forEach(m => m.addTo(map));
           }
         } else {
-
+          cellarBtn.style.background = '#f8f8f8';
+          cellarBtn.style.color = '#333';
+          cellarBtn.style.border = '1px solid #ccc';
           if (window.inventoryMarkers) {
             window.inventoryMarkers.forEach(m => m.remove());
           }
