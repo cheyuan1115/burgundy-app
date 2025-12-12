@@ -195,14 +195,14 @@
     /* Dark Mode Styles */
     @media (prefers-color-scheme: dark) {
       body {
-        background-color: #121212; /* Dark background for the document itself */
+        background-color: #000000; /* Changed from #121212 to #000000 */
         color: #e0e0e0;
       }
       .ui,
       #info-panel,
       .legend,
       .maplibregl-popup-content {
-        background-color: #1e1e1e; /* Darker background for UI elements */
+        background-color: #000000; /* Changed from #1e1e1e to #000000 */
         color: #e0e0e0;
         box-shadow: 0 6px 20px rgba(255, 255, 255, 0.1);
       }
@@ -226,29 +226,29 @@
         border-top: 1px solid #444;
       }
       #filter-panel .btn {
-    background: #0d6efd !important;   /* 標準 Bootstrap 藍，更亮一點在暗模式好看 */
-    color: white !important;
-    border: none !important;
-  }
-  #filter-panel .btn.inactive {
-    background: #343a40 !important;   /* 深灰黑，比 #333 更協調 */
-    color: #adb5bd !important;        /* 稍暗的白，避免太刺眼 */
-    border: 1px solid #495057 !important;
-  }
-  #filter-panel .btn:hover {
-    background: #0b5ed7 !important;   /* hover 時更深的藍 */
-  }
+        background: #0d6efd !important;
+        color: white !important;
+        border: none !important;
+      }
+      #filter-panel .btn.inactive {
+        background: #343a40 !important;
+        color: #adb5bd !important;
+        border: 1px solid #495057 !important;
+      }
+      #filter-panel .btn:hover {
+        background: #0b5ed7 !important;
+      }
       #panel-content .small {
         color: #b0b0b0 !important;
       }
       #panel-content a {
-        color: #8ab4f8 !important; /* Lighter blue for links */
+        color: #8ab4f8 !important;
       }
       #panel-content a:visited {
-        color: #c58af9 !important; /* Purple for visited links */
+        color: #c58af9 !important;
       }
-      #panel-content div[style*="color:#2c7d2c"] { /* Style note color */
-        color: #6ed16e !important; /* A lighter green for dark mode */
+      #panel-content div[style*="color:#2c7d2c"] {
+        color: #6ed16e !important;
       }
     }
   </style>
@@ -288,7 +288,7 @@
 
   <!-- 右下篩選 -->
   <div class="legend" id="filter-panel">
-    <div style="font-weight:bold; margin-bottom:6px;">篩選顯示</div>
+    <div style="font-weight:bold; margin-bottom:6px;">篩選顯示test</div>
     <div><button class="btn filter-btn" data-level="GC">Grand Cru</button></div>
     <div><button class="btn filter-btn" data-level="PC">Premier Cru</button></div>
     <div><button class="btn filter-btn" data-level="VI">Village</button></div>
