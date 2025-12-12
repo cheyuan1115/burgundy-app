@@ -136,32 +136,7 @@
       padding: 8px;
       width: 130px;
     }
-    /* 這裡才是亮模式的預設按鈕樣式 */
-    #filter-panel .filter-btn { /* 特意增加 .filter-btn 確保特異性 */
-      width: 100%;
-      margin-bottom: 5px;
-      padding: 5px 8px;
-      font-size: 12px;
-      text-align: left;
-      cursor: pointer;
-      background: #007bff; /* 預設藍底 (亮模式活躍) */
-      color: white;
-      border: none;
-      border-radius: 8px;
-      transition: all 0.2s ease;
-    }
-    #filter-panel .filter-btn.inactive {
-      background: #f8f8f8; /* 沒選中時淺灰 (亮模式非活躍) */
-      color: #333;
-      border: 1px solid #ccc;
-    }
-    #filter-panel .filter-btn:hover { /* 針對亮模式 hover */
-      background: #3399ff;
-      color: white;
-    }
-
-    /* toggleCellarBtn 額外處理 */
-    #toggleCellarBtn { /* 這個按鈕獨立出來，因為它在亮模式下也是藍色 */
+    #filter-panel .btn {
       width: 100%;
       margin-bottom: 5px;
       padding: 5px 8px;
@@ -174,12 +149,49 @@
       border-radius: 8px;
       transition: all 0.2s ease;
     }
-    #toggleCellarBtn.inactive { /* 這個類別可能不需要，但為了一致性 */
+    #filter-panel .btn.inactive {
       background: #f8f8f8;
       color: #333;
       border: 1px solid #ccc;
     }
+    #filter-panel .btn:hover {
+      background: #3399ff;
+      color: white;
+    }
 
+    /* 右下篩選面板 */
+    #filter-panel {
+      right: 10px;
+      bottom: 10px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.18);
+      font: 12px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      padding: 8px;
+      width: 130px;
+    }
+    #filter-panel .btn {
+      width: 100%;
+      margin-bottom: 5px;
+      padding: 5px 8px;
+      font-size: 12px;
+      text-align: left;
+      cursor: pointer;
+      background: #007bff; /* 預設藍底 */
+      color: white;
+      border: none;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+    #filter-panel .btn.inactive {
+      background: #333; /* 沒選中時黑色 */
+      color: white;
+      border: 1px solid #555;
+    }
+    #filter-panel .btn:hover {
+      background: #3399ff;
+      color: white;
+    }
     /* Dark Mode Styles */
     @media (prefers-color-scheme: dark) {
       body {
@@ -199,7 +211,7 @@
         border: 1px solid #555;
         color: #e0e0e0;
       }
-      .btn { /* 通用按鈕在暗模式下的預設樣式 */
+      .btn {
         background: #444;
         color: #e0e0e0;
         border: 1px solid #666;
@@ -213,37 +225,19 @@
       .winery-search-box {
         border-top: 1px solid #444;
       }
-
-      /* 針對篩選面板按鈕的暗模式樣式 */
-      #filter-panel .filter-btn { /* 暗模式下，活躍按鈕 */
-        background: #0d6efd !important;   /* 使用 !important 確保覆蓋 JavaScript 可能設定的內聯樣式 */
-        color: white !important;
-        border: none !important;
-      }
-      #filter-panel .filter-btn.inactive { /* 暗模式下，非活躍按鈕 */
-        background: #343a40 !important;   /* 深灰黑 */
-        color: #adb5bd !important;        /* 稍暗的白 */
-        border: 1px solid #495057 !important;
-      }
-      #filter-panel .filter-btn:hover { /* 暗模式下 hover 效果 */
-        background: #0b5ed7 !important;   /* hover 時更深的藍 */
-      }
-
-      /* 針對 #toggleCellarBtn 的暗模式樣式 */
-      #toggleCellarBtn { /* 暗模式下，活躍的酒窖按鈕 */
-        background: #0d6efd !important;
-        color: white !important;
-        border: none !important;
-      }
-      #toggleCellarBtn.inactive { /* 暗模式下，非活躍的酒窖按鈕 */
-        background: #343a40 !important;
-        color: #adb5bd !important;
-        border: 1px solid #495057 !important;
-      }
-      #toggleCellarBtn:hover {
-        background: #0b5ed7 !important;
-      }
-
+      #filter-panel .btn {
+    background: #0d6efd !important;   /* 標準 Bootstrap 藍，更亮一點在暗模式好看 */
+    color: white !important;
+    border: none !important;
+  }
+  #filter-panel .btn.inactive {
+    background: #343a40 !important;   /* 深灰黑，比 #333 更協調 */
+    color: #adb5bd !important;        /* 稍暗的白，避免太刺眼 */
+    border: 1px solid #495057 !important;
+  }
+  #filter-panel .btn:hover {
+    background: #0b5ed7 !important;   /* hover 時更深的藍 */
+  }
       #panel-content .small {
         color: #b0b0b0 !important;
       }
@@ -367,56 +361,56 @@
     };
 const VILLAGES = [
       // --- Yonne / Chablis 地區 ---
-      "Chablis",
-      "Petit Chablis",
-      "Irancy",
+      "Chablis", 
+      "Petit Chablis", 
+      "Irancy", 
       "Saint-Bris",
       "Vézelay",
 
       // --- Côte de Nuits (夜丘) ---
-      "Marsannay",
-      "Fixin",
-      "Gevrey-Chambertin",
-      "Morey-Saint-Denis",
-      "Chambolle-Musigny",
-      "Vougeot",
-      "Vosne-Romanée",
-      "Nuits-Saint-Georges",
+      "Marsannay", 
+      "Fixin", 
+      "Gevrey-Chambertin", 
+      "Morey-Saint-Denis", 
+      "Chambolle-Musigny", 
+      "Vougeot", 
+      "Vosne-Romanée", 
+      "Nuits-Saint-Georges", 
       "Côte de Nuits-Villages",
 
       // --- Côte de Beaune (伯恩丘) ---
-      "Ladoix-Serrigny",
-      "Aloxe-Corton",
-      "Pernand-Vergelesses",
-      "Chorey-lès-Beaune",
+      "Ladoix-Serrigny", 
+      "Aloxe-Corton", 
+      "Pernand-Vergelesses", 
+      "Chorey-lès-Beaune", 
       "Savigny-lès-Beaune",
-      "Beaune",
-      "Pommard",
-      "Volnay",
-      "Monthélie",
-      "Auxey-Duresses",
-      "Saint-Romain",
-      "Meursault",
-      "Puligny-Montrachet",
-      "Chassagne-Montrachet",
-      "Saint-Aubin",
-      "Santenay",
+      "Beaune", 
+      "Pommard", 
+      "Volnay", 
+      "Monthélie", 
+      "Auxey-Duresses", 
+      "Saint-Romain", 
+      "Meursault", 
+      "Puligny-Montrachet", 
+      "Chassagne-Montrachet", 
+      "Saint-Aubin", 
+      "Santenay", 
       "Maranges",
       "Côte de Beaune",         // 這是指村莊級 AOC，非整個產區
       "Côte de Beaune-Villages",
 
       // --- Côte Chalonnaise (夏隆內丘) ---
-      "Bouzeron",
-      "Rully",
-      "Mercurey",
-      "Givry",
+      "Bouzeron", 
+      "Rully", 
+      "Mercurey", 
+      "Givry", 
       "Montagny",
 
       // --- Mâconnais (馬貢內 - 特級村莊) ---
-      "Pouilly-Fuissé",
-      "Pouilly-Vinzelles",
-      "Pouilly-Loché",
-      "Saint-Véran",
+      "Pouilly-Fuissé", 
+      "Pouilly-Vinzelles", 
+      "Pouilly-Loché", 
+      "Saint-Véran", 
       "Viré-Clessé"
     ];
     const VILL_NORM = VILLAGES.map(_norm);
@@ -470,7 +464,7 @@ const VILLAGES = [
               }
             }
           }
-
+          
           if (gcCanon === 'Corton') {
             const climatPartRaw = parts.find(p => p.startsWith('Corton ') && p.length > 'Corton'.length + 1);
             if (climatPartRaw) {
@@ -518,10 +512,10 @@ const VILLAGES = [
       // ==========================================
       // Village (村莊級) - 修改後的邏輯
       // ==========================================
-
+      
       // 定義要「禮讓」的低優先權村莊
       const LOW_PRIORITY_VILLAGES = [
-
+  
         "Côte de Nuits-Villages",
         "Côte de Beaune",
         "Côte de Beaune-Villages"
@@ -532,7 +526,7 @@ const VILLAGES = [
       for (let i = 0; i < parts.length; i++) {
         const pNorm = partsNorm[i];
         const idx = VILL_NORM.indexOf(pNorm);
-
+        
         if (idx !== -1) {
           const foundName = VILLAGES[idx];
 
@@ -670,17 +664,17 @@ if (window.__LARGE_FONT_MODE__) {
   const style = document.createElement('style');
   style.innerHTML = `
     /* 讓所有 popup 內容文字變大 */
-    .maplibregl-popup-content,
+    .maplibregl-popup-content, 
     .maplibregl-popup-content .small,
-    .ui,
+    .ui, 
     .legend,
-    #info-panel {
-      font-size: 18px !important;
+    #info-panel { 
+      font-size: 18px !important; 
       line-height: 1.6 !important;
     }
     /* 特別針對原本是小字的 class */
     .small { font-size: 16px !important; }
-
+    
     /* 調整按鈕大小 */
     .btn { font-size: 16px !important; padding: 8px 12px !important; }
   `;
@@ -1233,7 +1227,7 @@ map.addLayer({
       masterWineries = await wRes.json();
       window.masterWineries = masterWineries;
       map.addSource('wineries', { type: 'geojson', data: masterWineries });
-      window.masterWineries = masterWineries;
+      window.masterWineries = masterWineries; 
       map.addLayer({
         id: 'wineries',
         type: 'circle',
@@ -1252,7 +1246,7 @@ map.addLayer({
       map.on('click', 'wineries', (e) => {
         const f = e.features && e.features[0];
         if (!f) return;
-
+        
         const p = f.properties || {};
         const key =
           (p.id && String(p.id)) ||
@@ -1276,14 +1270,14 @@ map.addLayer({
         // 2. 組合 HTML (加入 Wine-Searcher 按鈕)
         const html = `
           <div style="font-weight:700; font-size: 18px; margin-bottom: 6px;">${name}</div>
-
+          
           ${addr ? `<div class="small" style="color:#666; margin-bottom: 8px;">📍 ${addr}</div>` : ''}
-
+          
           <div style="display: flex; flex-direction: column; gap: 6px; font-size: 14px;">
             ${phone ? `<div>☎ <a href="tel:${phone.replace(/\s/g,'')}" style="color:#333;text-decoration:none;">${phone}</a></div>` : ''}
-
+            
             ${site ? `<div>🔗 <a href="javascript:void(0)" onclick="openExternalLink('${site}')" style="color:#007bff;">官方網站</a></div>` : ''}
-
+            
             <!-- ★ 新增 Wine-Searcher 按鈕 -->
             <div>🔍 <a href="javascript:void(0)" onclick="openExternalLink('${wsUrl}')" style="color:#d32f2f; font-weight:500;">在 Wine-Searcher 搜尋</a></div>
           </div>
@@ -1299,7 +1293,7 @@ map.addLayer({
         // 寫入底部面板並顯示
         const infoPanel = document.getElementById('info-panel');
         const panelContent = document.getElementById('panel-content');
-
+        
         panelContent.innerHTML = html;
         infoPanel.classList.add('visible');
       });
@@ -1417,7 +1411,7 @@ window.applySearchByKey = applySearchByKey;
             window.addEventListener('message', async function (event) {
         const data = event.data || {};
         if (data.type === 'focusAOC') {
-          // 1. 有 key 的話，用 key 找（這就是為了解決一級園問題）
+          // 1. 有 key 的話，用 key 找（這就是為了一級園）
           if (data.aocKey && typeof applySearchByKey === 'function') {
             await applySearchByKey(data.aocKey);
             return;
@@ -1552,17 +1546,15 @@ window.applyWinerySearch = applyWinerySearch;
           if (activeLevels.has(level)) {
             activeLevels.delete(level);
             btn.classList.add('inactive');
-            // 移除 JavaScript 設定的內聯樣式，讓 CSS 規則生效
-            btn.style.background = '';
-            btn.style.color = '';
-            btn.style.border = '';
+            btn.style.background = '#f8f8f8';
+            btn.style.color = '#333';
+            btn.style.border = '1px solid #ccc';
           } else {
             activeLevels.add(level);
             btn.classList.remove('inactive');
-            // 移除 JavaScript 設定的內聯樣式，讓 CSS 規則生效
-            btn.style.background = '';
-            btn.style.color = '';
-            btn.style.border = '';
+            btn.style.background = '#007bff';
+            btn.style.color = '#fff';
+            btn.style.border = 'none';
           }
           btn.blur();
           updateAocVisibility();
@@ -1571,29 +1563,23 @@ window.applyWinerySearch = applyWinerySearch;
 
       // 酒窖顯示切換
       const cellarBtn = document.getElementById('toggleCellarBtn');
-      // 初始化時，也移除內聯樣式，讓 CSS 規則生效
-      cellarBtn.style.background = '';
-      cellarBtn.style.color = '';
-      cellarBtn.style.border = '';
-
+      cellarBtn.style.background = '#007bff';
+      cellarBtn.style.color = '#fff';
+      cellarBtn.style.border = 'none';
       cellarBtn.addEventListener('click', () => {
         // 這裡直接反轉
         cellarVisible = !cellarVisible;
         if (cellarVisible) {
-          // 活躍時，移除內聯樣式，讓 CSS 決定顏色
-          cellarBtn.classList.remove('inactive');
-          cellarBtn.style.background = '';
-          cellarBtn.style.color = '';
-          cellarBtn.style.border = '';
+          cellarBtn.style.background = '#007bff';
+          cellarBtn.style.color = '#fff';
+          cellarBtn.style.border = 'none';
           if (window.inventoryMarkers) {
             window.inventoryMarkers.forEach(m => m.addTo(map));
           }
         } else {
-          // 非活躍時，添加 inactive class，並移除內聯樣式
-          cellarBtn.classList.add('inactive');
-          cellarBtn.style.background = '';
-          cellarBtn.style.color = '';
-          cellarBtn.style.border = '';
+          cellarBtn.style.background = '#f8f8f8';
+          cellarBtn.style.color = '#333';
+          cellarBtn.style.border = '1px solid #ccc';
           if (window.inventoryMarkers) {
             window.inventoryMarkers.forEach(m => m.remove());
           }
@@ -1618,31 +1604,8 @@ window.applyWinerySearch = applyWinerySearch;
         window.drawCellarMarkers(window.__PENDING_CELLAR__);
         window.__PENDING_CELLAR__ = null;
       }
-
-      // 初始化篩選按鈕狀態
-      document.querySelectorAll('.filter-btn').forEach(btn => {
-        const level = btn.dataset.level;
-        if (activeLevels.has(level)) {
-          btn.classList.remove('inactive');
-        } else {
-          btn.classList.add('inactive');
-        }
-        // 確保初始狀態沒有內聯樣式，讓 CSS 掌控
-        btn.style.background = '';
-        btn.style.color = '';
-        btn.style.border = '';
-      });
-      // 初始化酒窖按鈕狀態
-      if (cellarVisible) {
-        cellarBtn.classList.remove('inactive');
-      } else {
-        cellarBtn.classList.add('inactive');
-      }
-      cellarBtn.style.background = '';
-      cellarBtn.style.color = '';
-      cellarBtn.style.border = '';
     });
-
+ 
 
    // ============================================================
     //  通用訊息監聽器：接收 React Native 的 AOC 與 酒莊搜尋指令
@@ -1673,7 +1636,7 @@ window.applyWinerySearch = applyWinerySearch;
             // 1. 強制開啟酒莊圖層
             if (map.getLayer('wineries') && map.getLayoutProperty('wineries', 'visibility') !== 'visible') {
               map.setLayoutProperty('wineries', 'visibility', 'visible');
-
+              
               // UI 同步
               var btn = document.getElementById('toggleWineries');
               var box = document.getElementById('winery-search-container');
@@ -1716,5 +1679,7 @@ window.applyWinerySearch = applyWinerySearch;
       }
     });
   </script>
+</body>
+</html>
 </body>
 </html>
