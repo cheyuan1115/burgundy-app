@@ -1451,45 +1451,38 @@ window.applyWinerySearch = applyWinerySearch;
       };
 
       // 篩選按鈕
-     function updateAocVisibility() {
+// ================== 篩選按鈕（只用 class 控制狀態） ==================
+function updateAocVisibility() {
   const levelsArray = Array.from(activeLevels);
   const baseFilter = ['in', ['get', 'lvl'], ['literal', levelsArray]];
 
-  // ① 一般面
   map.setFilter('aoc-fill', baseFilter);
-
-  // ② 一般線
   map.setFilter('aoc-line', baseFilter);
 
-  // ③ 標籤（原本就還要再多一層 _show_label = 1）
   map.setFilter('aoc-labels', [
     'all',
     baseFilter,
     ['==', ['get', '_show_label'], 1]
   ]);
 
-  // ④ 搜尋到的比較實的面：要同時「是被搜尋的」+「這個等級目前有開」
   map.setFilter('aoc-fill-search-hl', [
     'all',
     ['==', ['get', '__searched'], 1],
     baseFilter
   ]);
 
-  // ⑤ 搜尋白色 halo 線
   map.setFilter('aoc-search-halo', [
     'all',
     ['==', ['get', '__searched'], 1],
     baseFilter
   ]);
 
-  // ⑥ 搜尋有色粗線
   map.setFilter('aoc-search-hl', [
     'all',
     ['==', ['get', '__searched'], 1],
     baseFilter
   ]);
 
-  // ⑦ 搜尋的立體層
   map.setFilter('aoc-search-extrude', [
     'all',
     ['==', ['get', '__searched'], 1],
@@ -1497,7 +1490,8 @@ window.applyWinerySearch = applyWinerySearch;
   ]);
 }
 
-      document.querySelectorAll('.filter-btn').forEach(btn => {
+// 綁定按鈕（⚠️ 不要再寫 btn.style.xxx）
+document.querySelectorAll('.filter-btn').forEach(btn => {
   btn.addEventListener('click', (e) => {
     e.preventDefault();
     const level = btn.dataset.level;
@@ -1515,6 +1509,16 @@ window.applyWinerySearch = applyWinerySearch;
   });
 });
 
+// ⭐ 初始化同步（非常重要）
+function syncFilterButtons() {
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    const level = btn.dataset.level;
+    btn.classList.toggle('inactive', !activeLevels.has(level));
+  });
+}
+
+// 地圖 load 完後跑一次
+syncFilterButtons();
 
       // 酒窖顯示切換
       const cellarBtn = document.getElementById('toggleCellarBtn');
