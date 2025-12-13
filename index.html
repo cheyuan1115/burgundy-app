@@ -1426,223 +1426,71 @@ window.applySearchByKey = applySearchByKey;
 
 
       // ================== 酒莊搜尋 ==================
-      function toSimple(str) {
-    if (!str) return '';
-    var s = str.toLowerCase();
-    s = s.replace(/œ/g, "oe").replace(/æ/g, "ae");
-    s = s.replace(/’/g, "'");
-    s = s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    s = s.replace(/[^a-z0-9]/g, "");
-    return s;
-}
-// 如果你的 _norm 函數已經在其他地方定義，並確保其功能等同於 toSimple
-// 則在 applyWinerySearch 內部繼續使用 _norm 即可。
-// 為了演示清晰，我會假設 _norm == toSimple，或直接使用 toSimple。
+      function applyWinerySearch(qRaw){
+        const qNorm = _norm(qRaw || '');
+        if (!map.getSource('wineries')) return;
 
-
-// ================== 酒莊搜尋 (修改後的版本) ==================
-function applyWinerySearch(qRaw){
-    const qNorm = toSimple(qRaw || ''); // 使用 toSimple 進行正規化
-    if (!map.getSource('wineries')) {
-        window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'log', message: 'Wineries source not ready.' }));
-        return;
-    }
-
-    // --- 1. 清理之前的狀態 ---
-    // 將所有酒莊圖層恢復預設可見 (稍後會根據是否找到特定酒莊來決定隱藏)
-    map.setLayoutProperty('wineries-point', 'visibility', 'visible');
-    map.setFilter('wineries-point', null); 
-    map.setLayoutProperty('wineries-label', 'visibility', 'visible');
-    map.setFilter('wineries-label', null);
-
-    // 移除任何之前添加的「高亮酒莊」源和層
-    if (map.getSource('highlight-winery')) {
-        if (map.getLayer('highlight-winery-point')) map.removeLayer('highlight-winery-point');
-        if (map.getLayer('highlight-winery-label')) map.removeLayer('highlight-winery-label');
-        map.removeSource('highlight-winery');
-    }
-    // 隱藏 info-panel (如果你有其他資訊面板，也一併清理)
-    document.getElementById('info-panel').style.display = 'none';
-
-    // 移除所有打開的 Mapbox Popup
-    // Mapbox GL JS 的 Popup 實例通常需要被保存起來才能移除。
-    // 一種簡單粗暴的方法是移除所有 .maplibregl-popup 元素，但這可能會移除其他非酒莊相關的 popup。
-    // 更優雅的做法是，如果你會創建多個 popup，將它們存儲在一個陣列中，然後遍歷移除。
-    // 這裡為了簡潔，假設我們只處理這個酒莊 popup，或者讓新 popup 替換舊的。
-    document.querySelectorAll('.maplibregl-popup').forEach(p => p.remove());
-
-
-    // --- 2. 處理空搜尋 (清空狀態) ---
-    if (!qNorm) {
-        window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'log', message: 'Winery search cleared. Showing all wineries.' }));
-        // 將原有酒莊層數據恢復到所有酒莊 (防止篩選後沒有恢復)
-        map.getSource('wineries').setData(masterWineries); 
-        // 回到預設區域
-        map.flyTo({ center: [4.75, 47.1667], zoom: 9, essential: true, duration: 800 });
-        return;
-    }
-    
-    // --- 3. 執行酒莊篩選 ---
-    const filteredWineries = masterWineries.features.filter(f => {
-      const name = toSimple(f.properties?.name || ''); // 使用 toSimple
-      const address = toSimple(f.properties?.address || ''); 
-      const combined = `${name} ${address}`;
-      return combined.includes(qNorm);
-    });
-
-    // --- 4. 處理搜尋結果 ---
-    if (filteredWineries.length > 0) {
-        const targetFeature = filteredWineries[0]; // 只處理第一個匹配的酒莊
-        const coords = targetFeature.geometry.coordinates;
-
-        window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'log', message: '✅ Found winery: ' + targetFeature.properties.name }));
-
-        // ★★★ 核心改動：添加一個獨立的高亮源和圖層 ★★★
-        map.addSource('highlight-winery', {
-            type: 'geojson',
-            data: {
-                type: 'FeatureCollection',
-                features: [targetFeature] // 只包含這個被高亮的酒莊
-            }
-        });
-
-        // 點圖層 - 獨立的高亮樣式
-        map.addLayer({
-            id: 'highlight-winery-point',
-            type: 'circle',
-            source: 'highlight-winery',
-            paint: {
-                'circle-radius': 12, 
-                'circle-color': '#FFD700', // 金色
-                'circle-stroke-color': '#FFA500',
-                'circle-stroke-width': 3
-            }
-        });
-        // 文字標籤層 - 獨立的高亮樣式
-        map.addLayer({
-            id: 'highlight-winery-label',
-            type: 'symbol',
-            source: 'highlight-winery',
-            layout: {
-                'text-field': ['get', 'name'],
-                'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-                'text-size': 16,
-                'text-anchor': 'bottom',
-                'text-offset': [0, -1.8]
-            },
-            paint: {
-                'text-color': '#000',
-                'text-halo-color': '#fff',
-                'text-halo-width': 2.5
-            }
-        });
-
-        // ★★★ 隱藏所有其他酒莊層 (只顯示高亮的) ★★★
-        map.setLayoutProperty('wineries-point', 'visibility', 'none');
-        map.setLayoutProperty('wineries-label', 'visibility', 'none');
-
-        // 移動地圖視圖
-        if (coords && coords.length === 2 && typeof coords[0] === 'number') {
-            map.flyTo({ 
-                center: coords, 
-                zoom: Math.min(Math.max(map.getZoom(), 12), 14.5), 
-                essential: true, 
-                duration: 1000 
-            });
-
-            // 顯示酒莊介紹 (彈出 Popup)
-            setTimeout(function() {
-                if (map.isStyleLoaded()) {
-                    new maplibregl.Popup({ offset: 25 })
-                        .setLngLat(coords)
-                        .setHTML(`
-                            <h3>${targetFeature.properties.name}</h3>
-                            <p>${targetFeature.properties.description || '尚無描述'}</p>
-                            ${targetFeature.properties.website ? `<p><a href="${targetFeature.properties.website}" target="_blank">官方網站</a></p>` : ''}
-                            ${targetFeature.properties.address ? `<p>${targetFeature.properties.address}</p>` : ''}
-                        `)
-                        .addTo(map);
-
-                     // 如果你有 info-panel，可以考慮這樣更新它
-                     // updateInfoPanel(targetFeature.properties); 
-                }
-            }, 1200); 
+        if (!qNorm) {
+          map.getSource('wineries').setData(masterWineries);
+          return;
         }
-    } else {
-        // 如果找不到酒莊
-        window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'log', message: '❌ Winery not found for search: ' + qRaw }));
-        alert(`地圖上無法找到 "${qRaw}" 的確切位置。`);
-        
-        // 恢復顯示所有酒莊並回到預設區域
-        map.getSource('wineries').setData(masterWineries); // 恢復所有數據
-        map.setLayoutProperty('wineries-point', 'visibility', 'visible');
-        map.setLayoutProperty('wineries-label', 'visibility', 'visible');
-        map.flyTo({ center: [4.75, 47.1667], zoom: 9, essential: true, duration: 800 });
-    }
-}
-// ================== UI 綁定 (保持不變或依你需求調整) ==================
-window.applyWinerySearch = applyWinerySearch; // 確保全局可訪問
+        const filteredWineries = masterWineries.features.filter(f => {
+          const name = _norm(f.properties?.name || '');
+          const combined = `${name} ${_norm(f.properties?.address || '')}`;
+          return combined.includes(qNorm);
+        });
+        map.getSource('wineries').setData({ type: 'FeatureCollection', features: filteredWineries });
+        if (filteredWineries.length > 0) {
+          const firstFeature = filteredWineries[0];
+          const coords = firstFeature.geometry.coordinates;
+          if (coords && coords.length === 2 && typeof coords[0] === 'number') {
+            map.flyTo({ center: coords, zoom: Math.min(Math.max(map.getZoom(), 12), 14.5), duration: 600 });
+          }
+        }
+      }
+window.applyWinerySearch = applyWinerySearch;
+      // ================== UI 綁定 ==================
+      const qInput = document.getElementById('q');
+      const btnAll = document.getElementById('showAll');
+      const btnWineries = document.getElementById('toggleWineries');
+      const wineryQ = document.getElementById('winery-q');
+      const btnClearWinery = document.getElementById('clear-winery');
+      const wineryContainer = document.getElementById('winery-search-container');
+      const goHomeBtn = document.getElementById('goHomeBtn');
 
-const qInput = document.getElementById('q');
-const btnAll = document.getElementById('showAll');
-const btnWineries = document.getElementById('toggleWineries');
-const wineryQ = document.getElementById('winery-q');
-const btnClearWinery = document.getElementById('clear-winery');
-const wineryContainer = document.getElementById('winery-search-container');
-const goHomeBtn = document.getElementById('goHomeBtn');
+      let tAOC = null;
+      qInput.addEventListener('input', ()=>{ clearTimeout(tAOC); tAOC = setTimeout(()=> applySearch(qInput.value), 220); });
+      btnAll.onclick   = ()=> { qInput.value=''; applySearch(''); };
+      goHomeBtn.onclick = goBackToHome;
 
-let tAOC = null;
-qInput.addEventListener('input', ()=>{ clearTimeout(tAOC); tAOC = setTimeout(()=> applySearch(qInput.value), 220); });
-btnAll.onclick   = ()=> { qInput.value=''; applySearch(''); };
-goHomeBtn.onclick = goBackToHome;
+      btnWineries.onclick = () => {
+        const currentVis = map.getLayoutProperty('wineries', 'visibility') === 'visible';
+        const newVis = currentVis ? 'none' : 'visible';
+        map.setLayoutProperty('wineries', 'visibility', newVis);
+        if (newVis === 'visible') {
+          btnWineries.textContent = '🍷';
+          btnWineries.title = '隱藏酒莊';
+          wineryContainer.style.display = 'block';
+        } else {
+          btnWineries.textContent = '🚫🍷';
+          btnWineries.title = '顯示酒莊';
+          wineryContainer.style.display = 'none';
+          wineryQ.value = '';
+          applyWinerySearch('');
+        }
+      };
 
-btnWineries.onclick = () => {
-    // 當切換酒莊顯示時，需要確保高亮狀態也被清理
-    const currentVis = map.getLayoutProperty('wineries-point', 'visibility') === 'visible'; // 檢查點層的狀態
-    const newVis = currentVis ? 'none' : 'visible';
-    
-    map.setLayoutProperty('wineries-point', 'visibility', newVis);
-    map.setLayoutProperty('wineries-label', 'visibility', newVis); // 標籤層也要同步
-
-    // 清理高亮酒莊
-    if (map.getSource('highlight-winery')) {
-        if (map.getLayer('highlight-winery-point')) map.removeLayer('highlight-winery-point');
-        if (map.getLayer('highlight-winery-label')) map.removeLayer('highlight-winery-label');
-        map.removeSource('highlight-winery');
-    }
-    document.querySelectorAll('.maplibregl-popup').forEach(p => p.remove()); // 移除所有 popup
-    document.getElementById('info-panel').style.display = 'none'; // 隱藏面板
-
-    if (newVis === 'visible') {
-        btnWineries.textContent = '🍷';
-        btnWineries.title = '隱藏酒莊';
-        wineryContainer.style.display = 'block';
-        // 恢復原始的 masterWineries 數據，防止之前篩選只顯示了部分
-        map.getSource('wineries').setData(masterWineries); 
-        map.flyTo({ center: [4.75, 47.1667], zoom: 9, essential: true, duration: 800 }); // 回到預設視圖
-    } else {
-        btnWineries.textContent = '🚫🍷';
-        btnWineries.title = '顯示酒莊';
-        wineryContainer.style.display = 'none';
+      let tWinery = null;
+      wineryQ.addEventListener('input', ()=>{ clearTimeout(tWinery); tWinery = setTimeout(()=> applyWinerySearch(wineryQ.value), 220); });
+      btnClearWinery.onclick = ()=> {
         wineryQ.value = '';
-        // 由於已經隱藏了所有層，這裡不需要再調用 applyWinerySearch('')
-    }
-};
-
-let tWinery = null;
-wineryQ.addEventListener('input', ()=>{ clearTimeout(tWinery); tWinery = setTimeout(()=> applyWinerySearch(wineryQ.value), 220); });
-
-btnClearWinery.onclick = ()=> {
-    wineryQ.value = '';
-    applyWinerySearch(''); // 呼叫 applyWinerySearch('') 會清理高亮並恢復顯示所有酒莊
-    // 如果toggleWineries按鈕的狀態不是可見，則讓它可見 (這段邏輯可以移除，因為applyWinerySearch('')已經會處理顯示所有酒莊)
-    // if (map.getLayoutProperty('wineries-point', 'visibility') !== 'visible') {
-    //   map.setLayoutProperty('wineries-point', 'visibility', 'visible');
-    //   map.setLayoutProperty('wineries-label', 'visibility', 'visible');
-    //   btnWineries.textContent = '🍷';
-    //   btnWineries.title = '隱藏酒莊';
-    // }
-};
+        applyWinerySearch('');
+        if (map.getLayoutProperty('wineries', 'visibility') !== 'visible') {
+          map.setLayoutProperty('wineries', 'visibility', 'visible');
+          btnWineries.textContent = '🍷';
+          btnWineries.title = '隱藏酒莊';
+        }
+      };
 
       // 篩選按鈕
      function updateAocVisibility() {
