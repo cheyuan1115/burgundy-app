@@ -1441,22 +1441,22 @@ window.applyWinerySearch = applyWinerySearch;
       btnAll.onclick   = ()=> { qInput.value=''; applySearch(''); };
       goHomeBtn.onclick = goBackToHome;
 
-      btnWineries.onclick = () => {
-        const currentVis = map.getLayoutProperty('wineries', 'visibility') === 'visible';
-        const newVis = currentVis ? 'none' : 'visible';
-        map.setLayoutProperty('wineries', 'visibility', newVis);
-        if (newVis === 'visible') {
-          btnWineries.textContent = '🍷';
-          btnWineries.title = '隱藏酒莊';
-          wineryContainer.style.display = 'block';
-        } else {
-          btnWineries.textContent = '🚫🍷';
-          btnWineries.title = '顯示酒莊';
-          wineryContainer.style.display = 'none';
-          wineryQ.value = '';
-          applyWinerySearch('');
-        }
-      };
+     btnWineries.onclick = () => {
+    const currentVis = map.getLayoutProperty('wineries', 'visibility') === 'visible';
+    const newVis = currentVis ? 'none' : 'visible';
+    map.setLayoutProperty('wineries', 'visibility', newVis);
+    if (newVis === 'visible') {
+        btnWineries.textContent = '🍷';
+        btnWineries.title = '隱藏酒莊';
+        wineryContainer.style.display = 'block';
+    } else {
+        btnWineries.textContent = '🚫🍷';
+        btnWineries.title = '顯示酒莊';
+        wineryContainer.style.display = 'none';
+        wineryQ.value = '';
+        applyWinerySearch('', false);  // ★ 傳 false，不要強制顯示圖層
+    }
+};
 
       let tWinery = null;
       wineryQ.addEventListener('input', ()=>{ clearTimeout(tWinery); tWinery = setTimeout(()=> applyWinerySearch(wineryQ.value), 220); });
