@@ -1523,8 +1523,11 @@ applyWinerySearch('', false);
         }
       };
 
-      let tWinery = null;
-      wineryQ.addEventListener('input', ()=>{ clearTimeout(tWinery); tWinery = setTimeout(()=> (wineryQ.value), 220); });
+     let tWinery = null;
+wineryQ.addEventListener('input', ()=>{ 
+    clearTimeout(tWinery); 
+    tWinery = setTimeout(()=> window.applyWinerySearch(wineryQ.value), 220); 
+});
       btnClearWinery.onclick = ()=> {
         wineryQ.value = '';
         ('');
