@@ -1519,15 +1519,15 @@ window.applyWinerySearch = applyWinerySearch;
           btnWineries.title = '顯示酒莊';
           wineryContainer.style.display = 'none';
           wineryQ.value = '';
-          applyWinerySearch('');
+applyWinerySearch('', false);
         }
       };
 
       let tWinery = null;
-      wineryQ.addEventListener('input', ()=>{ clearTimeout(tWinery); tWinery = setTimeout(()=> applyWinerySearch(wineryQ.value), 220); });
+      wineryQ.addEventListener('input', ()=>{ clearTimeout(tWinery); tWinery = setTimeout(()=> (wineryQ.value), 220); });
       btnClearWinery.onclick = ()=> {
         wineryQ.value = '';
-        applyWinerySearch('');
+        ('');
         if (map.getLayoutProperty('wineries', 'visibility') !== 'visible') {
           map.setLayoutProperty('wineries', 'visibility', 'visible');
           btnWineries.textContent = '🍷';
