@@ -1609,29 +1609,23 @@ btnClearWinery.onclick = ()=> {
 
       // 酒窖顯示切換
       const cellarBtn = document.getElementById('toggleCellarBtn');
-      cellarBtn.style.background = '#007bff';
-      cellarBtn.style.color = '#fff';
-      cellarBtn.style.border = 'none';
-      cellarBtn.addEventListener('click', () => {
-        // 這裡直接反轉
-        cellarVisible = !cellarVisible;
-        if (cellarVisible) {
-          cellarBtn.style.background = '#007bff';
-          cellarBtn.style.color = '#fff';
-          cellarBtn.style.border = 'none';
-          if (window.inventoryMarkers) {
+      // 預設啟動狀態
+cellarBtn.classList.remove('inactive');
+cellarBtn.addEventListener('click', () => {
+    cellarVisible = !cellarVisible;
+    if (cellarVisible) {
+        cellarBtn.classList.remove('inactive');
+        if (window.inventoryMarkers) {
             window.inventoryMarkers.forEach(m => m.addTo(map));
-          }
-        } else {
-          cellarBtn.style.background = '#f8f8f8';
-          cellarBtn.style.color = '#333';
-          cellarBtn.style.border = '1px solid #ccc';
-          if (window.inventoryMarkers) {
-            window.inventoryMarkers.forEach(m => m.remove());
-          }
         }
-        cellarBtn.blur();
-      });
+    } else {
+        cellarBtn.classList.add('inactive');
+        if (window.inventoryMarkers) {
+            window.inventoryMarkers.forEach(m => m.remove());
+        }
+    }
+    cellarBtn.blur();
+});
 
       // 限制放大
       const ZMAX = 14.5;
