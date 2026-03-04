@@ -1485,9 +1485,8 @@ const gridHTML = (meta && (meta.area_ha || meta.elevation || meta.soil)) ? `
   </div>
 ` : '';
 
-const noteHTML = meta?.style_note ? `<div class="panel-note">🍷 ${meta.style_note}</div>` : '';
-const notesHTML = meta?.notes ? `<div class="panel-notes-text">${meta.notes}</div>` : '';
-const wsHTML = meta?.link ? `<div style="margin-top:8px; font-size:15px;">
+const noteHTML = meta?.style_note ? `<div class="panel-note" onclick="this.style.fontSize=this.style.fontSize==='20px'?'15px':'20px'">🍷 ${meta.style_note}</div>` : '';
+const notesHTML = meta?.notes ? `<div class="panel-notes-text" onclick="this.style.fontSize=this.style.fontSize==='20px'?'15px':'20px'">${meta.notes}</div>` : '';        const wsHTML = meta?.link ? `<div style="margin-top:8px; font-size:15px;">
   <a href="javascript:void(0)" onclick="openExternalLink('${meta.link.replace(/'/g,"\\'")}')">🔗 Wine-Searcher</a>
 </div>` : '';
 
