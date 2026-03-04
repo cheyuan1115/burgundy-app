@@ -54,7 +54,178 @@
       padding-top: 6px;
       display: none;
     }
+/* ===== 底部面板：卡片式排版 ===== */
+#info-panel {
+  font-size: 16px;
+  line-height: 1.7;
+}
 
+/* 標題區 */
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.panel-title {
+  font-size: 22px;
+  font-weight: 800;
+  flex: 1;
+}
+
+/* 等級標籤 */
+.level-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  color: white;
+  white-space: nowrap;
+}
+.level-badge.GC { background: #cc0033; }
+.level-badge.PC { background: #ff7f0e; }
+.level-badge.VI { background: #1f77b4; }
+.level-badge.RE { background: #2ca02c; }
+
+/* 資料格狀區 */
+.panel-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 12px 0;
+}
+.panel-stat {
+  background: #f8f8f8;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+.panel-stat span {
+  display: block;
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 2px;
+}
+.panel-stat b {
+  font-size: 16px;
+  color: #222;
+}
+
+/* 風格備註區 */
+.panel-note {
+  background: #f0f7f0;
+  border-left: 3px solid #2ca02c;
+  border-radius: 0 8px 8px 0;
+  padding: 8px 12px;
+  margin: 10px 0;
+  font-size: 15px;
+  color: #2c7d2c;
+  line-height: 1.6;
+}
+
+/* 擁有酒莊區 */
+.panel-owners {
+  margin: 12px 0;
+}
+.panel-owners-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.panel-owners ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.panel-owners li {
+  font-size: 15px;
+  padding: 5px 0;
+  border-bottom: 1px solid #eee;
+  line-height: 1.5;
+}
+.panel-owners li:last-child { border-bottom: none; }
+
+/* 備註文字 */
+.panel-notes-text {
+  font-size: 15px;
+  color: #555;
+  line-height: 1.7;
+  margin: 8px 0;
+}
+
+/* 庫存狀態 */
+.panel-cellar-status {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  background: #f8f8f8;
+  border-radius: 8px;
+}
+
+/* 管理按鈕 */
+.panel-manage-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  background: #800000;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  gap: 8px;
+}
+
+/* 酒莊介紹 */
+.panel-winery-name {
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+.panel-winery-addr {
+  font-size: 15px;
+  color: #666;
+  margin-bottom: 10px;
+}
+.panel-winery-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+.panel-winery-note {
+  margin-top: 12px;
+  border-top: 1px solid #eee;
+  padding-top: 12px;
+}
+.panel-winery-note-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #555;
+  margin-bottom: 6px;
+}
+.panel-winery-note-text {
+  font-size: 15px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+/* 暗模式適配 */
+@media (prefers-color-scheme: dark) {
+  .panel-stat { background: #2a2a2a; }
+  .panel-stat b { color: #e0e0e0; }
+  .panel-note { background: #1a2e1a; border-left-color: #6ed16e; color: #6ed16e; }
+  .panel-owners li { border-bottom-color: #333; }
+  .panel-cellar-status { background: #2a2a2a; }
+  .panel-manage-btn { background: #990000; }
+  .panel-winery-note { border-top-color: #333; }
+}
     /* ************ 手機資訊面板 CSS ************ */
     #info-panel {
       position: fixed;
@@ -1205,19 +1376,58 @@ map.addLayer({
         }
         const cellarStatusHTML = `<div id="cellar-status-${f.id}" style="font-weight: bold; font-size: 14px; margin-bottom: 8px;">${statusText}</div>`;
 
-        const finalHTML = `
-          <div style="font-weight:700">${info.title}</div>
-          <div class="small" style="color:#666;margin-top:6px">等級：${levelText}</div>
-          ${subRow}
-          ${extra}
-          <div style="margin-top:10px; border-top: 1px solid #eee; padding-top: 8px;">
-            ${cellarStatusHTML}
-            <button class="btn" style="width: 100%; display: flex; align-items: center; justify-content: center; background: #f0f0f0;"
-              onclick="(function(){ if (window.ReactNativeWebView) { window.ReactNativeWebView.postMessage(JSON.stringify({ __from:'wv_cellar', type:'open_manager', aocTitle:'${aocTitle}', aocLevel:'${aocLevel}', climatName:'${climatName}', aocKey:'${aoc_key_for_cellar}' })); } })()">
-              <span style="font-size: 18px; margin-right: 8px;">🍷</span> 管理我的收藏 / 紀錄
-            </button>
-          </div>
-        `;
+        const levelClass = info.level; // GC / PC / VI / RE
+const levelBadge = `<span class="level-badge ${levelClass}">${levelText}</span>`;
+
+const locationText = subText ? subText.replace('地塊：','').replace('地點：','') : '';
+
+const gridHTML = (meta && (meta.area_ha || meta.elevation || meta.aspect || meta.soil)) ? `
+  <div class="panel-grid">
+    ${meta.area_ha ? `<div class="panel-stat"><span>面積</span><b>${meta.area_ha} ha</b></div>` : ''}
+    ${meta.elevation ? `<div class="panel-stat"><span>海拔</span><b>${meta.elevation}</b></div>` : ''}
+    ${meta.aspect ? `<div class="panel-stat"><span>坡向</span><b>${meta.aspect}</b></div>` : ''}
+    ${meta.soil ? `<div class="panel-stat"><span>土壤</span><b>${meta.soil}</b></div>` : ''}
+  </div>
+` : '';
+
+const noteHTML = meta?.style_note ? `<div class="panel-note">🍷 ${meta.style_note}</div>` : '';
+const notesHTML = meta?.notes ? `<div class="panel-notes-text">${meta.notes}</div>` : '';
+const wsHTML = meta?.link ? `<div style="margin-top:8px; font-size:15px;">
+  <a href="javascript:void(0)" onclick="openExternalLink('${meta.link.replace(/'/g,"\\'")}')">🔗 Wine-Searcher</a>
+</div>` : '';
+
+const ownersSection = ownersHTML ? `<div class="panel-owners">
+  <div class="panel-owners-title">🥂 擁有酒莊</div>
+  <ul>${owners.map(owner => {
+    const monopole = owner.is_monopole ? ' <b>(獨佔園)</b>' : '';
+    const area = owner.ha ? ` <span style="color:#888">(${owner.ha} ha)</span>` : '';
+    const ownerName = owner.search_link
+      ? `<a href="javascript:void(0)" onclick="openExternalLink('${owner.search_link.replace(/'/g,"\\'")}')">${owner.name}</a>`
+      : owner.name;
+    return `<li>${ownerName}${monopole}${area}</li>`;
+  }).join('')}</ul>
+</div>` : '';
+
+const finalHTML = `
+  <div class="panel-header">
+    <div class="panel-title">${info.title}</div>
+    ${levelBadge}
+  </div>
+  ${locationText ? `<div style="font-size:15px; color:#666; margin-bottom:10px;">📍 ${locationText}</div>` : ''}
+  ${meta?.zh && meta.zh !== info.title ? `<div style="font-size:16px; color:#444; margin-bottom:8px;">📖 ${meta.zh}</div>` : ''}
+  ${gridHTML}
+  ${noteHTML}
+  ${notesHTML}
+  ${ownersSection}
+  ${wsHTML}
+  <div style="margin-top:12px; border-top:1px solid #eee; padding-top:12px;">
+    <div class="panel-cellar-status">${statusText}</div>
+    <button class="panel-manage-btn"
+      onclick="(function(){ if (window.ReactNativeWebView) { window.ReactNativeWebView.postMessage(JSON.stringify({ __from:'wv_cellar', type:'open_manager', aocTitle:'${aocTitle}', aocLevel:'${aocLevel}', climatName:'${climatName}', aocKey:'${aoc_key_for_cellar}' })); } })()">
+      🍷 管理我的收藏 / 紀錄
+    </button>
+  </div>
+`;
 
         panelContent.innerHTML = finalHTML;
         infoPanel.classList.add('visible');
@@ -1269,26 +1479,21 @@ map.addLayer({
         const wsUrl = `https://www.wine-searcher.com/find/${encodeURIComponent(name)}`;
 
         // 2. 組合 HTML (加入 Wine-Searcher 按鈕)
-        const html = `
-          <div style="font-weight:700; font-size: 18px; margin-bottom: 6px;">${name}</div>
-          
-          ${addr ? `<div class="small" style="color:#666; margin-bottom: 8px;">📍 ${addr}</div>` : ''}
-          
-          <div style="display: flex; flex-direction: column; gap: 6px; font-size: 14px;">
-            ${phone ? `<div>☎ <a href="tel:${phone.replace(/\s/g,'')}" style="color:#333;text-decoration:none;">${phone}</a></div>` : ''}
-            
-            ${site ? `<div>🔗 <a href="javascript:void(0)" onclick="openExternalLink('${site}')" style="color:#007bff;">官方網站</a></div>` : ''}
-            
-            <!-- ★ 新增 Wine-Searcher 按鈕 -->
-            <div>🔍 <a href="javascript:void(0)" onclick="openExternalLink('${wsUrl}')" style="color:#d32f2f; font-weight:500;">在 Wine-Searcher 搜尋</a></div>
-          </div>
-
-          ${note ? `
-            <div style="margin-top:12px; border-top:1px solid #eee; padding-top:10px;">
-              <div style="font-weight:bold; font-size:13px; color:#555; margin-bottom:4px;">介紹 / 筆記</div>
-<div style="font-size: 15px; line-height: 1.6; white-space: pre-wrap;">${note}</div>            </div>
-          ` : ''}
-        `;
+const html = `
+  <div class="panel-winery-name">${name}</div>
+  ${addr ? `<div class="panel-winery-addr">📍 ${addr}</div>` : ''}
+  <div class="panel-winery-links">
+    ${phone ? `<div>☎ <a href="tel:${phone.replace(/\s/g,'')}" style="color:#333;text-decoration:none;">${phone}</a></div>` : ''}
+    ${site ? `<div>🔗 <a href="javascript:void(0)" onclick="openExternalLink('${site}')" style="color:#007bff;">官方網站</a></div>` : ''}
+    <div>🔍 <a href="javascript:void(0)" onclick="openExternalLink('${wsUrl}')" style="color:#d32f2f; font-weight:500;">在 Wine-Searcher 搜尋</a></div>
+  </div>
+  ${note ? `
+    <div class="panel-winery-note">
+      <div class="panel-winery-note-title">介紹 / 筆記</div>
+      <div class="panel-winery-note-text">${note}</div>
+    </div>
+  ` : ''}
+`;
 
         // 寫入底部面板並顯示
         const infoPanel = document.getElementById('info-panel');
