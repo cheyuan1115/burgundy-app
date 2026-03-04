@@ -356,92 +356,137 @@
   .cellar-marker span { font-size: 18px; }
 
   /* ===== 暗模式 ===== */
-  @media (prefers-color-scheme: dark) {
-    body { background-color: #121212; color: #e0e0e0; }
+ /* ===== 暗模式 ===== */
+@media (prefers-color-scheme: dark) {
+  html, body { background-color: #121212; color: #e0e0e0; }
 
-    /* 主要 UI 容器 */
-    .ui,
-    .legend,
-    .maplibregl-popup-content {
-      background-color: #1e1e1e;
-      color: #e0e0e0;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
-    }
+  /* 主要 UI 容器 */
+  .ui,
+  .legend,
+  .maplibregl-popup-content {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+  }
 
-    /* 底部面板獨立設定，確保暗底 */
-    #info-panel {
-      background-color: #181818;
-      color: #e8e8e8;
-      box-shadow: 0 -4px 20px rgba(0,0,0,0.6);
-    }
+  /* 底部面板 */
+  #info-panel {
+    background-color: #181818;
+    color: #e8e8e8;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.6);
+  }
 
-    .ui input[type="text"] {
-      background-color: #2a2a2a;
-      border: 1px solid #444;
-      color: #e0e0e0;
-    }
-    .btn { background: #2a2a2a; color: #e0e0e0; border: 1px solid #444; }
-    .btn:hover { background: #3a3a3a; }
-    .close-btn { color: #bbb; }
-    .winery-search-box { border-top: 1px solid #333; }
+  /* 輸入框 */
+  .ui input[type="text"] {
+    background-color: #2a2a2a;
+    border: 1px solid #444;
+    color: #e0e0e0;
+  }
+  .ui input[type="text"]::placeholder { color: #888; }
 
-    /* 篩選按鈕 */
-    #filter-panel { background: #1e1e1e; }
-    #filter-panel .btn { background: #0d6efd !important; color: white !important; border: none !important; }
-    #filter-panel .btn.inactive { background: #343a40 !important; color: #adb5bd !important; border: 1px solid #495057 !important; }
-    #filter-panel .btn:hover { background: #0b5ed7 !important; }
+  /* 一般按鈕 */
+  .btn {
+    background: #2a2a2a;
+    color: #e0e0e0;
+    border: 1px solid #444;
+  }
+  .btn:hover { background: #3a3a3a; color: #ffffff; }
 
-    /* 標題 */
-    .panel-title { color: #ffffff; }
-    .panel-winery-name { color: #ffffff; }
+  .close-btn { color: #bbb; background: transparent; }
+  .winery-search-box { border-top: 1px solid #333; }
 
-    /* 資料卡片：深色底 + 亮字 */
-    .panel-stat {
-      background: #242424;
-      border: 1px solid #383838;
-    }
-    .panel-stat span { color: #999; }
-    .panel-stat b { color: #f0f0f0; }
+  /* UI 標題 */
+  .ui .title-row { color: #ffffff; }
 
-    .panel-row-item {
-      background: #242424;
-      border: 1px solid #383838;
-    }
-    .panel-row-item span { color: #999; }
-    .panel-row-item b { color: #f0f0f0; }
+  /* 篩選面板 */
+  #filter-panel {
+    background: #1e1e1e;
+    color: #e0e0e0;
+  }
+  #filter-panel div[style*="font-weight"] { color: #e0e0e0; }
+  #filter-panel .btn {
+    background: #0d6efd !important;
+    color: white !important;
+    border: none !important;
+  }
+  #filter-panel .btn.inactive {
+    background: #343a40 !important;
+    color: #adb5bd !important;
+    border: 1px solid #495057 !important;
+  }
+  #filter-panel .btn:hover {
+    background: #0b5ed7 !important;
+    color: white !important;
+  }
 
-    /* 風格備註 */
-    .panel-note {
-      background: #1a2e1a;
-      border-left-color: #66bb6a;
-      color: #a5d6a7;
-    }
+  /* 面板標題 */
+  .panel-title { color: #ffffff; }
+  .panel-winery-name { color: #ffffff; }
+  .panel-header { color: #ffffff; }
 
-    /* 備註與其他文字 */
-    .panel-notes-text { color: #b8b8b8; }
-    .panel-owners-title { color: #e0e0e0; }
-    .panel-owners li { color: #cccccc; border-bottom-color: #333; }
+  /* 位置小字 */
+  #panel-content > div[style*="color:#666"] { color: #999 !important; }
 
-    /* 庫存狀態 */
-    .panel-cellar-status {
-      background: #242424;
-      color: #f0f0f0;
-      border: 1px solid #383838;
-    }
+  /* 資料卡片 */
+  .panel-stat {
+    background: #242424;
+    border: 1px solid #383838;
+  }
+  .panel-stat span { color: #999; }
+  .panel-stat b { color: #f0f0f0; }
 
-    /* 管理按鈕 */
-    .panel-manage-btn { background: #9a0000; }
-    .panel-manage-btn:active { background: #700000; }
+  .panel-row-item {
+    background: #242424;
+    border: 1px solid #383838;
+  }
+  .panel-row-item span { color: #999; }
+  .panel-row-item b { color: #f0f0f0; }
 
-    /* 酒莊介紹 */
-    .panel-winery-addr { color: #aaa; }
-    .panel-winery-note { border-top-color: #333; }
-    .panel-winery-note-title { color: #999; }
-    .panel-winery-note-text { color: #cccccc; }
+  /* 風格備註 */
+  .panel-note {
+    background: #1a2e1a;
+    border-left-color: #66bb6a;
+    color: #a5d6a7;
+  }
 
-    /* 連結 */
-    #panel-content a { color: #82b1ff; }
-    #panel-content a:visited { color: #ce93d8; }
+  /* 備註文字 */
+  .panel-notes-text { color: #b8b8b8; }
+
+  /* 擁有者 */
+  .panel-owners-title { color: #e0e0e0; }
+  .panel-owners li { color: #cccccc; border-bottom-color: #333; }
+
+  /* 庫存狀態 */
+  .panel-cellar-status {
+    background: #242424;
+    color: #f0f0f0;
+    border: 1px solid #383838;
+  }
+
+  /* 管理按鈕 */
+  .panel-manage-btn { background: #9a0000; color: #ffffff; }
+  .panel-manage-btn:active { background: #700000; }
+
+  /* 酒莊介紹 */
+  .panel-winery-addr { color: #aaa; }
+  .panel-winery-links { color: #e0e0e0; }
+  .panel-winery-links a[style*="color:#333"] { color: #ccc !important; }
+  .panel-winery-note { border-top-color: #333; }
+  .panel-winery-note-title { color: #999; }
+  .panel-winery-note-text { color: #cccccc; }
+
+  /* 分隔線 */
+  #panel-content > div[style*="border-top"] {
+    border-top-color: #333 !important;
+  }
+
+  /* 連結 */
+  #panel-content a { color: #82b1ff; }
+  #panel-content a:visited { color: #ce93d8; }
+
+  /* Popup 文字 */
+  .maplibregl-popup-content div[style*="color:#666"] { color: #aaa !important; }
+
   }
 </style>
   <script>
