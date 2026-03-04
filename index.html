@@ -1362,12 +1362,20 @@ const levelBadge = `<span class="level-badge ${levelClass}">${levelText}</span>`
 
 const locationText = subText ? subText.replace('地塊：','').replace('地點：','') : '';
 
-const gridHTML = (meta && (meta.area_ha || meta.elevation || meta.aspect || meta.soil)) ? `
+const zhName = (meta?.zh && meta.zh !== info.title) ? meta.zh : '';
+
+const topRowHTML = (zhName || meta?.aspect) ? `
+  <div class="panel-row-split">
+    ${zhName ? `<div class="panel-row-item"><span>中文名</span><b>${zhName}</b></div>` : '<div></div>'}
+    ${meta?.aspect ? `<div class="panel-row-item"><span>坡向</span><b>${meta.aspect}</b></div>` : '<div></div>'}
+  </div>
+` : '';
+
+const gridHTML = (meta && (meta.area_ha || meta.elevation || meta.soil)) ? `
   <div class="panel-grid">
     ${meta.area_ha ? `<div class="panel-stat"><span>面積</span><b>${meta.area_ha} ha</b></div>` : ''}
     ${meta.elevation ? `<div class="panel-stat"><span>海拔</span><b>${meta.elevation}</b></div>` : ''}
-    ${meta.aspect ? `<div class="panel-stat"><span>坡向</span><b>${meta.aspect}</b></div>` : ''}
-    ${meta.soil ? `<div class="panel-stat"><span>土壤</span><b>${meta.soil}</b></div>` : ''}
+    ${meta.soil ? `<div class="panel-stat full-width"><span>土壤</span><b>${meta.soil}</b></div>` : ''}
   </div>
 ` : '';
 
@@ -1395,7 +1403,7 @@ const finalHTML = `
     ${levelBadge}
   </div>
   ${locationText ? `<div style="font-size:15px; color:#666; margin-bottom:10px;">📍 ${locationText}</div>` : ''}
-  ${meta?.zh && meta.zh !== info.title ? `<div style="font-size:16px; color:#444; margin-bottom:8px;">📖 ${meta.zh}</div>` : ''}
+${topRowHTML}
   ${gridHTML}
   ${noteHTML}
   ${notesHTML}
