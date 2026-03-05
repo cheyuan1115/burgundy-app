@@ -562,6 +562,12 @@
   </div>
 
   <script>
+    function toggleFontSize(el) {
+  var b = el.querySelector('b');
+  var isBig = el.getAttribute('data-big') === '1';
+  b.style.fontSize = isBig ? '15px' : '22px';
+  el.setAttribute('data-big', isBig ? '0' : '1');
+}
     const AOC_DATA_FILE    = 'https://raw.githubusercontent.com/cheyuan1115/burgundy-app/main/burgundy.geojson';
     const WINERY_DATA_FILE = 'https://raw.githubusercontent.com/cheyuan1115/burgundy-app/main/wineries.geojson';
     const META_DATA_FILE   = 'https://raw.githubusercontent.com/cheyuan1115/burgundy-app/main/meta.json';
@@ -1481,34 +1487,20 @@ const gridHTML = (meta && (meta.area_ha || meta.elevation || meta.soil)) ? `
   <div class="panel-grid">
     ${meta.area_ha ? `<div class="panel-stat"><span>面積</span><b>${meta.area_ha} ha</b></div>` : ''}
     ${meta.elevation ? `<div class="panel-stat"><span>海拔</span><b>${meta.elevation}</b></div>` : ''}
-    ${meta.soil ? `<div class="panel-stat full-width"><span>土壤</span><b>${meta.soil}</b></div>` : ''}
+    ${meta.soil ? `<div class="panel-stat full-width" style="cursor:pointer;" onclick="toggleFontSize(this)"><span>土壤 👆</span><b style="line-height:1.7;">${meta.soil}</b></div>` : ''}
   </div>
 ` : '';
 
 const noteHTML = meta?.style_note ? `
-  <div class="panel-stat full-width" style="cursor:pointer;" onclick="
-    var b=this.querySelector('b');
-    var isOpen=this.getAttribute('data-open')==='1';
-    b.style.webkitLineClamp=isOpen?'3':'unset';
-    b.style.display=isOpen?'-webkit-box':'block';
-    this.setAttribute('data-open', isOpen?'0':'1');
-    this.querySelector('.expand-hint').textContent=isOpen?'▼ 展開':'▲ 收合';
-  ">
-    <span>🍷 風格 <span class="expand-hint" style="float:right;color:#aaa;font-size:11px;">▼ 展開</span></span>
-    <b style="font-weight:400;line-height:1.7;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;">${meta.style_note}</b>
+  <div class="panel-stat full-width" style="cursor:pointer;" onclick="toggleFontSize(this)">
+    <span>🍷 風格 👆</span>
+    <b style="font-weight:400; line-height:1.7;">${meta.style_note}</b>
   </div>` : '';
 
 const notesHTML = meta?.notes ? `
-  <div class="panel-stat full-width" style="cursor:pointer;" onclick="
-    var b=this.querySelector('b');
-    var isOpen=this.getAttribute('data-open')==='1';
-    b.style.webkitLineClamp=isOpen?'3':'unset';
-    b.style.display=isOpen?'-webkit-box':'block';
-    this.setAttribute('data-open', isOpen?'0':'1');
-    this.querySelector('.expand-hint').textContent=isOpen?'▼ 展開':'▲ 收合';
-  ">
-    <span>📝 備註 <span class="expand-hint" style="float:right;color:#aaa;font-size:11px;">▼ 展開</span></span>
-    <b style="font-weight:400;line-height:1.7;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;">${meta.notes}</b>
+  <div class="panel-stat full-width" style="cursor:pointer;" onclick="toggleFontSize(this)">
+    <span>📝 備註 👆</span>
+    <b style="font-weight:400; line-height:1.7;">${meta.notes}</b>
   </div>` : '';
 const wsHTML = meta?.link ? `<div style="margin-top:8px; font-size:15px;">
   <a href="javascript:void(0)" onclick="openExternalLink('${meta.link.replace(/'/g,"\\'")}')">🔗 Wine-Searcher</a>
