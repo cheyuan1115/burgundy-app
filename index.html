@@ -1231,19 +1231,29 @@ map.addLayer({
         const f = e.features && e.features[0];
         if (!f) return;
 // 點擊後讓該地塊立體浮起
-  const clickedId = f.id;
+ // 點擊後讓該地塊立體浮起
   const base = window.__AOC_BASE_FC__;
   if (base) {
+    // 先把所有地塊的 __searched 清零
     const updated = {
       type: 'FeatureCollection',
       features: base.features.map(feat => ({
         ...feat,
         properties: {
           ...feat.properties,
-          __searched: feat.id === clickedId ? 1 : 0
+          __searched: 0
         }
       }))
     };
+    // 找出同一個 aoc_key 的所有地塊一起浮起（例如一級園可能有多塊）
+    const clickedKey = f.properties.aoc_key;
+    updated.features = updated.features.map(feat => ({
+      ...feat,
+      properties: {
+        ...feat.properties,
+        __searched: feat.properties.aoc_key === clickedKey ? 1 : 0
+      }
+    }));
     map.getSource('aoc').setData(updated);
   }
         const summary = window.CELLAR_DATA_TO_DRAW || window.__INVENTORY_SUMMARY__ || {};
