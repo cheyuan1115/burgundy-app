@@ -512,22 +512,7 @@
   }
 </style>
   <script>
-    function toggleExpand(el) {
-  var b = el.querySelector('b');
-  var hint = el.querySelector('.expand-hint');
-  var isOpen = el.getAttribute('data-open') === '1';
-  if (isOpen) {
-    b.style.display = '-webkit-box';
-    b.style.webkitLineClamp = '3';
-    hint.textContent = '▼ 展開';
-    el.setAttribute('data-open', '0');
-  } else {
-    b.style.display = 'block';
-    b.style.webkitLineClamp = 'unset';
-    hint.textContent = '▲ 收合';
-    el.setAttribute('data-open', '1');
-  }
-}
+    
     // 阻止 iOS 全頁 pinch-zoom
     (function () {
       function block(e){ e.preventDefault(); }
@@ -578,6 +563,22 @@
   </div>
 
   <script>
+    function toggleExpand(el) {
+  var b = el.querySelector('b');
+  var hint = el.querySelector('.expand-hint');
+  var isOpen = el.getAttribute('data-open') === '1';
+  if (isOpen) {
+    b.style.display = '-webkit-box';
+    b.style.webkitLineClamp = '3';
+    hint.textContent = '▼ 展開';
+    el.setAttribute('data-open', '0');
+  } else {
+    b.style.display = 'block';
+    b.style.webkitLineClamp = 'unset';
+    hint.textContent = '▲ 收合';
+    el.setAttribute('data-open', '1');
+  }
+}
     const AOC_DATA_FILE    = 'https://raw.githubusercontent.com/cheyuan1115/burgundy-app/main/burgundy.geojson';
     const WINERY_DATA_FILE = 'https://raw.githubusercontent.com/cheyuan1115/burgundy-app/main/wineries.geojson';
     const META_DATA_FILE   = 'https://raw.githubusercontent.com/cheyuan1115/burgundy-app/main/meta.json';
