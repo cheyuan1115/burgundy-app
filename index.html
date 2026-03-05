@@ -1485,8 +1485,32 @@ const gridHTML = (meta && (meta.area_ha || meta.elevation || meta.soil)) ? `
   </div>
 ` : '';
 
-const noteHTML = meta?.style_note ? `<div class="panel-note" onclick="this.style.fontSize=this.style.fontSize==='20px'?'15px':'20px'">🍷 ${meta.style_note}</div>` : '';
-const notesHTML = meta?.notes ? `<div class="panel-notes-text" onclick="this.style.fontSize=this.style.fontSize==='20px'?'15px':'20px'">${meta.notes}</div>` : '';const wsHTML = meta?.link ? `<div style="margin-top:8px; font-size:15px;">
+const noteHTML = meta?.style_note ? `
+  <div class="panel-stat full-width" style="cursor:pointer;" onclick="
+    var b=this.querySelector('b');
+    var isOpen=this.getAttribute('data-open')==='1';
+    b.style.webkitLineClamp=isOpen?'3':'unset';
+    b.style.display=isOpen?'-webkit-box':'block';
+    this.setAttribute('data-open', isOpen?'0':'1');
+    this.querySelector('.expand-hint').textContent=isOpen?'▼ 展開':'▲ 收合';
+  ">
+    <span>🍷 風格 <span class="expand-hint" style="float:right;color:#aaa;font-size:11px;">▼ 展開</span></span>
+    <b style="font-weight:400;line-height:1.7;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;">${meta.style_note}</b>
+  </div>` : '';
+
+const notesHTML = meta?.notes ? `
+  <div class="panel-stat full-width" style="cursor:pointer;" onclick="
+    var b=this.querySelector('b');
+    var isOpen=this.getAttribute('data-open')==='1';
+    b.style.webkitLineClamp=isOpen?'3':'unset';
+    b.style.display=isOpen?'-webkit-box':'block';
+    this.setAttribute('data-open', isOpen?'0':'1');
+    this.querySelector('.expand-hint').textContent=isOpen?'▼ 展開':'▲ 收合';
+  ">
+    <span>📝 備註 <span class="expand-hint" style="float:right;color:#aaa;font-size:11px;">▼ 展開</span></span>
+    <b style="font-weight:400;line-height:1.7;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;">${meta.notes}</b>
+  </div>` : '';
+const wsHTML = meta?.link ? `<div style="margin-top:8px; font-size:15px;">
   <a href="javascript:void(0)" onclick="openExternalLink('${meta.link.replace(/'/g,"\\'")}')">🔗 Wine-Searcher</a>
 </div>` : '';
 
