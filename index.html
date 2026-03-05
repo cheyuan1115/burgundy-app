@@ -187,7 +187,11 @@
     font-weight: 600;
     line-height: 1.6;
   }
-
+/* 風格框專用綠色字 */
+.panel-stat.note-style b {
+    color: #1b5e20;
+    font-weight: 400;
+}
   /* 風格備註 */
   .panel-note {
     background: #f0f7f0;
@@ -482,6 +486,7 @@
       color: #f0f0f0;
       border: 1px solid #3a3a3a;
     }
+.panel-stat.note-style b { color: #a5d6a7 !important; }
 
     /* 管理收藏按鈕 */
     .panel-manage-btn {
@@ -562,7 +567,7 @@
   </div>
 
   <script>
-    function toggleFontSize(el) {
+function toggleFontSize(el) {
   var b = el.querySelector('b');
   var isBig = el.getAttribute('data-big') === '1';
   b.style.fontSize = isBig ? '15px' : '22px';
