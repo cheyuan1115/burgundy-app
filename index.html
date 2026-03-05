@@ -1492,15 +1492,15 @@ const gridHTML = (meta && (meta.area_ha || meta.elevation || meta.soil)) ? `
 ` : '';
 
 const noteHTML = meta?.style_note ? `
-  <div class="panel-stat full-width" style="cursor:pointer;" onclick="toggleFontSize(this)">
-    <span>🍷 風格 👆</span>
-    <b style="font-weight:400; line-height:1.7;">${meta.style_note}</b>
+  <div class="panel-note" style="cursor:pointer;" onclick="toggleFontSize(this)">
+    <span style="font-size:12px;color:#2e7d32;text-transform:uppercase;letter-spacing:0.5px;">🍷 風格 👆</span>
+    <b style="font-weight:400; line-height:1.7; display:block; margin-top:3px;">${meta.style_note}</b>
   </div>` : '';
 
 const notesHTML = meta?.notes ? `
   <div class="panel-stat full-width" style="cursor:pointer;" onclick="toggleFontSize(this)">
     <span>📝 備註 👆</span>
-    <b style="font-weight:400; line-height:1.7;">${meta.notes}</b>
+    <b style="line-height:1.7;">${meta.notes}</b>
   </div>` : '';
 const wsHTML = meta?.link ? `<div style="margin-top:8px; font-size:15px;">
   <a href="javascript:void(0)" onclick="openExternalLink('${meta.link.replace(/'/g,"\\'")}')">🔗 Wine-Searcher</a>
