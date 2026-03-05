@@ -1401,10 +1401,11 @@ const ownersSection = ownersHTML ? `<div class="panel-owners">
 
 const finalHTML = `
   <div class="panel-header">
-    <div class="panel-title">${info.title}</div>
+    <div class="panel-title">${info.level === 'PC' && info.climats[0] ? info.climats[0] : info.title}</div>
     ${levelBadge}
   </div>
-  ${locationText ? `<div style="font-size:15px; color:#666; margin-bottom:10px;">📍 ${locationText}</div>` : ''}
+  ${info.level === 'PC' && info.title ? `<div style="font-size:16px; color:#888; margin-bottom:4px;">📍 ${info.title}</div>` : ''}
+  ${locationText && info.level !== 'PC' ? `<div style="font-size:15px; color:#666; margin-bottom:10px;">📍 ${locationText}</div>` : ''}
 ${topRowHTML}
   ${gridHTML}
   ${noteHTML}
