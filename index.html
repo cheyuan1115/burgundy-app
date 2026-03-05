@@ -1492,9 +1492,9 @@ const gridHTML = (meta && (meta.area_ha || meta.elevation || meta.soil)) ? `
 ` : '';
 
 const noteHTML = meta?.style_note ? `
-  <div class="panel-note" style="cursor:pointer;" onclick="toggleFontSize(this)">
-    <span style="font-size:12px;color:#2e7d32;text-transform:uppercase;letter-spacing:0.5px;">🍷 風格 👆</span>
-    <b style="font-weight:400; line-height:1.7; display:block; margin-top:3px;">${meta.style_note}</b>
+  <div class="panel-stat full-width" style="cursor:pointer; border-left: 4px solid #2e7d32;" onclick="toggleFontSize(this)">
+    <span style="color:#2e7d32;">🍷 風格 👆</span>
+    <b style="font-weight:400; line-height:1.7;">${meta.style_note}</b>
   </div>` : '';
 
 const notesHTML = meta?.notes ? `
