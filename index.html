@@ -512,6 +512,22 @@
   }
 </style>
   <script>
+    function toggleExpand(el) {
+  var b = el.querySelector('b');
+  var hint = el.querySelector('.expand-hint');
+  var isOpen = el.getAttribute('data-open') === '1';
+  if (isOpen) {
+    b.style.display = '-webkit-box';
+    b.style.webkitLineClamp = '3';
+    hint.textContent = '▼ 展開';
+    el.setAttribute('data-open', '0');
+  } else {
+    b.style.display = 'block';
+    b.style.webkitLineClamp = 'unset';
+    hint.textContent = '▲ 收合';
+    el.setAttribute('data-open', '1');
+  }
+}
     // 阻止 iOS 全頁 pinch-zoom
     (function () {
       function block(e){ e.preventDefault(); }
@@ -1486,32 +1502,16 @@ const gridHTML = (meta && (meta.area_ha || meta.elevation || meta.soil)) ? `
 ` : '';
 
 const noteHTML = meta?.style_note ? `
-  <div class="panel-stat full-width" style="cursor:pointer;" onclick="
-    var b=this.querySelector('b');
-    var isOpen=this.getAttribute('data-open')==='1';
-    b.style.webkitLineClamp=isOpen?'3':'unset';
-    b.style.display=isOpen?'-webkit-box':'block';
-    this.setAttribute('data-open', isOpen?'0':'1');
-    this.querySelector('.expand-hint').textContent=isOpen?'▼ 展開':'▲ 收合';
-  ">
+  <div class="panel-stat full-width" style="cursor:pointer;" onclick="toggleExpand(this)">
     <span>🍷 風格 <span class="expand-hint" style="float:right;color:#aaa;font-size:11px;">▼ 展開</span></span>
     <b style="font-weight:400;line-height:1.7;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;">${meta.style_note}</b>
   </div>` : '';
 
 const notesHTML = meta?.notes ? `
-  <div class="panel-stat full-width" style="cursor:pointer;" onclick="
-    var b=this.querySelector('b');
-    var isOpen=this.getAttribute('data-open')==='1';
-    b.style.webkitLineClamp=isOpen?'3':'unset';
-    b.style.display=isOpen?'-webkit-box':'block';
-    this.setAttribute('data-open', isOpen?'0':'1');
-    this.querySelector('.expand-hint').textContent=isOpen?'▼ 展開':'▲ 收合';
-  ">
+  <div class="panel-stat full-width" style="cursor:pointer;" onclick="toggleExpand(this)">
     <span>📝 備註 <span class="expand-hint" style="float:right;color:#aaa;font-size:11px;">▼ 展開</span></span>
     <b style="font-weight:400;line-height:1.7;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;">${meta.notes}</b>
-  </div>` : '';  <a href="javascript:void(0)" onclick="openExternalLink('${meta.link.replace(/'/g,"\\'")}')">🔗 Wine-Searcher</a>
-</div>` : '';
-
+  </div>` : '';
 const ownersSection = ownersHTML ? `<div class="panel-owners">
   <div class="panel-owners-title">🥂 擁有酒莊</div>
   <ul>${owners.map(owner => {
